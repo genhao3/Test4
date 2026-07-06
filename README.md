@@ -69,6 +69,8 @@ julia --project=. scripts/<脚本名>.jl
 - 运行：`julia --project=. scripts/plot_geometry.jl`
 - 输出：`lmc_geometry.png`
 
+![lmc_geometry](lmc_geometry.png)
+
 ---
 
 ### `plot_flux_surface.jl` — 磁面参考图（仅线圈几何，俯视 + 侧视）
@@ -78,6 +80,8 @@ julia --project=. scripts/<脚本名>.jl
 - 依赖：`lmc_field_utils.jl`、`Plots`(gr)
 - 运行：`julia --project=. scripts/plot_flux_surface.jl`
 - 输出：`lmc_flux_surface.png`
+
+![lmc_flux_surface](assets/lmc_flux_surface.png)
 
 ---
 
@@ -89,6 +93,8 @@ julia --project=. scripts/<脚本名>.jl
 - 运行：`julia --project=. scripts/plot_flux_surfaces.jl`
 - 输出：`lmc_flux_surface.png`（稳态静图，会覆盖上一个脚本的同名文件）+ `lmc_flux_transient.gif`
 
+![lmc_flux_transient](lmc_flux_transient.gif)
+
 ---
 
 ### `plot_flux_transient.jl` — 磁力线随电流上升的暂态动画（Plots）
@@ -98,6 +104,8 @@ julia --project=. scripts/<脚本名>.jl
 - 依赖：`Plots`(gr)、`Test4`
 - 运行：`julia --project=. scripts/plot_flux_transient.jl`
 - 输出：`lmc_flux_transient2.gif`
+
+![lmc_flux_transient2](lmc_flux_transient2.gif)
 
 > 注意：脚本顶部的 `using Test4` 目前被注释掉，但代码用 `Test4.` 前缀调用了包函数。若在全新会话中直接运行会报 `UndefVarError: Test4`；请先取消该行注释（或在已 `using Test4` 的会话中运行）。
 
@@ -112,6 +120,8 @@ julia --project=. scripts/<脚本名>.jl
 - 输出：`lmc_poincare.png`
 - 耗时：约 3–4 分钟（6 条磁面 × 2 个截面的长程追踪）
 
+![lmc_poincare](lmc_poincare.png)
+
 ---
 
 ### `plot_rotational_transform.jl` — 图 4：旋转变换 ι 随径向位置 x
@@ -122,6 +132,8 @@ julia --project=. scripts/<脚本名>.jl
 - 运行：`julia --project=. scripts/plot_rotational_transform.jl`
 - 输出：`lmc_rotational_transform.png`
 - 耗时：约 30 秒
+
+![lmc_rotational_transform](lmc_rotational_transform.png)
 
 ---
 
@@ -134,6 +146,8 @@ julia --project=. scripts/<脚本名>.jl
 - 输出：`lmc_figure5.png`
 - 耗时：约 2–3 分钟（约 38 个参数点，每点约 2 秒）
 
+![lmc_figure5](lmc_figure5.png)
+
 ---
 
 ### `plot_particles.jl` — 带电粒子约束动画
@@ -144,6 +158,8 @@ julia --project=. scripts/<脚本名>.jl
 - 运行：`julia --project=. scripts/plot_particles.jl`
 - 输出：`particles.gif`
 - 说明：粒子质量 / 电荷可在脚本顶部 `PARTICLE_MASS` / `PARTICLE_CHARGE` 处修改以切换粒子种类。
+
+![particles](particles.gif)
 
 ---
 
