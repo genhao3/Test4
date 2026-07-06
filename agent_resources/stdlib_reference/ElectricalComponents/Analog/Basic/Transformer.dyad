@@ -1,0 +1,34 @@
+"""
+Transformer with two ports.
+
+Models an ideal transformer with mutual inductance coupling between
+primary and secondary windings. The voltage-current relationships are:
+```math
+v_1 = L_1 \cdot \frac{di_1}{dt} + M \cdot \frac{di_2}{dt}
+```
+```math
+v_2 = M \cdot \frac{di_1}{dt} + L_2 \cdot \frac{di_2}{dt}
+```
+where `L1` and `L2` are the primary and secondary self-inductances,
+and `M` is the mutual (coupling) inductance.
+
+Corresponds to `Modelica.Electrical.Analog.Basic.Transformer`.
+"""
+component Transformer
+  extends ElectricalComponents.Analog.Interfaces.TwoPort
+  "Primary inductance"
+  parameter L1::Inductance = 1
+  "Secondary inductance"
+  parameter L2::Inductance = 1
+  "Coupling inductance"
+  parameter M::Inductance = 1
+relations
+  v1 = L1 * der(i1) + M * der(i2)
+  v2 = M * der(i1) + L2 * der(i2)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/Transformer.svg"}
+  }
+}
+end

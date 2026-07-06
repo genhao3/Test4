@@ -1,0 +1,27 @@
+"""
+Represents a mechanical rotational element fixed at a specified angle.
+
+This component models a shaft that is rigidly clamped or fixed in its housing,
+preventing any rotation. The angle of this fixed shaft, `phi0`, is a
+configurable parameter. It effectively acts as an angular boundary
+condition in a 1D rotational mechanical system. The core behavior is
+defined by the equation that sets the angle of its connection spline
+(`spline.phi`) to this fixed parameter `phi0`:
+```math
+spline.phi = phi0
+```
+"""
+component Fixed
+  "Rotational connector representing the mechanical interface of the fixed shaft."
+  spline = Spline() {^spline}
+  "The prescribed fixed angle of the shaft with respect to the housing."
+  parameter phi0::Angle = 0.0
+relations
+  spline.phi = phi0
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/Fixed.svg"}},
+  "_links": {
+    "spline": {"Dyad": {"placement": {"icon": {"x1": 450, "y1": -50, "x2": 550, "y2": 50}}}}
+  }
+}
+end

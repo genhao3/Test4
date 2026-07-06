@@ -1,0 +1,25 @@
+"""
+Measures the absolute rotational angle of a connected spline.
+This component models an ideal sensor that outputs the absolute angle of a spline.
+It directly reflects the `phi` variable of an associated `spline` object, which is
+assumed to be defined in the extended `PartialAbsoluteSensor` or through a
+connection. The relationship defining the sensor's output is:
+```math
+phi_{sensor} = spline.phi
+```
+There are no dynamics, delays, or inaccuracies modeled in this sensor;
+it provides a perfect, instantaneous reading of the spline's angle.
+"""
+component AngleSensor
+  extends RotationalComponents.Interfaces.PartialAbsoluteSensor
+  "Absolute angle of spline as output signal"
+  phi = RealOutput() {^phi}
+relations
+  phi = spline.phi
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/SingleSplineSensor.svg"}},
+  "_links": {
+    "phi": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}}
+  }
+}
+end

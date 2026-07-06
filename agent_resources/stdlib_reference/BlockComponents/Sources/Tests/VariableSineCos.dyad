@@ -1,0 +1,83 @@
+"""
+Test component for sine and cosine generators with variable frequency and amplitude inputs.
+
+Creates a test environment that connects amplitude and frequency input sources to sine and cosine
+wave generators. The amplitude source is a ramp that starts at 2 and decreases to 0 over 3 seconds,
+while the frequency is held constant at 2 Hz. This test setup allows visualization of how the wave
+generators respond to changing amplitude while maintaining a constant frequency.
+"""
+test component VariableSinCos
+  "Sine wave generator with variable frequency and amplitude inputs"
+  sine_wave = BlockComponents.Sources.SineVariableFrequencyAndAmplitude() {^sine_wave}
+  "Cosine wave generator with variable frequency and amplitude inputs"
+  cos_wave = BlockComponents.Sources.CosineVariableFrequencyAndAmplitude() {^cos_wave}
+  "Amplitude source that starts at 2 and linearly decreases to 0 over 3 seconds"
+  amplitude_source = BlockComponents.Sources.Ramp(start_time = 0, offset = 2, duration = 3, height = -2) {^amplitude_source}
+  "Frequency source providing a constant value of 2 Hz"
+  frequency_source = BlockComponents.Sources.Constant(k = 2) {^frequency_source}
+relations
+  connect(cos_wave.amplitude, amplitude_source.y) {^id5}
+  connect(amplitude_source.y, sine_wave.amplitude) {^id6}
+  connect(frequency_source.y, sine_wave.frequency) {^id7}
+  connect(frequency_source.y, cos_wave.frequency) {^id8}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {"case1": {"stop": 10, "signals": ["sine_wave.y", "cos_wave.y"]}}
+  },
+  "_links": {
+    "sine_wave": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 630, "y1": 340, "x2": 730, "y2": 440, "rot": 0}
+        }
+      }
+    },
+    "cos_wave": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 640, "y1": 90, "x2": 740, "y2": 190, "rot": 0}
+        }
+      }
+    },
+    "amplitude_source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 220, "y1": 100, "x2": 320, "y2": 200, "rot": 0}
+        }
+      }
+    },
+    "frequency_source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 210, "y1": 340, "x2": 310, "y2": 440, "rot": 0}
+        }
+      }
+    },
+    "id5": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 450, "y": 114}, {"x": 450, "y": 150}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id6": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 455, "y": 150}, {"x": 455, "y": 362}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 390}, {"x": 500, "y": 413}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 390}, {"x": 500, "y": 163}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

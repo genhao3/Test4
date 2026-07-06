@@ -1,0 +1,58 @@
+"""
+Test harness for the Limiter component that constrains signals to specified bounds.
+
+This test component creates a signal chain that feeds a high-amplitude sine wave through
+an integrator and then into a limiter with bounds at -3 and 3. The limiter constrains the
+integrated sine wave output to stay within the specified bounds, demonstrating how signal
+limiting works in practice. The test includes verification of expected output values.
+"""
+test component Limiter
+  "Limiter block that constraints signals between -3 and 3"
+  limiter = BlockComponents.Nonlinear.Limiter(y_max = 3, y_min = -3) {^limiter}
+  "Integrator block that accumulates the input signal"
+  integrator = BlockComponents.Continuous.Integrator() {^integrator}
+  "Sine wave generator with large amplitude to drive the system"
+  sine = BlockComponents.Sources.Sine(amplitude = 4 * π, frequency = 1) {^sine}
+relations
+  "Connect sine output to integrator input"
+  connect(sine.y, integrator.u) {^id4}
+  "Connect integrator output to limiter input"
+  connect(integrator.y, limiter.u) {^id5}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "atol": {"limiter.y": 0.000001},
+        "expect": {"signals": ["limiter.y"], "final": {"limiter.y": 0}}
+      }
+    }
+  },
+  "_links": {
+    "limiter": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 280, "y1": 20, "x2": 380, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 150, "y1": 20, "x2": 250, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "sine": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id4": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id5": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

@@ -1,0 +1,82 @@
+"""
+Models a test fluid system where a step-defined pressure source drives flow through a pipe into a fixed volume.
+
+This `FluidSystem` component models the dynamic behavior of a fluid flowing from a pressure source
+through a pipe into a fixed volume. The pressure at the source is defined by a step input signal `signal.y`.
+The fluid is characterized by the `medium` properties, which are isothermal and compressible.
+The `tube` component accounts for frictional losses and optionally fluid inertia, with its geometry
+defined by `tube_area` and `length`. The `vol` component represents a terminal volume where fluid
+accumulates or is discharged.
+"""
+example component FluidSystem
+  "Step input signal dictating the boundary pressure."
+  signal = BlockComponents.Sources.Step(height = 1e6, start_time = 0.5) {^signal}
+  "Boundary pressure source."
+  src = HydraulicComponents.Sources.BoundaryPressure() {^src}
+  "Fixed volume reservoir."
+  vol = HydraulicComponents.Vessels.FixedVolume(vol = 10.0, p0 = 0.0) {^vol}
+  "Fluid conduit (pipe) with friction and optional inertia."
+  tube = HydraulicComponents.Pipes.TubeBase(area = tube_area, head_factor = 1, length = 50, shape_factor = 64, add_inertia = add_inertia, perimeter = 2 * sqrt(tube_area * pi), m_flow0 = 0) {^tube}
+  "Cross-sectional area of the tube."
+  parameter tube_area::Area = 0.01
+  "Boolean flag to include fluid inertia in the tube model."
+  parameter add_inertia::Boolean = true
+  "Wetted perimeter of the tube, calculated from tube_area assuming a circular cross-section."
+  final parameter tube_perimeter::Length = 2 * sqrt(tube_area * pi)
+  "Path defining the properties of the working fluid (isothermal, compressible)."
+  path medium::HydraulicComponents.Interfaces.AbstractMedium = IsothermalCompressible(bulk_modulus = 1e9, let_gas = false)
+relations
+  connect(signal.y, src.p) {^id5}
+  connect(src.port, tube.port_a) {^id6}
+  connect(tube.port_b, vol.port) {^id7}
+  continuity(medium, vol.port.medium)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://HydraulicComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 2,
+        "atol": {"vol.rho": 0.001, "vol.port.p": 150, "tube.m_flow": 0.006},
+        "expect": {"signals": ["vol.rho", "vol.port.p", "tube.m_flow"]}
+      }
+    }
+  },
+  "_links": {
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 130, "y1": 280, "x2": 230, "y2": 380, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "src": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 340, "y1": 280, "x2": 440, "y2": 380, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "vol": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 920, "y1": 280, "x2": 820, "y2": 380, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "tube": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 550, "y1": 280, "x2": 650, "y2": 380, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id5": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id6": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id7": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

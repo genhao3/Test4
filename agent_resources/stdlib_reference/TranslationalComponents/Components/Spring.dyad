@@ -1,0 +1,25 @@
+"""
+Linear 1D translational spring relating force to displacement via Hooke's Law.
+
+This component represents a one-dimensional translational mechanical spring.
+It models the linear relationship between the force ($f$) exerted by the
+spring and its deformation ($s_{rel}$) relative to an unstretched length ($s_{rel0}$).
+The governing equation is Hooke's Law:
+```math
+f = c \cdot (s_{rel} - s_{rel0})
+```
+Here, `c` is the spring constant (stiffness), $s_{rel}$ is the current
+relative displacement between the spring's two connection flanges (typically
+inherited from `PartialCompliant`), and $s_{rel0}$ is the relative displacement
+at which the spring exerts no force.
+"""
+component Spring
+  extends TranslationalComponents.Interfaces.PartialCompliant
+  "Spring constant, representing the stiffness of the spring."
+  parameter c::TranslationalSpringConstant(min=0)
+  "Unstretched relative displacement of the spring, where the spring force is zero."
+  parameter s_rel0::Distance = 0
+relations
+  f = c * (s_rel - s_rel0)
+metadata {"Dyad": {"icons": {"default": "dyad://TranslationalComponents/Spring.svg"}}}
+end

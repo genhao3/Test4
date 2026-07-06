@@ -1,0 +1,48 @@
+"""
+Generates a pulse signal with configurable parameters and integrates it.
+
+This test component demonstrates the connection of a Pulse signal generator to an
+Integrator block, showing how the integrated value of a periodic pulse signal evolves
+over time. The pulse signal alternates between two levels (offset and offset+amplitude)
+based on the duty cycle and period parameters. The resulting waveform is then integrated
+over time.
+"""
+test component Pulse
+  "Integrator that accumulates the pulse signal value over time"
+  integrator = BlockComponents.Continuous.Integrator() {^integrator}
+  "Pulse signal generator with configurable amplitude, duty cycle, offset, period and start time"
+  signal = BlockComponents.Sources.Pulse(amplitude = 1.5, duty_cycle = 0.5, offset = 0.75, period = 0.75, start_time = 0.5) {^signal}
+relations
+  "Connects the pulse signal output to the integrator input"
+  connect(signal.y, integrator.u) {^id3}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 3,
+        "expect": {
+          "signals": ["signal.y", "integrator.x"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 155, "y1": 20, "x2": 255, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

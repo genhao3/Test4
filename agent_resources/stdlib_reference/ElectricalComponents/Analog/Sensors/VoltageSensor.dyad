@@ -1,0 +1,59 @@
+"""
+Measures the electrical potential difference between its two connection terminals.
+
+This component models an ideal voltmeter. It is characterized by an infinite input
+impedance, meaning it draws no current from the circuit it is measuring. The voltage
+`v` across the sensor is determined by the difference in electrical potential between
+its positive pin `p` and its negative pin `n`.
+This relationship is defined by the equation:
+```math
+v = p.v - n.v
+```
+The currents flowing into both pins are constrained to be zero to ensure ideal behavior:
+```math
+p.i = 0
+```
+```math
+n.i = 0
+```
+The pins `p` and `n` are of type `Pin`, representing electrical connection points, and `v`
+is a `RealOutput` providing the measured voltage value.
+"""
+component VoltageSensor
+  "Positive electrical connection pin of the voltmeter."
+  p = Pin() {^p}
+  "Negative electrical connection pin of the voltmeter."
+  n = Pin() {^n}
+  "Output signal representing the measured voltage difference (p.v - n.v)."
+  v = RealOutput() {^v}
+relations
+  p.i = 0
+  n.i = 0
+  v = p.v - n.v
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "V", "x": 500, "y": 713, "rot": 0}
+    ],
+    "icons": {"default": "dyad://ElectricalComponents/TwoPinSensor.svg"}
+  },
+  "_links": {
+    "p": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "n": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "neg", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    },
+    "v": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

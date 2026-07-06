@@ -1,0 +1,74 @@
+"""
+First example: simple drive train.
+
+The drive train consists of a motor inertia which is driven by a sine-wave
+motor torque. Via a gearbox the rotational energy is transmitted to a load
+inertia. Elasticity in the gearbox is modeled by a spring element. A linear
+damper is used to model the damping in the gearbox bearing.
+
+In Dyad, support flanges are always present. Both torque source and ideal gear
+supports are explicitly connected to the fixed reference, matching the MSL
+variant with useSupport=true.
+
+Note: In Dyad (where support is always present), this model is topologically
+identical to FirstGrounded. Both are provided for MSL parity.
+
+Corresponds to Modelica.Mechanics.Rotational.Examples.First.
+StopTime=1.0, Interval=0.001.
+"""
+example component First
+  "Fixed mechanical ground."
+  fixed = RotationalComponents.Components.Fixed() {^fixed}
+  "Torque source driven by external sine signal (useSupport=true in MSL)."
+  torque = RotationalComponents.Sources.TorqueSource() {^torque}
+  "Motor inertia, J=0.1 kg.m^2."
+  inertia1 = RotationalComponents.Components.Inertia(J = 0.1) {^inertia1}
+  "Ideal gear with ratio=10 (useSupport=true in MSL)."
+  ideal_gear = RotationalComponents.Components.IdealGear(ratio = 10) {^ideal_gear}
+  "Intermediate inertia after gearbox, J=2 kg.m^2."
+  inertia2 = RotationalComponents.Components.Inertia(J = 2) {^inertia2}
+  "Torsional spring in gearbox, c=1e4 N.m/rad."
+  spring = RotationalComponents.Components.Spring(c = 1e4) {^spring}
+  "Load inertia, J=2 kg.m^2."
+  inertia3 = RotationalComponents.Components.Inertia(J = 2) {^inertia3}
+  "Bearing damper, d=10 N.m.s/rad."
+  damper = RotationalComponents.Components.Damper(d = 10) {^damper}
+  "Sine torque signal, amplitude=10 N.m, frequency=5 Hz."
+  sine = BlockComponents.Sources.Sine(amplitude = 10, frequency = 5) {^sine}
+relations
+  initial inertia2.phi = 0
+  initial inertia2.w = 0
+  initial spring.phi_rel = 0
+  initial inertia3.w = 0
+  connect(sine.y, torque.tau)
+  connect(torque.spline, inertia1.spline_a)
+  connect(torque.support, fixed.spline)
+  connect(inertia1.spline_b, ideal_gear.spline_a)
+  connect(ideal_gear.spline_b, inertia2.spline_a)
+  connect(ideal_gear.support, fixed.spline)
+  connect(inertia2.spline_b, spring.spline_a, damper.spline_a)
+  connect(spring.spline_b, inertia3.spline_a)
+  connect(damper.spline_b, fixed.spline)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "expect": {"initial": {"inertia2.phi": 0, "inertia2.w": 0, "inertia3.w": 0}}
+      }
+    }
+  },
+  "_links": {
+    "fixed": {},
+    "torque": {},
+    "inertia1": {},
+    "ideal_gear": {},
+    "inertia2": {},
+    "spring": {},
+    "inertia3": {},
+    "damper": {},
+    "sine": {}
+  }
+}
+end

@@ -1,0 +1,31 @@
+"""
+Imposes a specified temperature at a thermal connection point.
+
+This component establishes a thermal boundary condition where the temperature is dictated by an external input signal.
+It acts as an ideal thermal reservoir, capable of instantaneously providing or absorbing the necessary heat flow
+to maintain its connection `port` at the temperature specified by the `RealInput` `T`.
+The core behavior is defined by the equation $port.T = T$,
+where `port.T` is the temperature of the thermal port and `T` is the input signal in Kelvin.
+"""
+component PrescribedTemperature
+  "Thermal connection point where the temperature is prescribed."
+  port = HeatPort() {^port}
+  "External real input signal representing the prescribed temperature in Kelvin."
+  T = RealInput() {^T}
+relations
+  port.T = T
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ThermalComponents/PrescribedTemperature.svg"}
+  },
+  "_links": {
+    "port": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "port_b", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    },
+    "T": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

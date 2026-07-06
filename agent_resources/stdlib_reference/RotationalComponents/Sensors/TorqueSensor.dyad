@@ -1,0 +1,37 @@
+"""
+Ideal sensor measuring the torque transmitted between two rotational splines.
+
+This ideal sensor measures the torque exchanged between two coaxial rotational splines,
+`spline_a` and `spline_b` It enforces that the splines are rigidly connected,
+meaning there is no relative angular displacement between them. The relationship
+is described by the equation:
+```math
+\text{spline\\_a}.\\phi = \text{spline\\_b}.\\phi
+```
+The sensor provides an output signal, `tau`, which represents the torque transmitted
+through the splines.
+This output is set equal to the torque acting on `spline_a` (denoted \$\tau_a\$):
+```math
+\tau = \text{spline\\_a}.\tau
+```
+where \$\tau_a\$ is the torque variable of the `spline_a` connector. This is an
+ideal component as it introduces no mechanical losses, inertia, or backlash.
+"""
+component TorqueSensor
+  extends RotationalComponents.Interfaces.PartialRelativeSensor
+  "Output signal representing the measured torque transmitted between the splines."
+  tau = RealOutput() {^tau}
+relations
+  spline_a.phi = spline_b.phi
+  spline_a.tau = tau
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/Sensor-Power-Torque.svg"}},
+  "_links": {
+    "tau": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 100, "y1": 950, "x2": 200, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

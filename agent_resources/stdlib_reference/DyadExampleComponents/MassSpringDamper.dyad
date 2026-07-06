@@ -1,0 +1,71 @@
+component MassSpringDamper
+  mass = TranslationalComponents.Components.Mass(m = m, L = 0.0, g = g, theta = theta) {^mass}
+  spring_damper = TranslationalComponents.Components.SpringDamper(d = d, c = c, s_rel0 = missing) {^spring_damper}
+  flange_m = Flange() {^flange_m}
+  flange_sd = Flange() {^flange_sd}
+  "Component mass"
+  parameter m::Dyad.Mass
+  "Stiffness of the spring"
+  parameter c::TranslationalSpringConstant
+  "Damping coefficient"
+  parameter d::DampingCoefficient
+  "Gravity"
+  parameter g::Acceleration
+  "Angle of motion with +X axis"
+  parameter theta::Angle = 0
+relations
+  guess spring_damper.s_rel0 = 0
+  connect(flange_m, mass.flange_b, spring_damper.flange_a) {^id5}
+  connect(flange_sd, spring_damper.flange_b) {^id6}
+metadata {
+  "Dyad": {"icons": {"default": "dyad://DyadExampleComponents/mass_spring_damper.svg"}},
+  "_links": {
+    "mass": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 100, "y1": 50, "x2": 200, "y2": 150, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 200, "y1": 300, "x2": 300, "y2": 400, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "spring_damper": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 300, "y1": 200, "x2": 400, "y2": 300, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 450, "y1": 450, "x2": 550, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "flange_m": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -40, "y1": 460, "x2": 40, "y2": 540, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "flange_sd": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 960, "y1": 460, "x2": 1040, "y2": 540, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id5": {
+      "Dyad": {
+        "edges": [
+          {"S": -1, "M": [], "E": 1},
+          {"S": -1, "M": [{"x": 400, "y": 350}], "E": 2},
+          {"S": -1, "M": [], "E": 3}
+        ],
+        "junctions": [{"x": 400, "y": 500}],
+        "renderStyle": "standard"
+      }
+    },
+    "id6": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

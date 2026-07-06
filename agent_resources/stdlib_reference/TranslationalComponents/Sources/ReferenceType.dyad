@@ -1,0 +1,13 @@
+"""
+Type of reference signal handling for position and speed source components.
+
+- Exact: The reference signal is treated exactly. The solver differentiates the input
+  signal as needed. Only possible if the input is defined by an analytical function
+  that is sufficiently differentiable.
+- Filtered: The reference signal is filtered. A dynamic filter smooths the input and
+  provides the required derivatives.
+  - `f_crit` [Hz]: Critical frequency of the filter (default 50.0)
+"""
+enum ReferenceType =
+  | Exact
+  | Filtered(f_crit::Frequency = 50.0)

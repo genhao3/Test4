@@ -1,0 +1,69 @@
+"""
+Ideal sensor to measure the absolute angular velocity, torque, and power between two splines.
+
+This component serves as an ideal sensor for rotational mechanical systems.
+It provides output signals for the absolute angular velocity of its primary connection
+point (`spline_a`), the torque flowing through this connection, and the instantaneous
+mechanical power. As an ideal sensor, it introduces no parasitic effects like inertia
+or damping and its measurements are exact. The key relationships are:
+The absolute angular velocity `w` of `spline_a`:
+```math
+w = \frac{d\\phi_a}{dt}
+```
+The measured torque \$\tau\$ is the torque at `spline_a`:
+```math
+\tau = \text{spline\\_a}.\\tau
+```
+The mechanical power \$P\$:
+```math
+P = \tau \\cdot w
+```
+The component ensures that its two connection splines, `spline_a` and `spline_b`,
+have the same absolute angle (`spline_a.phi = spline_b.phi`), indicating a rigid passthrough.
+"""
+component MultiSensor
+  extends RotationalComponents.Interfaces.PartialRelativeSensor
+  "Power in spline `spline_a` as output signal"
+  power = RealOutput() {^power}
+  "Torque in spline `spline_a` as output signal"
+  tau = RealOutput() {^tau}
+  "Absolute angular velocity of spline `spline_a` as output signal"
+  w = RealOutput() {^w}
+relations
+  spline_a.phi = spline_b.phi
+  w = der(spline_a.phi)
+  tau = spline_a.tau
+  power = tau * w
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/MultiSensor.svg"},
+    "labels": [
+      {"label": "W", "x": 300, "y": 900, "rot": 0,
+        "attrs": {"font-size": "140"}},
+      {"label": "N.m", "x": 650, "y": 900, "rot": 0, 
+        "attrs": {"font-size": "140"}},
+      {"label": "rad", "x": 910, "y": 830, "rot": 0, 
+        "attrs": {"font-size": "140"}},
+      {"label": "/s", "x": 910, "y": 930, "rot": 0, 
+        "attrs": {"font-size": "140"}}
+    ]
+  },
+  "_links": {
+    "power": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 160, "y1": 950, "x2": 260, "y2": 1050, "rot": 90}}
+      }
+    },
+    "tau": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 90}}
+      }
+    },
+    "w": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 760, "y1": 950, "x2": 860, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

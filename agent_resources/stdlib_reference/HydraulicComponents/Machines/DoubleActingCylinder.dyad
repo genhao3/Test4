@@ -1,0 +1,112 @@
+"""
+ The Double Acting Cylinder model is a hydraulic actuator with two fluid ports (port_a and port_b) 
+
+ Here a piston moves inside a cylinder when pressurized. The 
+ model includes parameters for piston and chamber geometry (areas, length), piston
+ mass, initial position, end-stop stiffness and damping. It calculates piston motion
+ according to fluid pressure differences at the ports, incorporates end-stop spring-damper
+ forces when the piston hits the cylinder ends, and tracks changing chamber volumes and 
+ fluid masses as the piston moves. This model is typically used to simulate realistic hydraulic 
+ or pneumatic actuator behavior in dynamic system models.
+"""
+component DoubleActingCylinder
+  port_a = HydraulicComponents.Interfaces.Port() {^port_a}
+  port_b = HydraulicComponents.Interfaces.Port() {^port_b}
+  flange = Flange() {^flange}
+  "Length of the cylinder"
+  parameter L::Length = 1.5
+  "Mass of the Piston"
+  parameter M::Mass = 0.1
+  "Area of cross section of volume connected to 'port_a'"
+  parameter area_a::Area = 908e-3
+  "Area of cross section of volume connected to 'port_b'"
+  parameter area_b::Area = 360e-3
+  final parameter lmin::Length = 0.001
+  "initial position of piston"
+  parameter s0::Position = 0.5
+  "Contact stiffness [N/m] (typical for steel)"
+  parameter k_contact::TranslationalSpringConstant = 1e8
+  "Contact damping [N.s/m] (energy dissipation)"
+  parameter d_contact::TranslationalDampingConstant = 1e4
+  "Contact force from end stops"
+  variable contact_force::Force
+  "Mass of incoming fluid from `port_a`"
+  variable m_a::Mass
+  "Mass of incoming fluid from `port_b`"
+  variable m_b::Mass
+  "Position of center of mass"
+  variable s::Position
+  "Velocity"
+  variable v::Velocity(guess = 0)
+  variable F_dp::Dyad.Force
+  "density at port a"
+  variable d_a::Density
+  "density at port b"
+  variable d_b::Density
+  variable s_a::Position
+  variable s_b::Position
+relations
+  initial s = s0
+  F_dp = area_a * port_a.p - area_b * port_b.p
+  d_a = density(port_a.medium, port_a.p)
+  d_b = density(port_b.medium, port_b.p)
+  s_a = s + lmin
+  s_b = L - s + lmin
+  m_a = d_a * area_a * s_a
+  m_b = d_b * area_b * s_b
+  port_a.m_flow = der(m_a)
+  port_b.m_flow = der(m_b)
+  flange.s = s
+  v = der(s)
+  contact_force = ifelse(s <= lmin, k_contact * (lmin - s) - d_contact * v, ifelse(s > L, k_contact * (L - s) - d_contact * v, 0))
+  "contact_force = if s<lmin then k_contact*(lmin-s)-d_contact*v else if s>L then k_contact*(L-s)-d_contact*v else 0"
+  M * der(v) = F_dp + flange.f + contact_force
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true}
+  },
+  "_links": {
+    "port_a": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -50, "y1": 450, "x2": 50, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -50, "y1": 450, "x2": 50, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "port_b": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 950, "y1": 450, "x2": 1050, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 950, "y1": 450, "x2": 1050, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "flange": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 460, "y1": 1000, "x2": 560, "y2": 1100, "rot": 0}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

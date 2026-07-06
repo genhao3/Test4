@@ -1,0 +1,157 @@
+component DCMotor
+  p = Pin() {^p}
+  n = Pin() {^n}
+  shaft = Spline() {^shaft}
+  housing = Spline() {^housing}
+  R1 = ElectricalComponents.Analog.Basic.Resistor(R = R) {^R1}
+  L1 = ElectricalComponents.Analog.Basic.Inductor(L = L) {^L1}
+  emf = ElectricalComponents.Analog.Basic.RotationalEMF(k = k) {^emf}
+  inertia = RotationalComponents.Components.Inertia(J = J) {^inertia}
+  friction = RotationalComponents.Components.Damper(d = f) {^friction}
+  "Armature resistance"
+  parameter R::Resistance = 0.5
+  "Armature inductance"
+  parameter L::Inductance = 4.5e-3
+  "Motor constant"
+  parameter k::ElectricalTorqueConstant = 0.5
+  "Motor inertia"
+  parameter J::Inertia = 0.02
+  "Motor friction factor"
+  parameter f::RotationalDampingConstant = 0.01
+relations
+  initial inertia.phi = 0
+  connect(p, R1.p) {^id10}
+  connect(R1.n, L1.p) {^id11}
+  connect(L1.n, emf.p) {^id12}
+  connect(emf.n, n) {^id13}
+  connect(emf.rotor, inertia.spline_a, friction.spline_a) {^id14}
+  connect(friction.spline_b, emf.housing, housing) {^id15}
+  connect(inertia.spline_b, shaft) {^id16}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://DyadExampleComponents/DCMotor.svg"}
+  },
+  "_links": {
+    "p": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 120, "y1": -50, "x2": 220, "y2": 50, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "n": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 780, "y1": -50, "x2": 880, "y2": 50, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "shaft": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 950, "y1": 450, "x2": 1050, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "housing": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "R1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 200, "y1": 260, "x2": 300, "y2": 360, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "L1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 340, "y1": 260, "x2": 440, "y2": 360, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "emf": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 510, "y1": 550, "x2": 410, "y2": 450, "rot": 180}
+        },
+        "tags": []
+      }
+    },
+    "inertia": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 660, "y1": 450, "x2": 760, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "friction": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 660, "y1": 600, "x2": 760, "y2": 700, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 170, "y": 310}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id12": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 460, "y": 310}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 460, "y": 580}, {"x": 840, "y": 580}, {"x": 840, "y": 0}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [], "E": 2},
+          {"S": -1, "M": [{"x": 550, "y": 650}], "E": 3}
+        ],
+        "junctions": [{"x": 550, "y": 500}],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 900, "y": 650}, {"x": 900, "y": 790}], "E": -1},
+          {"S": -1, "M": [{"x": 370, "y": 790}, {"x": 370, "y": 500}], "E": 2},
+          {"S": -1, "M": [], "E": 3}
+        ],
+        "junctions": [{"x": 500, "y": 790}],
+        "renderStyle": "standard"
+      }
+    },
+    "id16": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

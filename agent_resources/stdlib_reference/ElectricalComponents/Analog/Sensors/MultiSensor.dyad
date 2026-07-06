@@ -1,0 +1,53 @@
+"""
+Provides combined voltage and current measurements from an electrical circuit.
+
+This component extends a `PowerSensor` to offer voltage, current and power
+readings as real-valued outputs. The output `v` represents the measured
+voltage, the output `i` represents the measured current and the output `power`
+represents power. `v` and `i` outputs are directly sourced from internal
+`voltage_sensor` and `current_sensor` subcomponents, which are part of the
+inherited `PowerSensor`. The defining equations from the `relations` block are:
+
+```math
+v = \text{voltage_sensor.v}
+```
+
+```math
+i = \text{current_sensor.i}
+```
+
+```math
+power = \text{voltage_sensor.v*current_sensor.i}
+```
+"""
+component MultiSensor
+  extends ElectricalComponents.Analog.Sensors.PowerSensor
+  "Output signal representing the measured current"
+  i = RealOutput() {^i}
+  "Output signal representing the measured voltage"
+  v = RealOutput() {^v}
+relations
+  i = current_sensor.i
+  v = voltage_sensor.v
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "M", "x": 500, "y": 713, "rot": 0}
+    ],
+    "icons": {"default": "dyad://ElectricalComponents/FourPinSensor.svg"}
+  },
+  "_links": {
+    "i": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 650, "y1": 950, "x2": 750, "y2": 1050, "rot": 90}}
+      }
+    },
+    "v": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 850, "y1": 950, "x2": 950, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

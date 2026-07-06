@@ -1,0 +1,77 @@
+"""
+An ideal electromechanical transducer coupling electrical voltage and current to rotational mechanical torque and angular velocity.
+
+This component models an ideal rotational electromotive force (EMF) device, acting as a bidirectional
+energy converter between the electrical and rotational mechanical domains. It establishes a relationship
+where the induced voltage (`v`) across its electrical terminals is directly proportional to the angular velocity
+(`w`) of its rotor, and conversely, the torque (`\tau`) generated on the rotor is directly proportional to the current
+(`i`) flowing through its electrical terminals. The constant of proportionality for these relationships is the
+electrical torque constant, `k`. The mechanical rotation and torque are defined relative to a
+housing or support structure.
+The defining equations for its behavior are:
+
+```math
+v = k \cdot w
+```
+
+and
+
+```math
+\tau = -k \cdot i
+```
+
+The negative sign in the torque equation is a convention related to motor action and the defined positive
+directions of current and torque.
+"""
+component RotationalEMF
+  "Positive electrical pin"
+  p = Pin() {^p}
+  "Negative electrical pin"
+  n = Pin() {^n}
+  "Rotor spline"
+  rotor = Spline() {^rotor}
+  "Housing (support) of the emf shaft"
+  housing = Spline() {^housing}
+  "Electrical torque constant / back-EMF constant"
+  parameter k::ElectricalTorqueConstant
+  "Voltage drop between the two pins"
+  variable v::Voltage
+  "Current flowing from positive to negative pin"
+  variable i::Current
+  "Angle of shaft flange with respect to housing spline"
+  variable phi::Angle
+  "Angular velocity of flange relative to housing spline"
+  variable w::AngularVelocity
+  "Torque of flange"
+  variable tau::Torque
+relations
+  v = p.v - n.v
+  0 = p.i + n.i
+  i = p.i
+  phi = rotor.phi - housing.phi
+  w = der(phi)
+  k * w = v
+  tau = -k * i
+  tau = rotor.tau
+  0 = housing.tau + rotor.tau
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/RotationalEMF.svg"}
+  },
+  "_links": {
+    "p": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": 450, "y1": -50, "x2": 550, "y2": 50}}
+      }
+    },
+    "n": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "neg", "x1": 450, "y1": 950, "x2": 550, "y2": 1050}}
+      }
+    },
+    "rotor": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}},
+    "housing": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

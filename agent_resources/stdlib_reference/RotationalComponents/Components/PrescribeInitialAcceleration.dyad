@@ -1,0 +1,35 @@
+"""
+Defines an initial angular acceleration for a rotational mechanical spline.
+
+This component sets a specific initial angular acceleration via its internal `Spline` subcomponent.
+The user provides the desired initial angular acceleration as the parameter `a0`.
+At the commencement of the simulation, an internal variable `a` is equated to `a0`.
+This acceleration `a` is then imposed as the second time derivative of the `Spline`'s
+angular displacement (`phi`), as described by the equation:
+```math
+\frac{d^2\\phi_{spline}}{dt^2} = a
+```
+Simultaneously, the torque (`tau`) associated with the `spline` is maintained at zero,
+ensuring that this component only dictates kinematic motion (specifically initial acceleration)
+without applying any torque.
+"""
+component PrescribeInitialAcceleration
+  spline = Spline() {^spline}
+  "User-defined initial angular acceleration to be prescribed."
+  parameter a0::AngularAcceleration
+  "Angular acceleration."
+  variable a::AngularAcceleration
+relations
+  initial a = a0
+  der(der(spline.phi)) = a
+  spline.tau = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "initial a=$(a0)", "x": 500, "y": 800, "rot": 0}],
+    "icons": {"default": "dyad://RotationalComponents/Pos-Speed-Acc-Move.svg"}
+  },
+  "_links": {
+    "spline": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

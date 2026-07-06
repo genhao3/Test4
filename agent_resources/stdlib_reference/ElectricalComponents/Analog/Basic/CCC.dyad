@@ -1,0 +1,25 @@
+"""
+Linear current-controlled current source.
+
+The right port current is controlled by the left port current:
+```math
+i_2 = i_1 \cdot \text{gain}
+```
+The left port voltage is zero (zero input impedance).
+
+Corresponds to `Modelica.Electrical.Analog.Basic.CCC`.
+"""
+component CCC
+  extends ElectricalComponents.Analog.Interfaces.TwoPort
+  "Current gain"
+  parameter gain::Real = 1
+relations
+  i2 = i1 * gain
+  v1 = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/CCC.svg"}
+  }
+}
+end

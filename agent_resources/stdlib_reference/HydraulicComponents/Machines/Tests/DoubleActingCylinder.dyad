@@ -1,0 +1,99 @@
+"""
+This test case simulates a Double Acting cylinder with an external mass connected 
+to the piston via a flange. The piston starts at the center position, with higher 
+initial pressure in the fixed volume on the right side causing the piston to move 
+left and stop when it hits the left chamber end. At 1 second, the pressure at the 
+left side is increased, causing the piston to move right and stop upon hitting the 
+right chamber end. The connected mass follows the piston movement, demonstrating 
+the dynamic response of the cylinder and the attached load 
+"""
+test component DoubleActingCylinder
+  double_acting_cylinder = HydraulicComponents.Machines.DoubleActingCylinder(L = 1.0, M = 0.2, area_a = 0.001, area_b = 0.001, s0 = 0.5) {^double_acting_cylinder}
+  port_a_side = HydraulicComponents.Sources.BoundaryPressure() {^port_a_side}
+  fixed_volume = HydraulicComponents.Vessels.FixedVolume(p0 = 1e6, vol = 100) {^fixed_volume}
+  step = BlockComponents.Sources.Step(start_time = 1, height = 2e6) {^step}
+  mass = TranslationalComponents.Components.Mass(L = 1, m = 0.5) {^mass}
+  path medium::HydraulicComponents.Interfaces.AbstractMedium = IsothermalCompressible(bulk_modulus = 1e9, let_gas = false)
+relations
+  initial double_acting_cylinder.port_a.m_flow = 0.0
+  connect(port_a_side.port, double_acting_cylinder.port_a) {^id6}
+  connect(step.y, port_a_side.p) {^id7}
+  continuity(medium, fixed_volume.port.medium)
+  continuity(medium, port_a_side.port.medium)
+  connect(double_acting_cylinder.flange, mass.flange_a) {^id8}
+  connect(fixed_volume.port, double_acting_cylinder.port_b) {^id9}
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {
+      "case1": {
+        "stop": 3,
+        "atol": {"double_acting_cylinder.s": 0.01},
+        "expect": {"signals": ["double_acting_cylinder.s"]}
+      }
+    },
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://Dyad/Default.svg"},
+    "path": {},
+    "doc": {"behavior": true}
+  },
+  "_links": {
+    "double_acting_cylinder": {
+      "Dyad": {"placement": {"diagram": {"x1": 450, "y1": 400, "x2": 550, "y2": 500}}}
+    },
+    "port_a_side": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 290, "y1": 400, "x2": 190, "y2": 500, "rot": 180}
+        },
+        "tags": []
+      }
+    },
+    "fixed_volume": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 800, "y1": 400, "x2": 700, "y2": 500, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "step": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": 20, "y1": 180, "x2": 120, "y2": 280, "sw": 0.1, "sh": 0.1, "rot": 0}
+        }
+      }
+    },
+    "mass": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": 590, "x2": 690, "y1": 620, "y2": 720, "sh": 1, "sw": 1, "rot": 0}
+        }
+      }
+    },
+    "id6": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 156.5, "y": 230}, {"x": 156.5, "y": 450}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 670}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

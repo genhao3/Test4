@@ -1,0 +1,19 @@
+"""
+Rod without inertia.
+
+A translational rod **without inertia** and two rigidly connected flanges.
+The rod transmits force without any mass effect:
+```math
+0 = flange\_a.f + flange\_b.f
+```
+The rod length `L` (inherited from `PartialRigid`) sets the fixed distance between flanges:
+```math
+flange\_b.s - flange\_a.s = L
+```
+"""
+component Rod
+  extends TranslationalComponents.Interfaces.PartialRigid
+relations
+  0 = flange_a.f + flange_b.f
+metadata {"Dyad": {"icons": {"default": "dyad://TranslationalComponents/Rod.svg"}}}
+end

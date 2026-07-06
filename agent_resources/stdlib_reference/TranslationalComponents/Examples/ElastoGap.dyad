@@ -1,0 +1,227 @@
+"""
+Demonstrate usage of ElastoGap.
+
+Replicates the structure of Modelica.Mechanics.Translational.Examples.ElastoGap.
+
+Two parallel systems compare the behaviour of SpringDamper (top) vs ElastoGap (bottom)
+for identical mass/stiffness/damping. Both masses start at the same position (s=2)
+and oscillate between two walls (rod ends) separated by 4 m via a Fixed at the centre.
+
+**Top system (SpringDamper):** mass1 is connected between the rod ends through two
+SpringDampers (c=10, d=1.5, s_rel0=1). The spring-damper forces act continuously,
+so mass1 always feels the restoring force.
+
+**Bottom system (ElastoGap):** mass2 is connected through two ElastoGaps (c=10,
+d=1.5, s_rel0=1.5). The gap allows mass2 to move freely in the region
+−0.5 m < s < 0.5 m (no contact force), which reduces the effective eigenfrequency
+compared to the top system.
+
+Each ElastoGap heat port is connected to a FixedTemperature boundary so the thermal
+energy balance is closed.
+"""
+example component ElastoGap
+  "Fixed reference at centre"
+  fixed = TranslationalComponents.Components.Fixed() {^fixed}
+  "Left rod (L=2)"
+  rod1 = TranslationalComponents.Components.Rod(L = 2) {^rod1}
+  "Right rod (L=2)"
+  rod2 = TranslationalComponents.Components.Rod(L = 2) {^rod2}
+  "Left spring-damper (top system)"
+  spring_damper1 = TranslationalComponents.Components.SpringDamper(c = 10, s_rel0 = 1, d = 1.5) {^spring_damper1}
+  "Right spring-damper (top system)"
+  spring_damper2 = TranslationalComponents.Components.SpringDamper(c = 10, s_rel0 = 1, d = 1.5) {^spring_damper2}
+  "Mass for the top system"
+  mass1 = TranslationalComponents.Components.Mass(m = 1, L = 0, s = initial 2, v = initial 0) {^mass1}
+  "Left elasto-gap (bottom system)"
+  elasto_gap1 = TranslationalComponents.Components.ElastoGap(c = 10, s_rel0 = 1.5, d = 1.5) {^elasto_gap1}
+  "Right elasto-gap (bottom system)"
+  elasto_gap2 = TranslationalComponents.Components.ElastoGap(c = 10, s_rel0 = 1.5, d = 1.5) {^elasto_gap2}
+  "Mass for the bottom system"
+  mass2 = TranslationalComponents.Components.Mass(m = 1, L = 0, s = initial 2, v = initial 0) {^mass2}
+  "Thermal boundary for elasto_gap1"
+  thermal_ground1 = ThermalComponents.Sources.FixedTemperature(T = 293.15) {^thermal_ground1}
+  "Thermal boundary for elasto_gap2"
+  thermal_ground2 = ThermalComponents.Sources.FixedTemperature(T = 293.15) {^thermal_ground2}
+relations
+  connect(spring_damper1.flange_a, rod1.flange_a) {^id12}
+  connect(spring_damper1.flange_b, mass1.flange_a) {^id13}
+  connect(mass1.flange_b, spring_damper2.flange_a) {^id14}
+  connect(spring_damper2.flange_b, rod2.flange_b) {^id15}
+  connect(elasto_gap1.flange_a, rod1.flange_a) {^id16}
+  connect(elasto_gap1.flange_b, mass2.flange_a) {^id17}
+  connect(mass2.flange_b, elasto_gap2.flange_a) {^id18}
+  connect(elasto_gap2.flange_b, rod2.flange_b) {^id19}
+  connect(elasto_gap1.heat_port, thermal_ground1.port) {^id20}
+  connect(elasto_gap2.heat_port, thermal_ground2.port) {^id21}
+  connect(rod1.flange_b, fixed.flange) {^id22}
+  connect(rod2.flange_a, fixed.flange) {^id23}
+  connect(rod1.flange_b, rod2.flange_a) {^id24}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "atol": {
+          "elasto_gap1.v_rel": 0.01,
+          "elasto_gap2.s_rel": 0.01,
+          "spring_damper1.v_rel": 0.001,
+          "spring_damper2.s_rel": 0.001
+        },
+        "expect": {
+          "final": {
+            "elasto_gap1.v_rel": 0.53753,
+            "elasto_gap2.s_rel": 2.70789,
+            "spring_damper1.v_rel": -0.00419,
+            "spring_damper2.s_rel": 2.00035
+          },
+          "signals": ["elasto_gap1.v_rel", "elasto_gap2.s_rel", "spring_damper1.v_rel", "spring_damper2.s_rel"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "fixed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 360, "y1": 290, "x2": 460, "y2": 390, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "rod1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 190, "y1": 190, "x2": 290, "y2": 290, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "rod2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 530, "y1": 190, "x2": 630, "y2": 290, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "spring_damper1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 190, "y1": 20, "x2": 290, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "spring_damper2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 520, "y1": 20, "x2": 620, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 350, "y1": 20, "x2": 450, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "elasto_gap1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 170, "y1": 450, "x2": 270, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "elasto_gap2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 530, "y1": 450, "x2": 630, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 360, "y1": 450, "x2": 460, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "thermal_ground1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -10, "y1": 620, "x2": 90, "y2": 720, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "thermal_ground2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 340, "y1": 640, "x2": 440, "y2": 740, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id12": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 135, "y": 70}, {"x": 135, "y": 240}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id14": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id15": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 655, "y": 70}, {"x": 655, "y": 240}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id16": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 135, "y": 500}, {"x": 135, "y": 240}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id17": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id18": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id19": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 655, "y": 500}, {"x": 655, "y": 240}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id20": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 140, "y": 550}, {"x": 140, "y": 670}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id21": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 470, "y": 550}, {"x": 470, "y": 690}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id22": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 410, "y": 240}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id23": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 410, "y": 240}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id24": {"Dyad": {"renderStyle": "standard", "edges": [{"S": 1, "E": 2, "M": []}]}}
+  }
+}
+end

@@ -1,0 +1,27 @@
+"""
+Represents a sliding mass with inertia, subject to external and gravitational forces.
+
+This component models the translational motion of a point mass along a single axis. It considers the mass's inertia, external forces applied through its two mechanical connection flanges (`flange_a` and `flange_b`), and a gravitational effect determined by parameters `g` and `theta`. The position `s`, velocity `v`, and acceleration `a` are related by `v = der(s)` and `a = der(v)`. The core dynamic behavior is defined by Newton's second law, expressed as:
+```math
+m \cdot (a + g \cdot \sin(\theta)) = \text{flange_a.f} + \text{flange_b.f}
+```
+where `m` is the mass, `a` is its acceleration, `g` is the gravitational acceleration parameter, `\theta` is the angle parameter, and `\text{flange_a.f} + \text{flange_b.f}` represents the sum of external forces applied via the flanges.
+"""
+component Mass
+  extends TranslationalComponents.Interfaces.PartialRigid
+  "Mass of the sliding body"
+  parameter m::Dyad.Mass
+  "Absolute velocity of the mass along its path of motion"
+  variable v::Velocity
+  "Absolute acceleration of the mass along its path of motion"
+  variable a::Acceleration
+  "Acceleration due to gravity; its effect is scaled by sin(theta) using the specified default or user-provided value."
+  parameter g::Acceleration = -9.80665
+  "Angle defining the path of motion relative to how gravity's influence is calculated as per the component's equations (0 for horizontal)."
+  parameter theta::Angle = 0.0
+relations
+  v = der(s)
+  a = der(v)
+  m * (a + g * sin(theta)) = flange_a.f + flange_b.f
+metadata {"Dyad": {"icons": {"default": "dyad://TranslationalComponents/Mass.svg"}}}
+end

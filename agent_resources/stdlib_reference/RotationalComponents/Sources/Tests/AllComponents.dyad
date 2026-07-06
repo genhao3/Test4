@@ -1,0 +1,83 @@
+"""
+Tests Position, SpeedSource, AccelerationSource, and Torque2 components,
+matching the source-related subsystems from MSL ModelicaTest.Rotational.AllComponents.
+
+Three subsystems from AllComponents are replicated here:
+
+1. Position (Filtered default, f_crit=50 Hz): Sine(f=1) → Position → Inertia(J=3)
+2. Speed + Torque2 (Filtered default): Sine(f=1) → SpeedSource → Inertia(J=3) → Torque2(Sine f=1) → Inertia(J=3)
+3. Accelerate: Sine(f=1) → AccelerationSource → Inertia(J=3)
+
+All supports are grounded to Fixed. Stop time = 0.9 s.
+"""
+test component AllComponents
+  "Fixed ground for all supports"
+  fixed = RotationalComponents.Components.Fixed()
+  "Sine reference for position source (f=1 Hz)"
+  sine_pos = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "Position source — default Filtered mode (f_crit=50 Hz)"
+  position = RotationalComponents.Sources.Position()
+  "Inertia driven by position source (MSL inertia9, J=3)"
+  inertia_pos = RotationalComponents.Components.Inertia(J = 3)
+  "Sine reference for speed source (f=1 Hz)"
+  sine_speed = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "SpeedSource — default Filtered mode (f_crit=50 Hz)"
+  speed = RotationalComponents.Sources.SpeedSource()
+  "Inertia driven by speed source (MSL inertia10, J=3)"
+  inertia_speed = RotationalComponents.Components.Inertia(J = 3)
+  "Sine input for Torque2 (f=1 Hz)"
+  sine_torque2 = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "Torque2 — acts between speed inertia and output inertia"
+  torque2 = RotationalComponents.Sources.Torque2()
+  "Inertia driven by Torque2 (MSL inertia13, J=3)"
+  inertia13 = RotationalComponents.Components.Inertia(J = 3)
+  "Sine reference for accelerate source (f=1 Hz)"
+  sine_acc = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "AccelerationSource"
+  accelerate = RotationalComponents.Sources.AccelerationSource()
+  "Inertia driven by accelerate source (MSL inertia11, J=3)"
+  inertia_acc = RotationalComponents.Components.Inertia(J = 3)
+relations
+  # Position subsystem
+  initial position.w = 0
+  connect(sine_pos.y, position.phi_ref)
+  connect(position.spline, inertia_pos.spline_a)
+  connect(position.support, fixed.spline)
+  # Speed + Torque2 subsystem
+  initial inertia13.phi = 0
+  initial inertia13.w = 0
+  connect(sine_speed.y, speed.w_ref)
+  connect(speed.spline, inertia_speed.spline_a)
+  connect(speed.support, fixed.spline)
+  connect(inertia_speed.spline_b, torque2.spline_a)
+  connect(torque2.spline_b, inertia13.spline_a)
+  connect(sine_torque2.y, torque2.tau)
+  # Accelerate subsystem
+  initial accelerate.phi = 0
+  initial accelerate.w = 0
+  connect(sine_acc.y, accelerate.a_ref)
+  connect(accelerate.spline, inertia_acc.spline_a)
+  connect(accelerate.support, fixed.spline)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 0.9,
+        "expect": {
+          "signals": [
+            "position.phi",
+            "position.w",
+            "speed.phi",
+            "speed.w",
+            "accelerate.phi",
+            "accelerate.w",
+            "inertia13.phi",
+            "inertia13.w"
+          ]
+        }
+      }
+    }
+  }
+}
+end

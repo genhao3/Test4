@@ -1,0 +1,31 @@
+"""
+Frame3D is the fundamental 3D connector used for 6DOF motion. Most components have one or several `Frame`
+connectors that can be connected together
+"""
+connector Frame3D
+  "Used to control rendering of `Frame3D` connectors"
+  parameter render::Boolean = false
+  "Radius of visualized connector"
+  parameter radius::Radius = 0.01
+  "Length of coordinate axes when visualized"
+  parameter length::Length = 1
+  "Position vector from the world frame to the frame origin, resolved in the world frame"
+  potential r_0::Position[3]
+  "Rotation matrix used to represent orientation"
+  potential R::Real[3,3]
+  "Cut force resolved in the connector frame"
+  flow f::Force[3]
+  "Cut torque resolved in the connector frame"
+  flow tau::Torque[3]
+metadata {
+  "Dyad": {
+    "labels": [
+      { "label": "$(instance)", "x": 500, "y": 1100, "layer": "icon" }
+    ],
+    "icons": {
+      "default": "dyad://Dyad/Frame3D.svg"
+    },
+    "path": { "stroke": "#cc3333" }
+  }
+}
+end

@@ -1,0 +1,61 @@
+"""
+Resistance of a rolling wheel.
+
+Simplified model of rolling resistance dependent on vertical wheel load
+(due to gravity, i.e. static only), inclination and rolling resistance
+coefficient.
+
+Matches MSL `Modelica.Mechanics.Translational.Components.RollingResistance`.
+Since Dyad does not support conditional connectors, the `cr` and
+`inclination` inputs are always visible. Connect them to
+`BlockComponents.Sources.Constant` blocks for constant values.
+
+The nominal (unregularised) rolling resistance force is:
+```math
+f_{nominal} = -C_r \\cdot f_{Weight} \\cdot \\cos(\\arctan(\\text{inclination}))
+```
+
+The rolling resistance is independent of speed but changes direction with
+velocity. To avoid numerical problems near zero velocity the force is
+regularised within `[-v0, v0]`. The regularisation type is selected by
+the structural parameter `reg` (see `Regularization` enum).
+
+Connect the `support` flange to a `Fixed` component for grounded behaviour.
+"""
+component RollingResistance
+  extends TranslationalComponents.Interfaces.PartialForce
+  "Rolling resistance coefficient"
+  cr = RealInput() {^cr}
+  "Inclination = tan(angle)"
+  inclination = RealInput() {^inclination}
+  "Wheel load due to gravity"
+  parameter fWeight::Dyad.Force
+  "Type of regularisation"
+  structural parameter reg::TranslationalComponents.Components.Regularization = TranslationalComponents.Components.Regularization.Exp()
+  "Regularisation below v0"
+  parameter v0::Velocity(min = eps(Float64)) = 0.1
+  "Velocity of flange with respect to support (= der(s))"
+  variable v::Velocity
+  "Nominal rolling resistance force without regularisation"
+  variable f_nominal::Dyad.Force
+relations
+  v = der(s)
+  f_nominal = -cr * fWeight * cos(atan(inclination))
+  switch reg
+    case Exp
+      f = -f_nominal * (2 / (1 + exp(-v / (0.01 * v0))) - 1)
+    case Sine
+      f = -f_nominal * ifelse(abs(v) >= v0, sign(v), sin(π / 2 * v / v0))
+    case Linear
+      f = -f_nominal * ifelse(abs(v) >= v0, sign(v), v / v0)
+    case Cosine
+      f = -f_nominal * ifelse(abs(v) >= v0, sign(v), sign(v) * (1 - cos(π / 2 * v / v0)))
+  end
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/RollingResistance.svg"}},
+  "_links": {
+    "cr": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 150, "x2": 50, "y2": 250}}}},
+    "inclination": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 700, "x2": 50, "y2": 800}}}}
+  }
+}
+end

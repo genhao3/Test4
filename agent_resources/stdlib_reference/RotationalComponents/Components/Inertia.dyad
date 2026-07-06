@@ -1,0 +1,38 @@
+"""
+A 1D-rotational component with inertia, subject to torques from two splines.
+
+This component represents a rigid body with a moment of inertia `J` that can rotate in one dimension.
+It connects to other components via two rotational splines, `spline_a` and `spline_b` (inherited from `PartialTwoSplines`).
+The absolute rotation angle of the inertia is `phi`, its angular velocity is `w`,
+and its angular acceleration is `a`.
+The core dynamic behavior is defined by Newton's second law for rotation:
+```math
+J \\cdot a = \text{spline\\_a}.\\tau + \text{spline\\_b}.\\tau
+```
+The kinematic relationships defining angular velocity and acceleration are:
+```math
+w = \frac{d\\phi}{dt}
+```
+```math
+a = \frac{dw}{dt}
+```
+Both splines are rigidly attached to the inertia, meaning `phi = spline_a.phi` and `phi = spline_b.phi`.
+"""
+component Inertia
+  extends RotationalComponents.Interfaces.PartialTwoSplines
+  "Moment of inertia of the rotating body"
+  parameter J::MomentOfInertia
+  "Absolute rotation angle of the inertia"
+  variable phi::Angle
+  "Absolute angular velocity of the inertia"
+  variable w::AngularVelocity
+  "Absolute angular acceleration of the inertia"
+  variable a::AngularAcceleration
+relations
+  phi = spline_a.phi
+  phi = spline_b.phi
+  der(phi) = w
+  der(w) = a
+  J * a = spline_a.tau + spline_b.tau
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/Inertia.svg"}}}
+end

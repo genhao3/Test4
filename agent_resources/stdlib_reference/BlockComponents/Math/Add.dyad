@@ -1,0 +1,27 @@
+"""
+Weighted adder that outputs the sum of two scalar inputs with configurable gains.
+
+Combines two input signals by multiplying each by its respective gain parameter and adding the results. The output
+is calculated as
+
+```math
+y = k1 \cdot u1 + k2 \cdot u2
+```
+where k1 and k2 are configurable gain factors that determine the weight of each input in the sum.
+"""
+component Add
+  extends BlockComponents.Interfaces.SI2SO()
+  "Gain multiplier for the first input (u1)"
+  parameter k1::Real = 1.0
+  "Gain multiplier for the second input (u2)"
+  parameter k2::Real = 1.0
+relations
+  "Output equation: weighted sum of inputs"
+  y = k1 * u1 + k2 * u2
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Add.svg"}
+  }
+}
+end

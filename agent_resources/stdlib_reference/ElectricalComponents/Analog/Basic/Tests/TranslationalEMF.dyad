@@ -1,0 +1,144 @@
+"""
+Test circuit for TranslationalEMF driven by a sinusoidal voltage with a mass load.
+
+A sine voltage source (amplitude=1 V, frequency=1 Hz) drives a TranslationalEMF
+(k=1 N/A). The mechanical flange is connected to a sliding mass (m=1 kg,
+horizontal, no gravity). The support is grounded via a Fixed component.
+
+With an ideal voltage source and k=1:
+- vel = v/k = sin(2π·t)
+- s = (1 − cos(2π·t))/(2π)
+- a = 2π·cos(2π·t)
+- f = m·a = 2π·cos(2π·t)
+- i = −f/k = −2π·cos(2π·t)
+
+Analogous to `RotationalEMFTest` in the standard library.
+"""
+test component TranslationalEMF
+  "Sine signal: amplitude=1, frequency=1 Hz"
+  sine = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1) {^sine}
+  "Voltage source driven by sine"
+  voltage_source = ElectricalComponents.Analog.Sources.VoltageSource() {^voltage_source}
+  "Translational EMF with k=1 N/A"
+  emf = ElectricalComponents.Analog.Basic.TranslationalEMF(k = 1) {^emf}
+  "Electrical ground"
+  ground = ElectricalComponents.Analog.Basic.Ground() {^ground}
+  "Mechanical ground for EMF support"
+  fixed = TranslationalComponents.Components.Fixed() {^fixed}
+  "Sliding mass (1 kg, horizontal)"
+  mass = TranslationalComponents.Components.Mass(m = 1) {^mass}
+relations
+  initial emf.s = 0
+  connect(sine.y, voltage_source.V) {^id7}
+  connect(voltage_source.p, emf.p) {^id8}
+  connect(fixed.flange, emf.support) {^id9}
+  connect(emf.flange, mass.flange_a) {^id10}
+  connect(ground.g, voltage_source.n) {^id11}
+  connect(emf.n, voltage_source.n) {^id12}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://ElectricalComponents/Example.svg"},
+    "tests": {
+      "case1": {"stop": 1, "expect": {"signals": ["emf.v", "emf.i", "emf.s", "emf.vel"]}}
+    }
+  },
+  "_links": {
+    "sine": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 350, "y1": 670, "x2": 450, "y2": 770, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "voltage_source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 550, "x2": 550, "y2": 450, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "emf": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 150, "x2": 550, "y2": 250, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 820, "y1": 680, "x2": 920, "y2": 780, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 230, "y1": 320, "x2": 330, "y2": 420, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "mass": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 810, "y1": 270, "x2": 910, "y2": 370, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 720}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 110, "y": 500}, {"x": 110, "y": 80}, {"x": 500, "y": 80}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 370, "y": 370}, {"x": 370, "y": 200}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 770, "y": 200}, {"x": 770, "y": 320}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "renderStyle": "standard",
+        "edges": [{"S": 1, "M": [{"x": 870, "y": 500}], "E": 2}]
+      }
+    },
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 500, "y": 290}, {"x": 690, "y": 290}, {"x": 690, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

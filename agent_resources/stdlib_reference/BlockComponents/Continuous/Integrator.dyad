@@ -1,0 +1,31 @@
+"""
+Integrates the input signal with optional gain factor.
+
+An integrator that computes the time integral of the input signal multiplied by a gain factor.
+The block implements the transfer function 1/s scaled by gain k.
+
+```math
+y(t) = \int_{t_0}^{t} k \cdot u(\tau) d\tau + x_0
+```
+
+Outputs `y = ∫k*u dt`, corresponding to the transfer function `\frac{1}{s}`.
+"""
+component Integrator
+  extends BlockComponents.Interfaces.SISO
+  "Internal state variable that stores the integrated value"
+  variable x::Real
+  "Initial value of the integrator state at simulation start"
+  parameter x0::Real = 0
+  "Gain factor applied to the input before integration"
+  parameter k::Real = 1.0
+relations
+  initial x = x0
+  der(x) = k * u
+  y = x
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Integrator.svg"}
+  }
+}
+end

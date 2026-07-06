@@ -1,0 +1,235 @@
+"""
+Test of braking force models.
+
+Tests five different braking force sources applied to individual masses,
+each starting at v=100 m/s from s=0. Replicates the structure of
+ModelicaTest.Translational.TestBraking (EddyCurrentForce omitted).
+
+- mass1 + LinearSpeedDependentForce (f_nominal=-100, v_nominal=100)
+- mass2 + QuadraticSpeedDependentForce (f_nominal=-100, v_nominal=100)
+- mass3 + ConstantForce (f_constant=-100)
+- mass4 + SignForce (f_nominal=-100, v0=1)
+- mass5 + InverseSpeedDependentForce (f_nominal=-100, v_nominal=100, v0=1)
+"""
+test component TestBraking
+  "Mass braked by linear speed-dependent force"
+  mass1 = TranslationalComponents.Components.Mass(m = 1) {^mass1}
+  linearSpeedDependentForce = TranslationalComponents.Sources.LinearSpeedDependentForce(f_nominal = -100.0, v_nominal = 100.0) {^linearSpeedDependentForce}
+  "Mass braked by quadratic speed-dependent force"
+  mass2 = TranslationalComponents.Components.Mass(m = 1) {^mass2}
+  quadraticSpeedDependentForce = TranslationalComponents.Sources.QuadraticSpeedDependentForce(f_nominal = -100.0, v_nominal = 100.0) {^quadraticSpeedDependentForce}
+  "Mass braked by constant force"
+  mass3 = TranslationalComponents.Components.Mass(m = 1) {^mass3}
+  constantForce = TranslationalComponents.Sources.ConstantForce(f_constant = -100.0) {^constantForce}
+  "Mass braked by sign force"
+  mass4 = TranslationalComponents.Components.Mass(m = 1) {^mass4}
+  signForce = TranslationalComponents.Sources.SignForce(f_nominal = -100.0, v0 = 1.0) {^signForce}
+  "Mass braked by inverse speed-dependent force"
+  mass5 = TranslationalComponents.Components.Mass(m = 1) {^mass5}
+  inverseSpeedDependentForce = TranslationalComponents.Sources.InverseSpeedDependentForce(f_nominal = -100.0, v_nominal = 100.0, v0 = 1.0) {^inverseSpeedDependentForce}
+  "Fixed ground for all force supports"
+  ground = TranslationalComponents.Components.Fixed() {^ground}
+relations
+  initial mass1.s = 0
+  initial mass1.v = 100
+  initial mass2.s = 0
+  initial mass2.v = 100
+  initial mass3.s = 0
+  initial mass3.v = 100
+  initial mass4.s = 0
+  initial mass4.v = 100
+  initial mass5.s = 0
+  initial mass5.v = 100
+  connect(mass1.flange_b, linearSpeedDependentForce.flange) {^id12}
+  connect(mass2.flange_b, quadraticSpeedDependentForce.flange) {^id13}
+  connect(mass3.flange_b, constantForce.flange) {^id14}
+  connect(mass4.flange_b, signForce.flange) {^id15}
+  connect(mass5.flange_b, inverseSpeedDependentForce.flange) {^id16}
+  connect(inverseSpeedDependentForce.support, ground.flange) {^id17}
+  connect(signForce.support, ground.flange) {^id18}
+  connect(quadraticSpeedDependentForce.support, ground.flange) {^id19}
+  connect(linearSpeedDependentForce.support, ground.flange) {^id20}
+  connect(constantForce.support, ground.flange) {^id21}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 2,
+        "atol": {
+          "mass1.v": 0.01,
+          "mass2.v": 0.01,
+          "mass3.v": 0.01,
+          "mass4.v": 0.01,
+          "mass5.v": 0.1
+        },
+        "expect": {
+          "final": {
+            "mass1.v": 13.53353,
+            "mass2.v": 33.333344,
+            "mass3.v": -100,
+            "mass4.v": 0.0,
+            "mass5.v": -173.19913
+          },
+          "signals": ["mass1.v", "mass2.v", "mass3.v", "mass4.v", "mass5.v"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "mass1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 680, "x2": 260, "y2": 780, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "linearSpeedDependentForce": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 500, "y1": 680, "x2": 400, "y2": 780, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 150, "y1": 450, "x2": 250, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "quadraticSpeedDependentForce": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 500, "y1": 450, "x2": 400, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 170, "y1": 880, "x2": 270, "y2": 980, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "constantForce": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 500, "y1": 880, "x2": 400, "y2": 980, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass4": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 140, "y1": 230, "x2": 240, "y2": 330, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "signForce": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 510, "y1": 230, "x2": 410, "y2": 330, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass5": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 140, "y1": 20, "x2": 240, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inverseSpeedDependentForce": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 500, "y1": 20, "x2": 400, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 890, "y1": 450, "x2": 990, "y2": 550, "rot": 270}
+        },
+        "tags": []
+      }
+    },
+    "id12": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id13": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id14": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id15": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id16": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id17": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 450, "y": 190}, {"x": 720, "y": 190}, {"x": 720, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id18": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 460, "y": 370}, {"x": 720, "y": 370}, {"x": 720, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id19": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 450, "y": 620}, {"x": 720, "y": 620}, {"x": 720, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id20": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 450, "y": 840}, {"x": 720, "y": 840}, {"x": 720, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id21": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 450, "y": 1050}, {"x": 720, "y": 1050}, {"x": 720, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

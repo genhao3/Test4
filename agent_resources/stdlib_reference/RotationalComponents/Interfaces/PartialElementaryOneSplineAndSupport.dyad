@@ -1,0 +1,37 @@
+"""
+A base model for a mechanical component with a primary rotational spline and an interconnected support spline.
+
+This partial component models the fundamental interaction between a primary rotational shaft spline
+and a support spline. The support spline's angle is explicitly defined by the variable `phi_support`.
+The key dynamic relationship is that the torque experienced by the support spline is equal in
+magnitude but opposite in direction to the torque on the primary shaft spline, representing a common
+mechanical reaction. This model is intended as a foundational element for more complex textual models.
+The defining equations are:
+```math
+\text{support}.\phi = \phi_{support}
+```
+```math
+\text{support}.\tau = -\text{spline}.\tau
+```
+"""
+partial component PartialElementaryOneSplineAndSupport
+  "Primary rotational shaft spline connector"
+  spline = Spline() {^spline}
+  "Support spline connector"
+  support = Spline() {^support}
+  "Absolute angle of the support spline"
+  variable phi_support::Angle
+relations
+  support.phi = phi_support
+  support.tau = -spline.tau
+metadata {
+  "_links": {
+    "spline": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}},
+    "support": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "support", "x1": 450, "y1": 950, "x2": 550, "y2": 1050}}
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,63 @@
+"""
+Test for SpeedSource with Filtered and Exact modes, matching MSL ModelicaTest.Rotational.TestSpeed.
+
+Two SpeedSource instances are driven by different reference signals and each
+drives an Inertia (J=1):
+
+1. speed_filtered: Filtered mode (f_crit=5 Hz), step input at t=0.5
+   The first-order filter smooths the step — w tracks the step with a time constant
+   of 1/(2π·5) ≈ 0.0318s. At t=1.1, w should be ≈1.0 (fully settled).
+
+2. speed_exact: Exact mode, sine input (f=1 Hz)
+   w tracks sin(2πt) exactly. At t=1.1: w = sin(2π·1.1) = sin(0.2π) ≈ 0.5878.
+"""
+test component Speed
+  "Fixed ground for all supports"
+  fixed = RotationalComponents.Components.Fixed()
+  "Step signal for filtered speed source (step at t=0.5)"
+  step = BlockComponents.Sources.Step(height = 1.0, start_time = 0.5)
+  "SpeedSource — Filtered mode with low f_crit=5 Hz"
+  speed_filtered = RotationalComponents.Sources.SpeedSource(ref_type = RotationalComponents.Sources.ReferenceType.Filtered(f_crit = 5.0))
+  "Inertia driven by filtered speed source"
+  inertia_filtered = RotationalComponents.Components.Inertia(J = 1)
+  "Sine signal for exact speed source (f=1 Hz)"
+  sine = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "SpeedSource — Exact mode"
+  speed_exact = RotationalComponents.Sources.SpeedSource(ref_type = RotationalComponents.Sources.ReferenceType.Exact())
+  "Inertia driven by exact speed source"
+  inertia_exact = RotationalComponents.Components.Inertia(J = 1)
+relations
+  initial inertia_exact.phi = 0
+  connect(step.y, speed_filtered.w_ref)
+  connect(speed_filtered.spline, inertia_filtered.spline_a)
+  connect(speed_filtered.support, fixed.spline)
+  connect(sine.y, speed_exact.w_ref)
+  connect(speed_exact.spline, inertia_exact.spline_a)
+  connect(speed_exact.support, fixed.spline)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1.1,
+        "atol": {"inertia_filtered.w": 0.01, "inertia_exact.w": 0.001},
+        "expect": {
+          "initial": {
+            "inertia_filtered.phi": 0,
+            "inertia_exact.phi": 0,
+            "inertia_filtered.w": 0,
+            "inertia_exact.w": 0
+          },
+          "final": {"inertia_exact.w": 0.5878},
+          "signals": [
+            "inertia_filtered.w",
+            "inertia_exact.w",
+            "inertia_filtered.phi",
+            "inertia_exact.phi"
+          ]
+        }
+      }
+    }
+  }
+}
+end

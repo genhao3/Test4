@@ -1,0 +1,34 @@
+"""
+Forced movement of a flange according to an acceleration signal.
+
+The input signal `a_ref` in [m/s²] moves the 1D translational flange with a predefined
+acceleration. The velocity and position of the flange are determined by integration:
+```math
+v = \\frac{ds}{dt}
+```
+```math
+a = \\frac{dv}{dt}
+```
+```math
+a = a_{ref}
+```
+"""
+component Accelerate
+  extends TranslationalComponents.Interfaces.PartialElementaryOneFlangeAndSupport2(s(statePriority = 50) = missing initial 0.0)
+  "Absolute acceleration of flange as input signal"
+  a_ref = RealInput(units="m/s2") {^a_ref}
+  "Velocity of flange with respect to support"
+  variable v::Velocity(statePriority = 50) = initial 0.0
+  "Acceleration of flange with respect to support"
+  variable a::Acceleration
+relations
+  v = der(s)
+  a = der(v)
+  a = a_ref
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/Accelerate.svg"}},
+  "_links": {
+    "a_ref": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

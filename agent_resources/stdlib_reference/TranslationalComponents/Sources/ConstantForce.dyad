@@ -1,0 +1,21 @@
+"""
+Constant force, not dependent on speed.
+
+Model of constant force, not dependent on velocity of flange.
+Positive force accelerates in positive direction of movement, but brakes in
+reverse direction of movement. Negative force brakes in positive direction
+of movement, but accelerates in reverse direction of movement.
+
+The equation is:
+```math
+f = -f_{constant}
+```
+"""
+component ConstantForce
+  extends TranslationalComponents.Interfaces.PartialForce
+  "Nominal force (if negative, force is acting as load in positive direction of motion)"
+  parameter f_constant::Dyad.Force
+relations
+  f = -f_constant
+metadata {"Dyad": {"icons": {"default": "dyad://TranslationalComponents/ConstantForce.svg"}}}
+end

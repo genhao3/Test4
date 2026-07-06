@@ -1,0 +1,24 @@
+"""
+Standard output interface with a single real output connector.
+
+A base interface component that defines a single real-valued output signal. This
+partial component serves as a foundation for components that need to output signals
+to other parts of a model.
+"""
+partial component SO
+  "Real-valued output connector for the component"
+  y = RealOutput() {^y}
+relations
+metadata {
+  "_links": {
+    "y": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

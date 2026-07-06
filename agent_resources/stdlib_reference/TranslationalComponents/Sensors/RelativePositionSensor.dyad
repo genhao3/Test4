@@ -1,0 +1,32 @@
+"""
+Measures the ideal relative translational position between two mechanical flanges.
+
+This component calculates the translational position of `flange_b` with respect to `flange_a`.
+It provides this relative position as an output signal `s_rel`. The sensor is considered
+ideal because it does not exert any forces on the flanges it connects to, meaning it
+does not influence the dynamics of the mechanical system. This is enforced by the
+equation `flange_a.f = 0`. The primary relationship is:
+```math
+s_{rel} = flange_b.s - flange_a.s
+```
+where `s_{rel}` is the relative position, `flange_b.s` is the absolute position of `flange_b`,
+and `flange_a.s` is the absolute position of `flange_a`.
+"""
+component RelativePositionSensor
+  extends TranslationalComponents.Interfaces.PartialRelativeSensor
+  "Relative position of `flange_b` relative to `flange_a` as output signal"
+  s_rel = RealOutput(units="m") {^s_rel}
+relations
+  s_rel = flange_b.s - flange_a.s
+  0 = flange_a.f
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/RelativeSensor.svg"}},
+  "_links": {
+    "s_rel": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

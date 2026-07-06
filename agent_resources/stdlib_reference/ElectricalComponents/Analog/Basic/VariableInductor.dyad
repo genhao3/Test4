@@ -1,0 +1,47 @@
+"""
+Ideal linear electrical inductor with variable inductance.
+
+The inductance value `L` is provided as an external input signal.
+A lower bound `Lmin` prevents the effective inductance from reaching
+zero, which would cause a variable index change:
+```math
+\Psi = \max(L, L_{min}) \cdot i
+```
+The branch voltage follows from the time derivative of flux linkage:
+```math
+v = \frac{d\Psi}{dt}
+```
+This flux-based formulation correctly accounts for time-varying
+inductance, producing `v = L \dot{i} + \dot{L} i`.
+
+Corresponds to `Modelica.Electrical.Analog.Basic.VariableInductor`.
+"""
+component VariableInductor
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "Inductance input signal"
+  L = RealInput() {^L}
+  "Lower bound for variable inductance"
+  parameter Lmin::Inductance = 1e-16
+  "Magnetic flux linkage"
+  variable Psi::MagneticFlux
+relations
+  assert(L >= 0, "Inductance L has to be >= 0!")
+  Psi = max(L, Lmin) * i
+  v = der(Psi)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/Inductor.svg"}
+  },
+  "_links": {
+    "L": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": -100, "x2": 550, "y2": 0, "rot": 90}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

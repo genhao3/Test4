@@ -1,0 +1,26 @@
+"""
+Measures the ideal absolute angular velocity of a rotational mechanical flange.
+
+This sensor provides an ideal measurement of the absolute angular velocity of a
+connected rotational flange. It computes the angular velocity by taking the time
+derivative of the absolute angular position, \$\text{spline}.\\phi\$, of the
+flange. The angular position \$\text{spline}.\\phi\$ is accessed via a
+`spline` connector. The defining equation for the output angular
+velocity \$w\$ is:
+```math
+w = \frac{d(\\phi_{spline})}{dt}
+```
+"""
+component VelocitySensor
+  extends RotationalComponents.Interfaces.PartialAbsoluteSensor
+  "Absolute angular velocity of flange as output signal"
+  w = RealOutput() {^w}
+relations
+  w = der(spline.phi)
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/SingleSplineSensor.svg"}},
+  "_links": {
+    "w": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}}
+  }
+}
+end

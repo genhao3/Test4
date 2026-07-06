@@ -1,0 +1,34 @@
+"""
+Sets a specific initial angular position for a rotational spline connector.
+
+This component establishes the starting angular position via a `spline`.
+At the very beginning of the simulation (time t=0), the angle `spline.phi` of the
+`Spline` subcomponent is set to the value provided by the parameter `phi0`.
+Throughout the simulation, the torque `spline.tau` of the `spline` is maintained at zero.
+This ensures that the component only dictates an initial state and does not introduce
+any rotational forces into the connected system.
+The defining equations are:
+```math
+\begin{align*}
+\text{spline.phi}(0) &= phi0 \\
+\text{spline.tau} &= 0
+\end{align*}
+```
+"""
+component PrescribeInitialPosition
+  spline = Spline() {^spline}
+  "Desired initial angular position for the spline."
+  parameter phi0::Dyad.Angle
+relations
+  initial spline.phi = phi0
+  spline.tau = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "initial phi = $(phi0)", "x": 500, "y": 800, "rot": 0}],
+    "icons": {"default": "dyad://RotationalComponents/Pos-Speed-Acc-Move.svg"}
+  },
+  "_links": {
+    "spline": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

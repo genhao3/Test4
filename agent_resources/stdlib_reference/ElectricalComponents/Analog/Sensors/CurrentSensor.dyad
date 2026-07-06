@@ -1,0 +1,53 @@
+"""
+Ideal ammeter measuring the electrical current flowing between its two pins.
+
+This component models an ideal ammeter, designed to be placed in series within an electrical circuit
+to measure the current. A key characteristic of an ideal ammeter is that it offers no internal
+resistance, and consequently, there is no voltage drop across its terminals ($p.v = n.v$).
+The current $i$, which flows from the positive pin ($p$) to the negative pin ($n$),
+is measured and made available as a real output signal. The current entering the positive pin
+is equal to this measured current ($p.i = i$), and to ensure current conservation,
+the current entering the negative pin is its negation ($n.i = -i$), meaning $i$
+flows out of the negative pin. Here, $p.v$ and $n.v$ are the pin voltages,
+and $p.i$ and $n.i$ are the pin currents.
+"""
+component CurrentSensor
+  "Positive electrical pin of the sensor."
+  p = Pin() {^p}
+  "Negative electrical pin of the sensor."
+  n = Pin() {^n}
+  "Output signal representing the measured current flowing from pin `p` to pin `n`."
+  i = RealOutput() {^i}
+relations
+  p.v = n.v
+  p.i = i
+  n.i = -i
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "A", "x": 500, "y": 713, "rot": 0}
+    ],
+    "icons": {"default": "dyad://ElectricalComponents/TwoPinSensor.svg"}
+  },
+  "_links": {
+    "p": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "n": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "neg", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    },
+    "i": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "pos", "x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 90}
+        }
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,22 @@
+"""
+Base ideal sensor for measuring absolute spline variables with no torque interaction.
+
+This `partial` model establishes the foundation for an ideal sensor designed to measure absolute kinematic variables from a `Spline` subcomponent.
+A key characteristic of this sensor model is that it does not exert any mechanical load (torque) on the spline it is connected to.
+This ideal behavior is enforced by the acausal equation in the `relations` section, which sets the spline's torque to zero:
+```math
+\text{spline}.\tau = 0
+```
+As a `partial` component, `PartialAbsoluteSensor` is meant to be extended by concrete sensor implementations that would specify precisely which absolute variable (e.g., absolute angle, displacement) is being measured and outputted.
+"""
+partial component PartialAbsoluteSensor
+  "Spline of the shaft from which sensor information shall be measured"
+  spline = Spline() {^spline}
+relations
+  0 = spline.tau
+metadata {
+  "_links": {
+    "spline": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

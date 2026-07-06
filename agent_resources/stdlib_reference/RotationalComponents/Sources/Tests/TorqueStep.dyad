@@ -1,0 +1,41 @@
+"""
+Test for TorqueStep source, matching MSL ModelicaTest.Rotational.AllComponents topology.
+
+TorqueStep applies offsetTorque=11 for t<1, then offsetTorque+stepTorque=33 for t≥1
+to an inertia (J=3, initially at rest).
+
+Phase 1 (0 ≤ t < 1): tau=11, a=11/3, w(t)=(11/3)t, phi(t)=(11/6)t²
+  w(1) = 11/3 ≈ 3.667, phi(1) = 11/6 ≈ 1.833
+
+Phase 2 (t ≥ 1): tau=33, a=11, w(t)=(11/3)+11(t-1), phi(t)=11/6+(11/3)(t-1)+(11/2)(t-1)²
+  w(2) = 11/3+11 ≈ 14.667, phi(2) = 11/6+11/3+11/2 = 11/6+22/6+33/6 = 11 
+"""
+test component TorqueStep
+  "Fixed ground for source support"
+  fixed = RotationalComponents.Components.Fixed()
+  "Torque step source (stepTorque=22, offsetTorque=11, startTime=1)"
+  torque_step = RotationalComponents.Sources.TorqueStep(stepTorque = 22, offsetTorque = 11, startTime = 1)
+  "Inertia (J=3)"
+  inertia = RotationalComponents.Components.Inertia(J = 3)
+relations
+  initial inertia.phi = 0
+  initial inertia.w = 0
+  connect(torque_step.spline, inertia.spline_a)
+  connect(torque_step.support, fixed.spline)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 2,
+        "atol": {"inertia.w": 0.01, "inertia.phi": 0.01},
+        "expect": {
+          "initial": {"inertia.phi": 0, "inertia.w": 0},
+          "final": {"inertia.w": 14.667, "inertia.phi": 11},
+          "signals": ["inertia.w", "inertia.phi", "torque_step.tau"]
+        }
+      }
+    }
+  }
+}
+end

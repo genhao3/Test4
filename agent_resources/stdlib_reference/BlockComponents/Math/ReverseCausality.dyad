@@ -1,0 +1,21 @@
+"""
+Forces equality between two input signals by computing an implicit output.
+
+The way to think about this component is that it computes an output (implicitly)
+such that the two inputs are equal.  To do this, it must be possible for the output
+to affect at least one of the inputs somehow.  This component supports model
+inversion scenarios where one of the outputs is prescribed and the system works
+backward to solve for one of the inputs.
+"""
+component ReverseCausality
+  extends BlockComponents.Interfaces.SI2SO
+relations
+  "Enforces equality between the two input signals"
+  u1 = u2
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/ReverseCausality.svg"},
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}]
+  }
+}
+end

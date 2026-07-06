@@ -1,0 +1,47 @@
+"""
+Forced movement of a flange according to a reference speed.
+
+The input signal `v_ref` defines the reference speed in [m/s]. The flange is forced to move
+relative to the support connector according to this reference motion. The parameter `ref_type`
+selects between two modes:
+
+1. **Exact**: The reference speed is treated exactly. This is only possible if
+   the input signal is defined by an analytical function which can be differentiated at
+   least once.
+2. **Filtered** (default): The reference speed is filtered and the first derivative of the
+   filtered curve is used to compute the reference acceleration of the flange. For filtering,
+   a first order filter is used:
+   ```math
+   a = (v_{ref} - v) \\cdot w_{crit}
+   ```
+   where `w_crit = 2π f_crit` is the critical angular frequency. The critical frequency
+   `f_crit` should be selected higher than the essential low frequencies in the input signal.
+"""
+component Speed
+  extends TranslationalComponents.Interfaces.PartialElementaryOneFlangeAndSupport2(s(statePriority = 50) = missing initial 0.0)
+  "Reference speed of flange as input signal"
+  v_ref = RealInput(units="m/s") {^v_ref}
+  "Type of reference signal handling"
+  structural parameter ref_type::TranslationalComponents.Sources.ReferenceType = TranslationalComponents.Sources.ReferenceType.Filtered()
+  "Velocity of flange with respect to support"
+  variable v::Velocity(statePriority = 50)
+  "Acceleration of flange with respect to support"
+  variable a::Acceleration
+relations
+  v = der(s)
+  switch ref_type
+    case Exact
+      v = v_ref
+      a = 0
+    case Filtered
+      initial v = v_ref
+      a = der(v)
+      a = (v_ref - v) * 2 * π * getproperty(ref_type, Symbol("f_crit"))
+  end
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/Speed.svg"}},
+  "_links": {
+    "v_ref": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

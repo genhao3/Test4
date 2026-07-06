@@ -1,0 +1,36 @@
+"""
+A nonlinear resistor with a piecewise-linear current-voltage characteristic, commonly known as Chua's Resistor.
+
+This component models a voltage-controlled nonlinear resistor where the current `i` is a function of the voltage `v` across its terminals.
+The current-voltage relationship is piecewise-linear, defined by three distinct regions:
+For voltages within the range `[-Ve, Ve]`, the resistor has a conductance `Ga`.
+For voltages outside this range (`v > Ve` or `v < -Ve`), the resistor exhibits a different conductance `Gb` for the portion of the voltage exceeding `+/-Ve`.
+The mathematical relationship is:
+
+```math
+i = \begin{cases}
+Gb(v + Ve) - Ga Ve & \text{if } v < -Ve \\
+Ga v & \text{if } -Ve \le v \le Ve \\
+Gb(v - Ve) + Ga Ve & \text{if } v > Ve
+\end{cases}
+```
+
+This behavior is characteristic of the nonlinear resistor element in Chua's circuit.
+"""
+component NonlinearResistor
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "Conductance in the central region (`-Ve <= v <= Ve`)."
+  parameter Ga::Conductance
+  "Conductance in the outer regions (`v < -Ve` or `v > Ve`)."
+  parameter Gb::Conductance
+  "Breakpoint voltage defining the boundaries of the different conductance regions."
+  parameter Ve::Voltage
+relations
+  i = ifelse(v < -Ve, Gb * (v + Ve) - Ga * Ve, ifelse(v > Ve, Gb * (v - Ve) + Ga * Ve, Ga * v))
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/NonlinearResistor.svg"}
+  }
+}
+end

@@ -1,0 +1,59 @@
+"""
+Test environment for verifying absolute position, speed, and acceleration sensors monitoring a mass driven by a constant force.
+
+This test component simulates a one-dimensional translational mechanical system to validate the behavior of absolute sensors.
+A mass (`body`) is subjected to a constant force (`force`, driven by `constant1`). One side of the force element is connected to
+a fixed point (`ground`), and the other side acts on the mass. The sensors (`position_sensor`, `speed_sensor`, `acceleration_sensor`)
+are then attached to this mass to measure its absolute position, speed, and acceleration, respectively.
+The `metadata` section includes a test case that checks if the sensor outputs match these expected dynamics.
+"""
+test component Sensors
+  "Represents the translational mass being sensed."
+  body = TranslationalComponents.Components.Mass(m = 1, L = 0)
+  "Represents the force applied to the mass."
+  force = TranslationalComponents.Sources.Force()
+  "Provides a constant signal input (k=1) to the force component."
+  constant1 = BlockComponents.Sources.Constant(k = 1)
+  "Represents the fixed mechanical ground."
+  ground = TranslationalComponents.Components.Fixed()
+  "Sensor to measure the absolute speed of the connected flange."
+  speed_sensor = TranslationalComponents.Sensors.SpeedSensor()
+  "Sensor to measure the absolute position of the connected flange."
+  position_sensor = TranslationalComponents.Sensors.PositionSensor()
+  "Sensor to measure the absolute acceleration of the connected flange."
+  acceleration_sensor = TranslationalComponents.Sensors.AccelerationSensor()
+relations
+  connect(constant1.y, force.f)
+  connect(force.flange_b, body.flange_a)
+  connect(force.flange_a, ground.flange)
+  connect(body.flange_b, speed_sensor.flange, position_sensor.flange, acceleration_sensor.flange)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "initial": {"body.s": 0, "body.v": 0},
+        "atol": {
+          "body.s": 0.01,
+          "body.v": 0.01,
+          "body.a": 0.01,
+          "position_sensor.s": 0.01,
+          "speed_sensor.v": 0.01,
+          "acceleration_sensor.a": 0.01
+        },
+        "expect": {
+          "final": {
+            "body.s": 12.49999999,
+            "body.v": 4.99999999,
+            "body.a": 1,
+            "position_sensor.s": 12.49999999,
+            "speed_sensor.v": 4.99999999,
+            "acceleration_sensor.a": 1
+          }
+        }
+      }
+    }
+  }
+}
+end

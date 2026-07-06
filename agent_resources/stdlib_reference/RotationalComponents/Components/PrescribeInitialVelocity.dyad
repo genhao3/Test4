@@ -1,0 +1,35 @@
+"""
+Sets a defined initial angular velocity to a rotational mechanical connector.
+
+This component is used to define and enforce a specific initial angular velocity
+(`w_0`) on a rotational mechanical system at the commencement of a
+simulation. It interfaces with the system through a `spline`, which
+acts as a rotational connector. The component ensures that at time t=0, the
+angular velocity `w` of the connector is precisely equal to the user-defined
+parameter `w_0`. The relationship \$\frac{d\text{spline.phi}}{dt} = w\$
+establishes that `w` is indeed the angular velocity of the `spline` connector.
+Importantly, the torque transmitted through this connector is constrained to be
+zero (\$\text{spline.tau} = 0\$), meaning the component prescribes motion
+kinematically without imparting any dynamic load itself. It effectively acts as
+an ideal angular velocity source at the initial moment.
+"""
+component PrescribeInitialVelocity
+  spline = Spline() {^spline}
+  "Desired initial angular velocity at the start of the simulation"
+  parameter w0::AngularVelocity
+  "Actual angular velocity of the component, initialized to w0"
+  variable w::AngularVelocity
+relations
+  initial w = w0
+  der(spline.phi) = w
+  spline.tau = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "initial w=$(w0)", "x": 500, "y": 800, "rot": 0}],
+    "icons": {"default": "dyad://RotationalComponents/Pos-Speed-Acc-Move.svg"}
+  },
+  "_links": {
+    "spline": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

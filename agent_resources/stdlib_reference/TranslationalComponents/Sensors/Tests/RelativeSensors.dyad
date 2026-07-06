@@ -1,0 +1,65 @@
+"""
+A test rig for sensors measuring relative translational motion between two independently forced masses.
+
+This test component sets up a dynamic system to verify the behavior of relative motion sensors. It features two 1kg masses, `body1` and `body2`, initially at rest and starting from the same position.
+`body1` is subjected to a constant force `F_1 = 1\,\text{N}` and `body2` is subjected to a constant force `F_2 = 10\,\text{N}`. Both forces are applied with respect to a fixed inertial frame.
+Consequently, `body1` experiences a constant acceleration ```math a_1 = F_1/m_1 = 1\,\text{m/s}^2 ``` and `body2` experiences a constant acceleration ```math a_2 = F_2/m_2 = 10\,\text{m/s}^2 ```.
+Three types of sensors measure the relative motion, defined as the motion of `body2` with respect to `body1`:
+- Relative position: ```math s_{rel}(t) = s_2(t) - s_1(t) ```
+- Relative speed: ```math v_{rel}(t) = v_2(t) - v_1(t) = \frac{d}{dt}s_{rel}(t) ```
+- Relative acceleration: ```math a_{rel}(t) = a_2(t) - a_1(t) = \frac{d}{dt}v_{rel}(t) ```
+"""
+test component RelativeSensors
+  "First translational mass (1kg) in the test setup."
+  body1 = TranslationalComponents.Components.Mass(m = 1, L = 0)
+  "Second translational mass (1kg) in the test setup."
+  body2 = TranslationalComponents.Components.Mass(m = 1, L = 0)
+  "Force source applying force to body1."
+  force1 = TranslationalComponents.Sources.Force()
+  "Force source applying force to body2."
+  force2 = TranslationalComponents.Sources.Force()
+  "Fixed inertial reference frame for the applied forces."
+  fixed = TranslationalComponents.Components.Fixed()
+  "Constant signal (1.0, typically Force [N]) for force1."
+  constant1 = BlockComponents.Sources.Constant(k = 1)
+  "Constant signal (10.0, typically Force [N]) for force2."
+  constant2 = BlockComponents.Sources.Constant(k = 10)
+  "Sensor measuring the relative speed between body1 and body2 (v_body2 - v_body1)."
+  relative_speed_sensor = TranslationalComponents.Sensors.RelativeSpeedSensor()
+  "Sensor measuring the relative position between body1 and body2 (s_body2 - s_body1)."
+  relative_position_sensor = TranslationalComponents.Sensors.RelativePositionSensor()
+  "Sensor measuring the relative acceleration between body1 and body2 (a_body2 - a_body1)."
+  relative_acceleration_sensor = TranslationalComponents.Sensors.RelativeAccelerationSensor()
+relations
+  connect(constant1.y, force1.f)
+  connect(constant2.y, force2.f)
+  connect(fixed.flange, force1.flange_a, force2.flange_a)
+  connect(force1.flange_b, body1.flange_a)
+  connect(force2.flange_b, body2.flange_a)
+  connect(body1.flange_b, relative_speed_sensor.flange_a, relative_position_sensor.flange_a, relative_acceleration_sensor.flange_a)
+  connect(body2.flange_b, relative_speed_sensor.flange_b, relative_position_sensor.flange_b, relative_acceleration_sensor.flange_b)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "initial": {"body1.s": 0, "body2.s": 0, "body1.v": 0, "body2.v": 0},
+        "atol": {
+          "relative_position_sensor.s_rel": 0.01,
+          "relative_speed_sensor.v_rel": 0.01,
+          "relative_acceleration_sensor.a_rel": 0.01
+        },
+        "expect": {
+          "final": {
+            "relative_position_sensor.s_rel": 112.5,
+            "relative_speed_sensor.v_rel": 44.99999999,
+            "relative_acceleration_sensor.a_rel": 9
+          },
+          "signals": ["relative_position_sensor.s_rel", "relative_speed_sensor.v_rel", "relative_acceleration_sensor.a_rel"]
+        }
+      }
+    }
+  }
+}
+end

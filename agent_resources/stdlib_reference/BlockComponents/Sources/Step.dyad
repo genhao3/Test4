@@ -1,0 +1,27 @@
+"""
+Generates a step signal that transitions from `offset` to `height+offset` at the specified time.
+
+The step component produces an output y that changes from the `offset` value to `height+offset`
+when the simulation time reaches `start_time`. This provides a way to model abrupt changes
+in signals for testing system responses. The behavior is defined by the equation:
+
+```math
+y = \begin{cases}
+\text{height} + \text{offset} & \text{if time} \geq \text{start\_time} \\
+\text{offset} & \text{otherwise}
+\end{cases}
+```
+"""
+component Step
+  extends BlockComponents.Interfaces.Signal
+  "Magnitude of the step change"
+  parameter height::Real
+relations
+  y = ifelse(time >= start_time, height + offset, offset)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Step.svg"}
+  }
+}
+end

@@ -1,0 +1,29 @@
+"""
+Quadratic dependency of torque versus speed.
+
+Model of torque, quadratically dependent on angular velocity of flange.
+Parameter TorqueDirection chooses whether direction of torque is the same in
+both directions of rotation or not.
+"""
+component QuadraticSpeedDependentTorque
+  extends RotationalComponents.Interfaces.PartialTorque
+  "Nominal torque (if negative, torque is acting as load in positive direction of rotation)"
+  parameter tau_nominal::Torque
+  "Same direction of torque in both directions of rotation"
+  structural parameter TorqueDirection::Boolean = true
+  "Nominal speed"
+  parameter w_nominal::AngularVelocity(min = eps(Float64))
+  "Angular velocity of spline with respect to support (= der(phi))"
+  variable w::AngularVelocity
+  "Accelerating torque acting at spline (= -spline.tau)"
+  variable tau::Torque
+relations
+  w = der(phi)
+  tau = -spline.tau
+  if TorqueDirection
+    tau = tau_nominal * (w / w_nominal) ^ 2
+  else
+    tau = tau_nominal * w * abs(w) / w_nominal ^ 2
+  end
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/QuadraticSpeedDepTorque.svg"}}}
+end

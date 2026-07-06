@@ -1,0 +1,64 @@
+"""
+Test of the Position source component with all ReferenceType enum variants,
+matching MSL ModelicaTest.Rotational.TestBearingConversion and TranslationalComponents pattern.
+
+Three Position instances are driven by a common Sine reference (amplitude=0.1, frequency=1 Hz)
+and each drives an Inertia (J=1) with support grounded to Fixed:
+
+- pos_filtered: default Filtered mode (f_crit=50 Hz, af=1.3617, bf=0.6180)
+- pos_exact: Exact mode — spline angle equals input directly
+- pos_filtered_low: Filtered mode with low critical frequency (f_crit=5 Hz) to show visible filtering
+"""
+test component Position
+  "Sine reference angle signal (amplitude=0.1, frequency=1 Hz)"
+  sine = BlockComponents.Sources.Sine(amplitude = 0.1, frequency = 1.0)
+  "Position source — Filtered with default Bessel filter (f_crit=50 Hz)"
+  pos_filtered = RotationalComponents.Sources.Position()
+  "Inertia driven by filtered position source"
+  inertia_filtered = RotationalComponents.Components.Inertia(J = 1)
+  "Position source — Exact (spline tracks input directly)"
+  pos_exact = RotationalComponents.Sources.Position(ref_type = RotationalComponents.Sources.ReferenceType.Exact())
+  "Inertia driven by exact position source"
+  inertia_exact = RotationalComponents.Components.Inertia(J = 1)
+  "Position source — Filtered with low critical frequency (f_crit=5 Hz)"
+  pos_filtered_low = RotationalComponents.Sources.Position(ref_type = RotationalComponents.Sources.ReferenceType.Filtered(f_crit = 5.0))
+  "Inertia driven by low-f_crit filtered position source"
+  inertia_filtered_low = RotationalComponents.Components.Inertia(J = 1)
+  "Fixed ground for all supports"
+  fixed = RotationalComponents.Components.Fixed()
+relations
+  connect(sine.y, pos_filtered.phi_ref)
+  connect(pos_filtered.spline, inertia_filtered.spline_a)
+  connect(pos_filtered.support, fixed.spline)
+  initial pos_filtered.w = 0
+  connect(sine.y, pos_exact.phi_ref)
+  connect(pos_exact.spline, inertia_exact.spline_a)
+  connect(pos_exact.support, fixed.spline)
+  connect(sine.y, pos_filtered_low.phi_ref)
+  connect(pos_filtered_low.spline, inertia_filtered_low.spline_a)
+  connect(pos_filtered_low.support, fixed.spline)
+  initial pos_filtered_low.w = 0
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1.1,
+        "atol": {
+          "inertia_filtered.phi": 0.001,
+          "inertia_exact.phi": 0.001,
+          "inertia_filtered_low.phi": 0.001
+        },
+        "expect": {
+          "initial": {
+            "inertia_exact.phi": 0,
+            "inertia_filtered.phi": 0,
+            "inertia_filtered_low.phi": 0
+          },
+          "signals": ["inertia_filtered.phi", "inertia_exact.phi", "inertia_filtered_low.phi"]
+        }
+      }
+    }
+  }
+}
+end

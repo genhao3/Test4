@@ -1,0 +1,131 @@
+component SecondOrderSystem
+  xdd = RealInput() {^xdd}
+  integrator1 = BlockComponents.Continuous.Integrator() {^integrator1}
+  integrator2 = BlockComponents.Continuous.Integrator() {^integrator2}
+  gain1 = BlockComponents.Math.Gain(k = k1) {^gain1}
+  gain2 = BlockComponents.Math.Gain(k = k2) {^gain2}
+  gain3 = BlockComponents.Math.Gain(k = k3) {^gain3}
+  sum = BlockComponents.Math.Add3() {^sum}
+  parameter k1::Real
+  parameter k2::Real
+  parameter k3::Real
+relations
+  connect(integrator1.u, gain1.u, xdd) {^id8}
+  connect(gain3.u, integrator2.y) {^id9}
+  connect(sum.u3, gain1.y) {^id10}
+  connect(sum.u2, gain2.y) {^id11}
+  connect(sum.u1, gain3.y) {^id12}
+  connect(integrator1.y, integrator2.u) {^id13}
+  connect(integrator1.y, gain2.u) {^id14}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://DyadExampleComponents/SecondOrder.svg"},
+    "labels": [
+      {
+        "label": "Second Order System",
+        "x": 500,
+        "y": 50,
+        "layer": "diagram",
+        "attrs": {"font-size": "50"}
+      }
+    ]
+  },
+  "_links": {
+    "xdd": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -40, "y1": 480, "x2": 0, "y2": 520, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -40, "y1": 480, "x2": 0, "y2": 520, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "integrator1": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 67, "y1": 67, "x2": 167, "y2": 167, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 160, "y1": 160, "x2": 260, "y2": 260, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "integrator2": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 233, "y1": 67, "x2": 333, "y2": 167, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 400, "y1": 160, "x2": 500, "y2": 260, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "gain1": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 67, "y1": 467, "x2": 167, "y2": 567, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 400, "y1": 710, "x2": 500, "y2": 810, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "gain2": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 233, "y1": 267, "x2": 333, "y2": 367, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 400, "y1": 450, "x2": 500, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "gain3": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 400, "y1": 67, "x2": 500, "y2": 167, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 660, "y1": 160, "x2": 760, "y2": 260, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "sum": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 567, "y1": 267, "x2": 667, "y2": 367, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 870, "y1": 450, "x2": 970, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [
+          {"S": -1, "M": [{"x": 120, "y": 210}], "E": 1},
+          {"S": -1, "M": [{"x": 120, "y": 760}], "E": 2},
+          {"S": -1, "M": [{"x": 26.5, "y": 330}, {"x": 26.5, "y": 499.5}], "E": 3}
+        ],
+        "junctions": [{"x": 120, "y": 330}],
+        "renderStyle": "standard"
+      }
+    },
+    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 800, "y": 530}, {"x": 800, "y": 760}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id12": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 790, "y": 470}, {"x": 790, "y": 210}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {"Dyad": {"renderStyle": "standard", "edges": [{"S": 1, "E": 2, "M": []}]}},
+    "id14": {
+      "Dyad": {
+        "renderStyle": "standard",
+        "edges": [{"S": 1, "M": [{"x": 330, "y": 210}, {"x": 330, "y": 500}], "E": 2}]
+      }
+    }
+  }
+}
+end

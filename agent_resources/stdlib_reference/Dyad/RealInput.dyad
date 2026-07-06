@@ -1,0 +1,12 @@
+"This connector represents a real signal as an input to a component"
+connector RealInput = input Real metadata {
+  "Dyad": {
+    "icons": {
+      "default": "dyad://Dyad/RealInput.svg"
+    },
+    "path": { "stroke": "rgb(0,0,127)" },
+    "labels": [
+      { "label": "$(instance)", "x": 500, "y": 1100, "layer": "icon" }
+    ]
+  }
+}

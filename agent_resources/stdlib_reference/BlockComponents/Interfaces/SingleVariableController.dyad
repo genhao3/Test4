@@ -1,0 +1,61 @@
+"""
+Interface for single-variable continuous controllers with setpoint input, measurement input, and control output.
+
+Defines the basic interface for feedback controllers with one setpoint input, one measurement input, and one
+control output. This partial component serves as a template for implementing specific control algorithms
+like PID controllers or state-feedback controllers.
+
+```
+u_s
+│
+v
+┌─────┐
+│     │
+│     │ ──► y
+│     │
+└─────┘
+^
+│
+u_m
+```
+
+Partial component that can be extended to create various controller implementations that operate on the error between setpoint and measurement.
+"""
+partial component SingleVariableController
+  "Connector of setpoint input signal"
+  u_s = RealInput() {^u_s}
+  "Connector of measurement input signal"
+  u_m = RealInput() {^u_m}
+  "Connector of actuator output signal"
+  y = RealOutput() {^y}
+relations
+metadata {
+  "Dyad": {"labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}]},
+  "_links": {
+    "u_s": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 220, "x2": 0, "y2": 320, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -100, "y1": 220, "x2": 0, "y2": 320, "rot": 0}
+        }
+      }
+    },
+    "u_m": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 680, "x2": 0, "y2": 780, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -100, "y1": 680, "x2": 0, "y2": 780, "rot": 0}
+        }
+      }
+    },
+    "y": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "output", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "output", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

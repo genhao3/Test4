@@ -1,0 +1,54 @@
+component TrainStopper
+  train = Train(v0 = v0) {^train}
+  stopper = Stopper(c = 1e1, d = 1e4) {^stopper}
+  reference = TranslationalComponents.Components.Fixed() {^reference}
+  parameter v0::Velocity = 10
+relations
+  connect(train.flange, stopper.flange_a) {^id4}
+  connect(stopper.flange_b, reference.flange) {^id5}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://DyadExampleComponents/Example.svg"},
+    "tests": {
+      "": {
+        "stop": 5,
+        "atol": {"train.engine.v": 0.01},
+        "expect": {"final": {"train.engine.v": -0.011}}
+      }
+    }
+  },
+  "_links": {
+    "train": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 360, "y1": 330, "x2": 460, "y2": 430, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "stopper": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 560, "y1": 330, "x2": 660, "y2": 430, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "reference": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 770, "y1": 500, "x2": 870, "y2": 600, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id4": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id5": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 820, "y": 380}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

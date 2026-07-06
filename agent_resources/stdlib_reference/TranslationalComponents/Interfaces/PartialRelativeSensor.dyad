@@ -1,0 +1,29 @@
+"""
+Base two-port element for relative sensing, ensuring conservation of flow between its connection points.
+
+This `partial component` acts as a base for creating sensors that measure a physical quantity at `flange_b` with respect to `flange_a`.
+It includes two `Flange` connectors: `flange_a`, typically serving as the negative or reference connection, and `flange_b`,
+serving as the positive or measurement connection. The core behavior is defined by the conservation equation
+in the `relations` section, which mandates that the sum of flow variables (`f`) at these flanges is zero:
+```math
+flange_a.f + flange_b.f = 0
+```
+This is equivalent to ```math flange_a.f = -flange_b.f ```, signifying that the sensor does not accumulate
+or dissipate the quantity represented by `f` (e.g., current, fluid flow). Sensors derived from this
+partial model would typically add equations to report a measured potential difference (like voltage or pressure)
+between `flange_b` and `flange_a`.
+"""
+partial component PartialRelativeSensor
+  "Negative connection flange of the sensor, often considered the reference point."
+  flange_a = Flange() {^flange_a}
+  "Positive connection flange of the sensor, where the measurement is taken relative to flange_a."
+  flange_b = Flange() {^flange_b}
+relations
+  0 = flange_a.f + flange_b.f
+metadata {
+  "_links": {
+    "flange_a": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}},
+    "flange_b": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}}
+  }
+}
+end

@@ -1,0 +1,35 @@
+"""
+Base model defining the mechanical interfaces for transforming rotational motion into translational motion.
+
+This partial component establishes the fundamental mechanical ports for components
+that convert rotational motion to translational motion. It provides a rotational
+input/output (`spline`), a translational input/output (`flange`), and corresponding
+support connectors (`support_r`, `support_t`). As a partial model, it does not
+contain any equations defining the motion transformation itself but serves as a
+structural base to be extended by more specific components. The `Spline` connectors
+represent rotational mechanical interfaces, typically characterized by angle
+($\phi$) and torque ($\tau$), while `Flange` connectors
+represent translational mechanical interfaces, typically characterized by position
+($s$) and force ($f$).
+"""
+partial component PartialElementaryRotationalToTranslational
+  "Flange of rotational shaft"
+  spline = Spline() {^spline}
+  "Flange of translational rod"
+  flange = Flange() {^flange}
+  "Rotational support/housing of component"
+  support_r = Spline() {^support_r}
+  "Translational support/housing of component"
+  support_t = Flange() {^support_t}
+relations
+  support_r.tau = -spline.tau
+  support_t.f = -flange.f
+metadata {
+  "_links": {
+    "spline": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}},
+    "flange": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}},
+    "support_r": {"Dyad": {"placement": {"icon": {"x1": 100, "y1": 950, "x2": 200, "y2": 1050}}}},
+    "support_t": {"Dyad": {"placement": {"icon": {"x1": 800, "y1": 950, "x2": 900, "y2": 1050}}}}
+  }
+}
+end

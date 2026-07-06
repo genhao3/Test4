@@ -1,0 +1,37 @@
+"""
+Ideal sensor measuring the translational power flowing through a point.
+
+This component measures the instantaneous mechanical translational power.
+It is intended to measure power calculated at `flange_a`.
+The sensor is ideal: it does not dissipate energy or introduce any mechanical impedance beyond its defining equations.
+A key characteristic is the constraint $flange_a.s = flange_b.s$, which means
+both flanges share the same position and, consequently, the same velocity.
+The sensor thus measures the power flowing through the connection point `flange_a`,
+while `flange_b` serves to complete the mechanical path with identical motion.
+The measured power $P$ is defined as:
+
+```math
+P = F \cdot v
+```math
+
+where $F$ corresponds to the force `flange_a.f` at `flange_a` and $v$ corresponds
+to the velocity `der(flange_a.s)` of `flange_a`.
+"""
+component PowerSensor
+  extends TranslationalComponents.Interfaces.PartialRelativeSensor
+  "Output signal representing the measured power, calculated as power in flange `flange_a`."
+  power = RealOutput(units="W") {^power}
+relations
+  flange_a.s = flange_b.s
+  power = flange_a.f * der(flange_a.s)
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/RelativeSensor.svg"}},
+  "_links": {
+    "power": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

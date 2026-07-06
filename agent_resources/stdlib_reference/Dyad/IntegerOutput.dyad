@@ -1,0 +1,12 @@
+"This connector represents an integer signal as an output from a component"
+connector IntegerOutput = output Integer metadata {
+  "Dyad": {
+    "icons": {
+      "default": "dyad://Dyad/IntegerOutput.svg"
+    },
+    "path": { "stroke": "rgb(224,116,21)" },
+    "labels": [
+      { "label": "$(instance)", "x": 500, "y": 1100, "layer": "icon" }
+    ]
+  }
+}

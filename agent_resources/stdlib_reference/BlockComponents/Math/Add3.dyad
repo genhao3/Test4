@@ -1,0 +1,58 @@
+"""
+Weighted summation block that adds three scalar inputs with configurable gains.
+
+A component that computes a weighted sum of three real inputs, allowing different gain factors to be
+applied to each input before summation. The output is calculated using the formula:
+
+```math
+y = k_1 \cdot u_1 + k_2 \cdot u_2 + k_3 \cdot u_3
+```
+
+where `k_1`, `k_2`, and `k_3` are user-configurable gain parameters.
+"""
+component Add3
+  "First real input signal"
+  u1 = RealInput() {^u1}
+  "Second real input signal"
+  u2 = RealInput() {^u2}
+  "Third real input signal"
+  u3 = RealInput() {^u3}
+  "Output signal representing the weighted sum of inputs"
+  y = RealOutput() {^y}
+  "Gain of `u1`"
+  parameter k1::Real = 1.0
+  "Gain of `u2`"
+  parameter k2::Real = 1.0
+  "Gain of `u3`"
+  parameter k3::Real = 1.0
+relations
+  y = k1 * u1 + k2 * u2 + k3 * u3
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Add3.svg"}
+  },
+  "_links": {
+    "u1": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "input1", "x1": -50, "y1": 150, "x2": 50, "y2": 250}}
+      }
+    },
+    "u2": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "input2", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "u3": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "input3", "x1": -50, "y1": 750, "x2": 50, "y2": 850}}
+      }
+    },
+    "y": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "output", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    }
+  }
+}
+end

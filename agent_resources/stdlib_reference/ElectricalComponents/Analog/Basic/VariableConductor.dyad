@@ -1,0 +1,63 @@
+"""
+Ideal linear electrical conductor with variable conductance.
+
+The conductance value `G` is provided as an external input signal.
+An optional linear temperature coefficient `alpha` adjusts the
+actual conductance based on the heat port temperature:
+```math
+G_{actual} = \frac{G}{1 + \alpha \cdot (T_{heatPort} - T_{ref})}
+```
+The electrical behavior follows Ohm's law in conductance form:
+```math
+i = G_{actual} \cdot v
+```
+Power dissipated in the conductor is transferred as heat through
+the thermal port `heat_port`.
+
+Corresponds to `Modelica.Electrical.Analog.Basic.VariableConductor`.
+"""
+component VariableConductor
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "Conductance input signal"
+  G = RealInput() {^G}
+  "Thermal port for heat exchange"
+  heat_port = HeatPort() {^heat_port}
+  "Reference temperature"
+  parameter T_ref::Temperature = 300.15
+  "Linear temperature coefficient of conductance"
+  parameter alpha::LinearTemperatureCoefficient = 0.0
+  "Actual conductance accounting for temperature"
+  variable G_actual::Conductance
+  "Power dissipated in the conductor"
+  variable LossPower::Power
+relations
+  assert((1 + alpha * (heat_port.T - T_ref)) >= 1e-15, "Temperature outside scope of model!")
+  G_actual = G / (1 + alpha * (heat_port.T - T_ref))
+  i = G_actual * v
+  LossPower = v * i
+  heat_port.Q_flow = -LossPower
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/Conductor.svg"}
+  },
+  "_links": {
+    "G": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": -100, "x2": 550, "y2": 0, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "heat_port": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 460, "y1": 950, "x2": 560, "y2": 1050, "rot": 0}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

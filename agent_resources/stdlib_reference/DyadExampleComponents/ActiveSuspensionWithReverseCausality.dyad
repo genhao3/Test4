@@ -1,0 +1,180 @@
+component ActiveSuspensionWithReverseCausality
+  wheel = MassSpringDamper(m = wheel_mass, d = wheel_damping, c = wheel_stiffness, g = -10, theta = pi / 2) {^wheel}
+  car_and_suspension = MassSpringDamper(m = car_mass, d = suspension_damping, c = suspension_stiffness, g = -10, theta = pi / 2) {^car_and_suspension}
+  seat = MassSpringDamper(m = human_and_seat_mass, d = seat_damping, c = seat_stiffness, g = -10, theta = pi / 2) {^seat}
+  road_data = RoadData() {^road_data}
+  rev_causality = BlockComponents.Math.ReverseCausality() {^rev_causality}
+  road = SimplePosition() {^road}
+  force = TranslationalComponents.Sources.Force() {^force}
+  set_point = BlockComponents.Sources.Constant(k = 1.5) {^set_point}
+  seat_pos = TranslationalComponents.Sensors.PositionSensor() {^seat_pos}
+  parameter wheel_mass::Dyad.Mass = 25
+  parameter wheel_stiffness::TranslationalSpringConstant = 1e2
+  parameter wheel_damping::DampingCoefficient = 1e4
+  parameter car_mass::Dyad.Mass = 1000
+  parameter suspension_stiffness::TranslationalSpringConstant = 1e4
+  parameter suspension_damping::DampingCoefficient = 10
+  parameter human_and_seat_mass::Dyad.Mass = 100
+  parameter seat_stiffness::TranslationalSpringConstant = 1000
+  parameter seat_damping::DampingCoefficient = 1
+  parameter wheel_initial_position::Dyad.Position = 0.5
+  parameter suspension_initial_position::Dyad.Position = 1
+  parameter seat_initial_position::Dyad.Position = 1.5
+  parameter kd::Real = 20
+  parameter ki::Real = 0.2
+  parameter kp::Real = 1
+relations
+  initial wheel.mass.s = wheel_initial_position
+  initial car_and_suspension.mass.s = suspension_initial_position
+  initial wheel.mass.v = 0
+  initial car_and_suspension.mass.v = 0
+  initial wheel.mass.a = 0
+  initial car_and_suspension.mass.a = 0
+  initial force.f = 0
+  connect(wheel.flange_sd, road.flange) {^id10}
+  connect(car_and_suspension.flange_sd, wheel.flange_m) {^id11}
+  connect(car_and_suspension.flange_m, seat.flange_sd, force.flange_a) {^id12}
+  connect(seat.flange_m, force.flange_b, seat_pos.flange) {^id13}
+  connect(seat_pos.s, rev_causality.u1) {^id14}
+  connect(rev_causality.u2, set_point.y) {^id15}
+  connect(force.f, rev_causality.y) {^id16}
+  connect(road_data.y, road.s) {^id17}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://DyadExampleComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 10,
+        "automatic_discontinuity_detection": true,
+        "abstol": 1e-8,
+        "reltol": 1e-8,
+        "atol": {
+          "wheel.mass.s": 0.001,
+          "seat.mass.s": 0.001,
+          "car_and_suspension.mass.s": 0.001,
+          "wheel.mass.v": 0.001,
+          "car_and_suspension.mass.v": 0.001,
+          "seat.mass.v": 0.001,
+          "rev_causality.y": 0.001
+        },
+        "expect": {
+          "signals": [
+            "wheel.mass.s",
+            "seat.mass.s",
+            "car_and_suspension.mass.s",
+            "wheel.mass.v",
+            "car_and_suspension.mass.v",
+            "seat.mass.v",
+            "rev_causality.y"
+          ]
+        }
+      }
+    }
+  },
+  "_links": {
+    "wheel": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 825, "y1": 675, "x2": 925, "y2": 775, "rot": 90},
+          "diagram": {"iconName": "default", "x1": 830, "y1": 650, "x2": 930, "y2": 750, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "car_and_suspension": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 825, "y1": 500, "x2": 925, "y2": 600, "rot": 90},
+          "diagram": {"iconName": "default", "x1": 830, "y1": 500, "x2": 930, "y2": 600, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "seat": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 825, "y1": 325, "x2": 925, "y2": 425, "rot": 90},
+          "diagram": {"iconName": "default", "x1": 830, "y1": 330, "x2": 930, "y2": 430, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "road_data": {"Dyad": {"placement": {"icon": {"x1": 500, "y1": 730, "x2": 600, "y2": 830}}}},
+    "rev_causality": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 500, "y1": 325, "x2": 600, "y2": 425, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 480, "y1": 330, "x2": 580, "y2": 430, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "road": {"Dyad": {"placement": {"icon": {"x1": 650, "y1": 730, "x2": 750, "y2": 830}}}},
+    "force": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 650, "y1": 325, "x2": 750, "y2": 425, "rot": 270},
+          "diagram": {"iconName": "default", "x1": 640, "y1": 330, "x2": 740, "y2": 430, "rot": 270}
+        },
+        "tags": []
+      }
+    },
+    "set_point": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 350, "y1": 355, "x2": 450, "y2": 455, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 310, "y1": 360, "x2": 410, "y2": 460, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "seat_pos": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 700, "y1": 150, "x2": 800, "y2": 250, "rot": 180},
+          "diagram": {"iconName": "default", "x1": 690, "y1": 160, "x2": 790, "y2": 260, "rot": 180}
+        },
+        "tags": []
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 880, "y": 780}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {"S": -1, "M": [], "E": 1},
+          {"S": -1, "M": [], "E": 2},
+          {"S": -1, "M": [{"x": 690, "y": 450}], "E": 3}
+        ],
+        "junctions": [{"x": 880, "y": 450}],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {"S": -1, "M": [], "E": 1},
+          {"S": -1, "M": [{"x": 690, "y": 310}], "E": 2},
+          {"S": -1, "M": [{"x": 880, "y": 210}], "E": 3}
+        ],
+        "junctions": [{"x": 880, "y": 310}],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 440, "y": 210}, {"x": 440, "y": 350}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id16": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id17": {"Dyad": {"renderStyle": "standard", "edges": [{"S": 1, "E": 2, "M": []}]}}
+  }
+}
+end

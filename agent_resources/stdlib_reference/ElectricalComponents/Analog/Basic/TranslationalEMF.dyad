@@ -1,0 +1,76 @@
+"""
+Electromotive force (electric/translational-mechanic transformer).
+
+Converts electrical energy into translational mechanical energy and vice versa.
+The induced voltage is proportional to the translational velocity, and the
+generated force is proportional to the current:
+```math
+v = k \cdot vel
+```
+```math
+f = -k \cdot i
+```
+where `k` is the electrical force constant (N/A), `vel` is the velocity of
+the `flange` relative to the `support`, and `f` is the force on the `flange`.
+
+The `support` connector is always exposed. To ground the support, connect it
+to `TranslationalComponents.Components.Fixed()` externally. This replaces the Modelica
+`useSupport` conditional parameter, which is not yet supported in Dyad.
+
+Corresponds to `Modelica.Electrical.Analog.Basic.TranslationalEMF`.
+"""
+component TranslationalEMF
+  "Positive electrical pin"
+  p = Pin() {^p}
+  "Negative electrical pin"
+  n = Pin() {^n}
+  "Translational flange"
+  flange = Flange() {^flange}
+  "Support/housing flange"
+  support = Flange() {^support}
+  "Transformation coefficient"
+  parameter k::ElectricalForceConstant = 1
+  "Voltage drop between the two pins"
+  variable v::Voltage
+  "Current flowing from positive to negative pin"
+  variable i::Current
+  "Position of flange relative to support"
+  variable s::Position
+  "Velocity of flange relative to support"
+  variable vel::Velocity
+  "Force of flange"
+  variable f::Force
+  "Electrical force"
+  variable fElectrical::Force
+relations
+  v = p.v - n.v
+  0 = p.i + n.i
+  i = p.i
+  s = flange.s - support.s
+  vel = der(s)
+  k * vel = v
+  f = -k * i
+  fElectrical = -f
+  f = flange.f
+  support.f = -f
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/TranslationalEMF.svg"}
+  },
+  "_links": {
+    "p": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "default", "x1": 450, "y1": -50, "x2": 550, "y2": 50}}
+      }
+    },
+    "n": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "default", "x1": 450, "y1": 950, "x2": 550, "y2": 1050}}
+      }
+    },
+    "flange": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}},
+    "support": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

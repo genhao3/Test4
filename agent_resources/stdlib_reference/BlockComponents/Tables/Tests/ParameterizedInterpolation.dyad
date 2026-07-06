@@ -1,0 +1,43 @@
+component ParameterizedInterpolation
+  # Parameters
+  parameter m::Mass = 1.0
+  parameter c::TranslationalSpringConstant = 10.0
+  parameter d::TranslationalDampingConstant = 2.0
+
+  # State variables
+  variable x::Position  # Position of mass
+  variable v::Velocity  # Velocity of mass
+
+  # Load force vs time data from file
+  structural parameter input_file::String = "dyad://BlockComponents/data/force_time.csv"
+  structural parameter force_dataset::DyadData.DyadTimeseries = DyadData.DyadTimeseries(
+    input_file,
+    independent_var = "timestamp",
+    dependent_vars = ["force"]
+  )
+  # Create interpolation block
+  force_interp = BlockComponents.Tables.ParameterizedInterpolation(
+    interpolation_type = BlockComponents.InterpolationType.LinearInterpolation(),
+    dataset = force_dataset
+  )
+  variable F_applied::Force
+
+relations
+  initial x = 0.0
+  initial v = 0.0
+  F_applied = force_interp.y
+  force_interp.u = time
+  # Kinematics
+  v = der(x)
+
+  # Dynamics: m*a = F_applied - c*x - d*v
+  # (spring force opposes displacement, damping opposes velocity)
+  m * der(v) = F_applied - c * x - d * v
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {"case1": {"stop": 0.1, "expect": {"signals": ["x"]}}},
+    "doc": {"behavior": false}
+  }
+}
+end

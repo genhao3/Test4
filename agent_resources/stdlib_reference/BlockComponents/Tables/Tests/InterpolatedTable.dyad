@@ -1,0 +1,50 @@
+test component InterpolatedTable
+  parameter m::Mass = 1.0
+  parameter k::TranslationalSpringConstant = 100.0
+
+  variable x::Position
+  variable v::Velocity
+  variable T::Temperature  # Operating temperature
+  variable F_damper::Force
+
+  structural parameter input_file::String = "dyad://BlockComponents/data/damper_force_table.csv"
+  structural parameter damper_table::DyadData.DyadInterpolationTable2D = DyadData.DyadInterpolationTable2D(
+    input_file,
+    axis1_name = "velocity",
+    axis2_name = "temperature",
+    data_name = "damping_force"
+  )
+
+  # 2D interpolation
+  damper_interp = BlockComponents.Tables.InterpolatedTable(
+    axis1 = damper_table["velocity"],
+    axis2 = damper_table["temperature"],
+    data = damper_table["damping_force"],
+    interpolation_dim1 = BlockComponents.InterpolationDimension.LinearInterpolationDimension(),
+    interpolation_dim2 = BlockComponents.InterpolationDimension.LinearInterpolationDimension()
+  )
+
+relations
+  initial x = 1.0
+  initial v = 0.0
+  # Connect interpolation inputs
+  damper_interp.u1 = v
+  damper_interp.u2 = T
+  F_damper = damper_interp.y
+
+  # Simple temperature model (could be constant or time-varying)
+  T = 300.0 + 50.0 * sin(2*pi*0.1*time)  # Varies from 250K to 350K
+
+  # Kinematics
+  v = der(x)
+
+  # Dynamics
+  m * der(v) = - k * x - F_damper
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {"case1": {"stop": 0.1, "expect": {"signals": ["v"]}}},
+    "doc": {"behavior": false}
+  }
+}
+end

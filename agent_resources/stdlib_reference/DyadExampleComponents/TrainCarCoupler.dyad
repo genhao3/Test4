@@ -1,0 +1,7 @@
+component TrainCarCoupler
+  extends TranslationalComponents.Components.SpringDamper(s_rel0 = 0)
+relations
+metadata {
+  "Dyad": {"icons": {"default": "dyad://DyadExampleComponents/spring_damper.svg"}}
+}
+end

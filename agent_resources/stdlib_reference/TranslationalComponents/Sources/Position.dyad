@@ -1,0 +1,52 @@
+"""
+Forced movement of a flange according to a reference position.
+
+The input signal `s_ref` defines the reference position in [m]. The flange is forced to move
+relative to the support connector according to this reference motion. The parameter `ref_type`
+selects between two modes:
+
+1. **Exact**: The reference position is treated exactly. This is only possible if
+   the input signal is defined by an analytical function which can be differentiated at
+   least twice.
+2. **Filtered** (default): The reference position is filtered and the second derivative of the
+   filtered curve is used to compute the reference acceleration of the flange. For filtering,
+   a second order Bessel filter is used. The critical frequency `f_crit` in [Hz] should be
+   selected higher than the essential low frequencies in the signal.
+
+   ```math
+   \\frac{bf}{w_{crit}^2} \\frac{d^2s}{dt^2} + \\frac{af}{w_{crit}} \\frac{ds}{dt} + s = s_{ref}
+   ```
+"""
+component Position
+  extends TranslationalComponents.Interfaces.PartialElementaryOneFlangeAndSupport2(s(statePriority = 50) = missing)
+  "Reference position of flange as input signal"
+  s_ref = RealInput(units="m") {^s_ref}
+  "Type of reference signal handling"
+  structural parameter ref_type::TranslationalComponents.Sources.ReferenceType = TranslationalComponents.Sources.ReferenceType.Filtered()
+  "s-coefficient of the Bessel filter"
+  final parameter a_f::Real = 1.3617
+  "s²-coefficient of the Bessel filter"
+  final parameter b_f::Real = 0.6180
+  "Velocity of flange with respect to support"
+  variable v::Velocity(statePriority = 50)
+  "Acceleration of flange with respect to support"
+  variable a::Acceleration
+relations
+  switch ref_type
+    case Exact
+      s = s_ref
+      v = 0
+      a = 0
+    case Filtered
+      initial s = s_ref
+      v = der(s)
+      a = der(v)
+      a = ((s_ref - s) * 2 * π * getproperty(ref_type, Symbol("f_crit")) - a_f * v) * (2 * π * getproperty(ref_type, Symbol("f_crit")) / b_f)
+  end
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/Position.svg"}},
+  "_links": {
+    "s_ref": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

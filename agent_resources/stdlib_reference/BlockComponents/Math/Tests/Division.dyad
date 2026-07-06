@@ -1,0 +1,61 @@
+"""
+Division operation that divides a first input by a second input.
+
+Performs a simple division operation where the output y = u1/u2, dividing the first input (`u1`)
+by the second input (`u2`). This component requires that the second input (denominator) is non-zero
+to avoid division by zero errors.
+"""
+test component Division
+  "Constant block that outputs the value 3 (numerator)"
+  c1 = BlockComponents.Sources.Constant(k = 3) {^c1}
+  "Constant block that outputs the value 2 (denominator)"
+  c2 = BlockComponents.Sources.Constant(k = 2) {^c2}
+  "Division block that divides the first input (u1) by the second input (u2)"
+  division = BlockComponents.Math.Division() {^division}
+relations
+  "Connects the output of constant block c1 (3) to the numerator input of the division block"
+  connect(division.u1, c1.y) {^id4}
+  "Connects the output of constant block c2 (2) to the denominator input of the division block"
+  connect(division.u2, c2.y) {^id5}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {"case1": {"stop": 5, "expect": {"final": {"division.y": 1.5}}}}
+  },
+  "_links": {
+    "c1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 30, "y1": 80, "x2": 130, "y2": 180, "rot": 0}
+        }
+      }
+    },
+    "c2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 30, "y1": 270, "x2": 130, "y2": 370, "rot": 0}
+        }
+      }
+    },
+    "division": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 330, "y1": 170, "x2": 430, "y2": 270, "rot": 0}
+        }
+      }
+    },
+    "id4": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 190, "y": 190}, {"x": 190, "y": 130}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id5": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 190, "y": 250}, {"x": 190, "y": 320}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

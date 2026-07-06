@@ -1,0 +1,34 @@
+component SecondOrderSystemTest
+  src = BlockComponents.Sources.Sine(amplitude = 1, frequency = 5) {^src}
+  sys = SecondOrderSystem(k1 = 2, k2 = 3, k3 = 4) {^sys}
+  collector = RealInput() {^collector}
+relations
+  connect(src.y, sys.xdd) {^id4}
+  collector = sys.sum.y
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://DyadExampleComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 10,
+        "atol": {"collector": 0.0001},
+        "expect": {"final": {"collector": 1.2732414701739279}}
+      }
+    }
+  },
+  "_links": {
+    "src": {"Dyad": {"placement": {"icon": {"x1": 50, "y1": 50, "x2": 150, "y2": 150}}}},
+    "sys": {"Dyad": {"placement": {"icon": {"x1": 200, "y1": 50, "x2": 300, "y2": 150}}}},
+    "collector": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 350, "y1": 50, "x2": 450, "y2": 150, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 350, "y1": 50, "x2": 450, "y2": 150, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id4": {"Dyad": {"edges": [{"S": 1, "E": 2}]}}
+  }
+}
+end

@@ -1,0 +1,25 @@
+"""
+Constant speed, not dependent on force.
+
+Model of fixed velocity of flange, not dependent on force. The velocity of the
+flange with respect to the support is fixed to the parameter `v_fixed`.
+
+The equations are:
+```math
+v = \\frac{ds}{dt}
+```
+```math
+v = v_{fixed}
+```
+"""
+component ConstantSpeed
+  extends TranslationalComponents.Interfaces.PartialForce
+  "Fixed speed (if negative, force is acting as load)"
+  parameter v_fixed::Velocity
+  "Velocity of flange with respect to support (= der(s))"
+  variable v::Velocity
+relations
+  v = der(s)
+  v = v_fixed
+metadata {"Dyad": {"icons": {"default": "dyad://TranslationalComponents/ConstantSpeed.svg"}}}
+end

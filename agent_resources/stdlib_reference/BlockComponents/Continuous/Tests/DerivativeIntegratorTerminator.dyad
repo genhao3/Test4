@@ -1,0 +1,74 @@
+"""
+Test component that demonstrates the chained behavior of differentiation and integration of a sine signal.
+
+This component connects a sine source through a derivative block to an integrator and finally to a terminator,
+demonstrating that differentiating and then integrating a signal approximately recovers the original signal.
+The derivative block approximates the mathematical operation d/dt, while the integrator performs the operation ∫dt.
+When applied in sequence to a sine wave, the output should theoretically match the input with some phase shift.
+"""
+test component DerivativeIntegratorTerminator
+  "Approximates the derivative of the input signal with configured gain and time constant"
+  derivative = BlockComponents.Continuous.Derivative(k = 1, T = 0.001) {^derivative}
+  "Integrates the input signal with specified gain"
+  integrator = BlockComponents.Continuous.Integrator(k = 1) {^integrator}
+  "Terminates the signal path, consuming the input without producing an output"
+  terminator = BlockComponents.Routing.Terminator() {^terminator}
+  "Generates a sinusoidal signal with 1 Hz frequency and unit amplitude"
+  source = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1) {^source}
+relations
+  "Connects the sine wave output to the derivative block input"
+  connect(source.y, derivative.u) {^id5}
+  "Connects the derivative output to the integrator input"
+  connect(derivative.y, integrator.u) {^id6}
+  "Connects the integrator output to the terminator input"
+  connect(integrator.y, terminator.u) {^id7}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "experiments": {},
+    "tests": {
+      "case1": {
+        "stop": 10,
+        "atol": {"integrator.y": 0.01, "terminator.u": 0.01},
+        "expect": {
+          "final": {"integrator.y": 0, "terminator.u": 0},
+          "signals": ["integrator.y", "terminator.u"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "derivative": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 150, "y1": 20, "x2": 250, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 280, "y1": 20, "x2": 380, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "terminator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 410, "y1": 20, "x2": 510, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id5": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id6": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id7": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

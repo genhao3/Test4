@@ -1,0 +1,19 @@
+component RoadData
+  y = RealOutput() {^y}
+  parameter bump::Real = 0.2
+  parameter freq::Real = 0.5
+  parameter offset::Real = 0.4
+  parameter loop::Real = 10
+relations
+  y = ifelse((time % loop) < offset, 0.0, ifelse((time % loop) - offset > freq, 0.0, bump * (1 - cos(2 * π * (time - offset) / freq))))
+metadata {
+  "Dyad": {"icons": {"default": "dyad://DyadExampleComponents/road_data.svg"}},
+  "_links": {
+    "y": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "output", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    }
+  }
+}
+end

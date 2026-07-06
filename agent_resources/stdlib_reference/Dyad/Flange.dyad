@@ -1,0 +1,18 @@
+"This connector represents a mechanical flange with position and force as the potential and flow variables, respectively."
+connector Flange
+  potential s::Position
+  flow f::Force
+metadata {
+  "Dyad": {
+    "labels": [
+      { "label": "$(instance)", "x": 500, "y": 1100, "layer": "icon" }
+    ],
+    "icons": {
+      "default": "dyad://Dyad/FlangeA.svg",
+      "flange_a": "dyad://Dyad/FlangeA.svg",
+      "flange_b": "dyad://Dyad/FlangeB.svg"
+    },
+    "path": { "stroke": "#2a661f" }
+  }
+}
+end

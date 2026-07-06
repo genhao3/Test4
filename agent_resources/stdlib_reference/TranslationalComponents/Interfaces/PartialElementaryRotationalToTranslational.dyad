@@ -1,0 +1,14 @@
+"""
+Base model defining the mechanical interfaces for transforming rotational motion into translational motion.
+
+This partial component provides a rotational flange (`spline`), a translational
+flange (`flange`), and corresponding support connectors (`support_r`, `support_t`).
+Force and torque balances are defined so that extending components only need to
+specify the kinematic constraint between rotation and translation.
+
+Matches MSL `Modelica.Mechanics.Translational.Interfaces.PartialElementaryRotationalToTranslational`.
+This is a re-export of `RotationalComponents.Interfaces.PartialElementaryRotationalToTranslational`.
+"""
+partial component PartialElementaryRotationalToTranslational
+  extends RotationalComponents.Interfaces.PartialElementaryRotationalToTranslational
+end

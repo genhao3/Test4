@@ -1,0 +1,25 @@
+"""
+Linear current-controlled voltage source.
+
+The right port voltage is controlled by the left port current:
+```math
+v_2 = i_1 \cdot \text{transResistance}
+```
+The left port voltage is zero (zero input impedance).
+
+Corresponds to `Modelica.Electrical.Analog.Basic.CCV`.
+"""
+component CCV
+  extends ElectricalComponents.Analog.Interfaces.TwoPort
+  "Transresistance: output voltage per input current (V/A)"
+  parameter transResistance::Resistance = 1
+relations
+  v2 = i1 * transResistance
+  v1 = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/CCV.svg"}
+  }
+}
+end

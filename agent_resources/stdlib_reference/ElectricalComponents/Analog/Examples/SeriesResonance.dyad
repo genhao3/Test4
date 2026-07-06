@@ -1,0 +1,320 @@
+"""
+Models two series RLC circuits, one driven by a sine voltage and the other by a cosine voltage, where both sources have their frequency controlled by a common ramp input and their amplitude by a common constant input.
+
+This component simulates a pair of series RLC circuits. The first circuit is excited
+by a sinusoidal voltage source, while the second is driven by a cosinusoidal voltage
+source. Both voltage sources share common control inputs for their frequency and
+amplitude. A `Ramp` component provides a linearly changing frequency signal, and a
+`Constant` component provides a fixed amplitude signal. This setup is typically used
+to analyze the frequency response and resonance phenomena of the RLC circuits. The
+ramp input sweeps the frequency of the voltage sources from 0 Hz up to 200 Hz over 1
+second (based on default `Ramp` parameters of offset=0, height=200, duration=1),
+allowing observation of the circuit's response across a range that includes its resonant frequency.
+With the default R=0.5 Ohm, L=0.1/(2*pi) H, and C=0.001/(2*pi) F, the resonant
+frequency ($f_0$) is 100 Hz.
+"""
+example component SeriesResonance
+  "Voltage source for the first RLC circuit (sine wave input)."
+  voltage_source1 = ElectricalComponents.Analog.Sources.VoltageSource() {^voltage_source1}
+  "Ground connection for the first RLC circuit."
+  ground1 = ElectricalComponents.Analog.Basic.Ground() {^ground1}
+  "Resistor in the first RLC circuit with R=0.5 Ohm."
+  resistor1 = ElectricalComponents.Analog.Basic.Resistor(R = 0.5) {^resistor1}
+  "Inductor in the first RLC circuit with L=0.1/(2*pi) Henry."
+  inductor1 = ElectricalComponents.Analog.Basic.Inductor(L = 0.1 / (2 * pi)) {^inductor1}
+  "Capacitor in the first RLC circuit with C=0.001/(2*pi) Farad."
+  capacitor1 = ElectricalComponents.Analog.Basic.Capacitor(C = 0.001 / (2 * pi)) {^capacitor1}
+  "Current sensor to measure the current in the first RLC circuit."
+  current_sensor1 = ElectricalComponents.Analog.Sensors.CurrentSensor() {^current_sensor1}
+  "Input signal generator for a sine wave with variable frequency and amplitude."
+  input_signal1 = BlockComponents.Sources.SineVariableFrequencyAndAmplitude() {^input_signal1}
+  "Input signal generator for a cosine wave with variable frequency and amplitude."
+  input_signal2 = BlockComponents.Sources.CosineVariableFrequencyAndAmplitude() {^input_signal2}
+  "Ramp signal generator to control the frequency of input_signal1 and input_signal2."
+  ramp = BlockComponents.Sources.Ramp(start_time = 0, duration = 1, offset = 0, height = 200) {^ramp}
+  "Constant signal generator to control the amplitude of input_signal1 and input_signal2."
+  const_signal = BlockComponents.Sources.Constant(k = 1) {^const_signal}
+  "Voltage source for the second RLC circuit (cosine wave input)."
+  voltage_source2 = ElectricalComponents.Analog.Sources.VoltageSource() {^voltage_source2}
+  "Ground connection for the second RLC circuit."
+  ground2 = ElectricalComponents.Analog.Basic.Ground() {^ground2}
+  "Resistor in the second RLC circuit with R=0.5 Ohm."
+  resistor2 = ElectricalComponents.Analog.Basic.Resistor(R = 0.5) {^resistor2}
+  "Inductor in the second RLC circuit with L=0.1/(2*pi) Henry."
+  inductor2 = ElectricalComponents.Analog.Basic.Inductor(L = 0.1 / (2 * pi)) {^inductor2}
+  "Capacitor in the second RLC circuit with C=0.001/(2*pi) Farad."
+  capacitor2 = ElectricalComponents.Analog.Basic.Capacitor(C = 0.001 / (2 * pi)) {^capacitor2}
+  "Current sensor to measure the current in the second RLC circuit."
+  current_sensor2 = ElectricalComponents.Analog.Sensors.CurrentSensor() {^current_sensor2}
+relations
+  initial inductor1.i = 0
+  initial inductor2.i = 0
+  initial capacitor1.v = 0
+  initial capacitor2.v = 0
+  connect(input_signal1.y, voltage_source1.V) {^id17}
+  connect(input_signal2.y, voltage_source2.V) {^id18}
+  "sine"
+  connect(voltage_source1.p, inductor1.p) {^id19}
+  connect(inductor1.n, capacitor1.p) {^id20}
+  connect(capacitor1.n, resistor1.p) {^id21}
+  connect(voltage_source1.n, ground1.g) {^id22}
+  connect(current_sensor1.p, resistor1.n) {^id23}
+  connect(ground1.g, current_sensor1.n) {^id24}
+  "cosine"
+  connect(voltage_source2.p, inductor2.p) {^id25}
+  connect(inductor2.n, capacitor2.p) {^id26}
+  connect(capacitor2.n, resistor2.p) {^id27}
+  connect(voltage_source2.n, ground2.g) {^id28}
+  connect(current_sensor2.p, resistor2.n) {^id29}
+  connect(ground2.g, current_sensor2.n) {^id30}
+  connect(ramp.y, input_signal1.frequency) {^id31}
+  connect(ramp.y, input_signal2.frequency) {^id32}
+  connect(input_signal1.amplitude, const_signal.y) {^id33}
+  connect(input_signal2.amplitude, const_signal.y) {^id34}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://ElectricalComponents/Example.svg"},
+    "tests": {
+      "case1": {"stop": 1, "expect": {"signals": ["current_sensor1.i", "current_sensor2.i"]}}
+    }
+  },
+  "_links": {
+    "voltage_source1": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 50, "y1": 50, "x2": 150, "y2": 150, "rot": 180},
+          "diagram": {"iconName": "default", "x1": 270, "y1": 220, "x2": 370, "y2": 320, "rot": 180}
+        },
+        "tags": []
+      }
+    },
+    "ground1": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 200, "y1": 200, "x2": 300, "y2": 300, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 420, "y1": 370, "x2": 520, "y2": 470, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "resistor1": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 500, "y1": 50, "x2": 600, "y2": 150, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 720, "y1": 220, "x2": 820, "y2": 320, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inductor1": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 200, "y1": 50, "x2": 300, "y2": 150, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 420, "y1": 220, "x2": 520, "y2": 320, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "capacitor1": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 350, "y1": 50, "x2": 450, "y2": 150, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 570, "y1": 220, "x2": 670, "y2": 320, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "current_sensor1": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 650, "y1": 50, "x2": 750, "y2": 150, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 870, "y1": 220, "x2": 970, "y2": 320, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "input_signal1": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 200, "x2": 0, "y2": 300, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 120, "y1": 370, "x2": 220, "y2": 470, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "input_signal2": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 500, "x2": 0, "y2": 600, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 120, "y1": 670, "x2": 220, "y2": 770, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ramp": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -300, "y1": 125, "x2": -200, "y2": 225, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -150, "y1": 290, "x2": -50, "y2": 390, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "const_signal": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -300, "y1": 275, "x2": -200, "y2": 375, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -160, "y1": 590, "x2": -60, "y2": 690, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "voltage_source2": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 50, "y1": 350, "x2": 150, "y2": 450, "rot": 180},
+          "diagram": {"iconName": "default", "x1": 270, "y1": 520, "x2": 370, "y2": 620, "rot": 180}
+        },
+        "tags": []
+      }
+    },
+    "ground2": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 200, "y1": 500, "x2": 300, "y2": 600, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 420, "y1": 720, "x2": 520, "y2": 820, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "resistor2": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 500, "y1": 350, "x2": 600, "y2": 450, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 720, "y1": 520, "x2": 820, "y2": 620, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inductor2": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 200, "y1": 350, "x2": 300, "y2": 450, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 420, "y1": 520, "x2": 520, "y2": 620, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "capacitor2": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 350, "y1": 350, "x2": 450, "y2": 450, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 570, "y1": 520, "x2": 670, "y2": 620, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "current_sensor2": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 650, "y1": 350, "x2": 750, "y2": 450, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 870, "y1": 520, "x2": 970, "y2": 620, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id17": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 320, "y": 420}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id18": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 320, "y": 720}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id19": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id20": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id21": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id22": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 210, "y": 270}, {"x": 210, "y": 350}, {"x": 470, "y": 350}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id23": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id24": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 470, "y": 350}, {"x": 1000, "y": 350}, {"x": 1000, "y": 270}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id25": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id26": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id27": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id28": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 250, "y": 570}, {"x": 250, "y": 660}, {"x": 470, "y": 660}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id29": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id30": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 470, "y": 660}, {"x": 1000, "y": 660}, {"x": 1000, "y": 570}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id31": {
+      "Dyad": {
+        "renderStyle": "standard",
+        "edges": [{"S": 1, "M": [{"x": 35, "y": 340}, {"x": 35, "y": 443}], "E": 2}]
+      }
+    },
+    "id32": {
+      "Dyad": {
+        "renderStyle": "standard",
+        "edges": [{"S": 1, "M": [{"x": 35, "y": 340}, {"x": 35, "y": 743}], "E": 2}]
+      }
+    },
+    "id33": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 0, "y": 392}, {"x": 0, "y": 640}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id34": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 0, "y": 694}, {"x": 0, "y": 640}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

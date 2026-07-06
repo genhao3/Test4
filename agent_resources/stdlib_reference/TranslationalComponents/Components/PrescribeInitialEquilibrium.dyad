@@ -1,0 +1,51 @@
+"""
+Sets the initial velocity and acceleration of a connected flange to zero.
+
+This component is used to define an initial equilibrium state for a mechanical
+system connected via its `flange`. It ensures that at the beginning of the
+simulation, the velocity `v` and acceleration `a` of the connected element
+are both zero. This is achieved through the equations:
+```math
+\begin{align*}
+v(0) &= 0\\
+a(0) &= 0
+\end{align*}
+```
+Additionally, the component ensures that the force `flange.f` at the connection
+point is zero. The velocity and acceleration are locally defined as derivatives
+of the flange's position `s`:
+```math
+v = \frac{d(\text{flange.s})}{dt}
+```
+```math
+a = \frac{dv}{dt}
+```
+This effectively means that the connected mechanical component starts from a
+standstill with no initial forces applied through this specific constraint.
+"""
+component PrescribeInitialEquilibrium
+  "Mechanical connection point (flange)."
+  flange = Flange() {^flange}
+  "Velocity associated with the flange's motion."
+  variable v::Velocity
+  "Acceleration associated with the flange's motion."
+  variable a::Acceleration
+relations
+  initial v = 0
+  initial a = 0
+  flange.f = 0
+  v = der(flange.s)
+  a = der(v)
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "initial v = 0", "x": 500, "y": 150, "rot": 0},
+      {"label": "initial a = 0", "x": 500, "y": 800, "rot": 0}
+    ],
+    "icons": {"default": "dyad://TranslationalComponents/Position.svg"}
+  },
+  "_links": {
+    "flange": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

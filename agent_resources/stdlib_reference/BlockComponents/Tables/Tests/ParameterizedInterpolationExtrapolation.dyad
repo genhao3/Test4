@@ -1,0 +1,52 @@
+"""
+Tests parameterized interpolation with extrapolation on a mass-spring-damper system.
+
+This component simulates a mass-spring-damper system where the applied force is obtained from
+time-series data using parameterized interpolation with constant extrapolation. The simulation
+runs beyond the data range (0 to 1) to verify that extrapolation correctly extends the boundary
+values for inputs outside the dataset range.
+"""
+component ParameterizedInterpolationExtrapolation
+  # Parameters
+  parameter m::Mass = 1.0
+  parameter c::TranslationalSpringConstant = 10.0
+  parameter d::TranslationalDampingConstant = 2.0
+
+  # State variables
+  variable x::Position  # Position of mass
+  variable v::Velocity  # Velocity of mass
+
+  # Load force vs time data from file (data range: 0 to 1)
+  structural parameter input_file::String = "dyad://BlockComponents/data/interp_square_data.csv"
+  structural parameter force_dataset::DyadData.DyadTimeseries = DyadData.DyadTimeseries(
+    input_file,
+    independent_var = "ts",
+    dependent_vars = ["data"]
+  )
+  # Create interpolation block with constant extrapolation
+  force_interp = BlockComponents.Tables.ParameterizedInterpolation(
+    interpolation_type = BlockComponents.InterpolationType.LinearInterpolation(),
+    extrapolation_type = BlockComponents.ExtrapolationType.Constant(),
+    dataset = force_dataset
+  )
+  variable F_applied::Force
+
+relations
+  initial x = 0.0
+  initial v = 0.0
+  F_applied = force_interp.y
+  force_interp.u = time
+  # Kinematics
+  v = der(x)
+
+  # Dynamics: m*a = F_applied - c*x - d*v
+  # (spring force opposes displacement, damping opposes velocity)
+  m * der(v) = F_applied - c * x - d * v
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {"case1": {"stop": 1.5, "expect": {"signals": ["x"]}}},
+    "doc": {"behavior": false}
+  }
+}
+end

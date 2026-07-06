@@ -1,0 +1,33 @@
+"""
+Models heat transfer by convection where the thermal conductance is a signal input.
+
+This component represents a lumped thermal element that experiences heat convection.
+The rate of heat transfer, `Q_flow`, is determined by the product of the
+convective thermal conductance, `Gc`, and the temperature difference, `ΔT`,
+across the element. The convective thermal conductance `Gc` is not a fixed
+parameter but rather a time-varying signal input to the component.
+The governing equation is:
+```math
+Q_{flow} = G_c \cdot \Delta T
+```
+The temperature difference `ΔT` and the heat flow `Q_flow` are typically
+defined in or inherited from the base class `ConvectiveElement1D`.
+"""
+component Convection
+  extends ThermalComponents.Interfaces.ConvectiveElement1D
+  "Signal representing the convective thermal conductance"
+  Gc = RealInput() {^Gc}
+relations
+  Q_flow = Gc * ΔT
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ThermalComponents/Convection.svg"}
+  },
+  "_links": {
+    "Gc": {
+      "Dyad": {"placement": {"icon": {"x1": 450, "y1": -50, "x2": 550, "y2": 50, "rot": 90}}}
+    }
+  }
+}
+end

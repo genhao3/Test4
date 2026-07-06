@@ -1,0 +1,104 @@
+"""
+Adjustable resistor (potentiometer) with three terminals.
+
+The sliding contact is placed between `pin_n` (r = 0) and `pin_p`
+(r = 1), controlled by the input signal `r`. The total resistance
+`R` is split into two sections by the wiper position:
+```math
+R_p = R_{actual} \cdot (1 - r'), \quad R_n = R_{actual} \cdot r'
+```
+where `r' = \min(1, \max(0, r))` is the clamped wiper position and
+```math
+R_{actual} = R \cdot (1 + \alpha \cdot (T_{heatPort} - T_{ref}))
+```
+The voltage drops follow Ohm's law for each section:
+```math
+v_p - v_c = R_p \cdot i_p, \quad v_n - v_c = R_n \cdot i_n
+```
+Kirchhoff's current law at the potentiometer:
+```math
+i_p + i_n + i_c = 0
+```
+
+Corresponds to `Modelica.Electrical.Analog.Basic.Potentiometer`.
+"""
+component Potentiometer
+  "Positive pin"
+  pin_p = Pin() {^pin_p}
+  "Negative pin"
+  pin_n = Pin() {^pin_n}
+  "Wiper (sliding contact)"
+  contact = Pin() {^contact}
+  "Wiper position input: 0 = at pin_n, 1 = at pin_p"
+  r = RealInput() {^r}
+  "Thermal port for heat exchange"
+  heat_port = HeatPort() {^heat_port}
+  "Total resistance at reference temperature"
+  parameter R::Resistance = 1.0
+  "Reference temperature"
+  parameter T_ref::Temperature = 293.15
+  "Linear temperature coefficient of resistance"
+  parameter alpha::LinearTemperatureCoefficient = 0.0
+  "Resistance from pin_p to contact"
+  variable Rp::Resistance
+  "Resistance from contact to pin_n"
+  variable Rn::Resistance
+  "Power dissipated in the potentiometer"
+  variable LossPower::Power
+relations
+  pin_p.i + pin_n.i + contact.i = 0
+  Rp = R * (1 + alpha * (heat_port.T - T_ref)) * (1 - min(1, max(0, r)))
+  Rn = R * (1 + alpha * (heat_port.T - T_ref)) * min(1, max(0, r))
+  pin_p.v - contact.v = Rp * pin_p.i
+  pin_n.v - contact.v = Rn * pin_n.i
+  LossPower = (pin_p.v - contact.v) * pin_p.i + (pin_n.v - contact.v) * pin_n.i
+  heat_port.Q_flow = -LossPower
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/Potentiometer.svg"}
+  },
+  "_links": {
+    "pin_p": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -50, "y1": 450, "x2": 50, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "pin_n": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 950, "y1": 450, "x2": 1050, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "contact": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 950, "y1": 950, "x2": 1050, "y2": 1050, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "r": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 50, "y1": 1000, "x2": -50, "y2": 1100, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "heat_port": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "node_a", "x1": 460, "y1": 960, "x2": 560, "y2": 1060, "rot": 0}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

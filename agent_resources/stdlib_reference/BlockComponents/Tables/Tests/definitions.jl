@@ -1,0 +1,1 @@
+square(r::AbstractVector) = @. ^(r, 2)

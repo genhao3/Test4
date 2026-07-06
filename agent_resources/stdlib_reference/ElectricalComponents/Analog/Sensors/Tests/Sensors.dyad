@@ -1,0 +1,191 @@
+"""
+A test circuit with a resistor and capacitor in series, driven by a sinusoidal voltage source, instrumented with voltage, current, and power sensors.
+
+This component models an electrical R-C series circuit. A `VoltageSource`, whose
+voltage is determined by a `Sine` signal generator, drives a `Resistor` (R=1 Ohm)
+and a `Capacitor` (C=1 Farad) connected in series. The circuit is completed by a
+`Ground` component. Several sensors are included to monitor the circuit's
+behavior: a `CurrentSensor` measures the current flowing through the series R-C
+combination, a `VoltageSensor` measures the voltage across the `Capacitor`, and
+a `PowerSensor` measures the instantaneous power associated with the `Capacitor`.
+The sine wave generator (`source`) provides an input signal defined by
+$V(t) = \text{offset} + \text{amplitude} \cdot \sin(2 \pi \cdot \text{frequency} \cdot t)$,
+where offset=1, amplitude=10, and frequency=5 Hz. The primary purpose is to
+test the dynamic response of these sensor components in a simple circuit.
+"""
+test component Sensors
+  "Signal generator providing a sinusoidal voltage waveform."
+  source = BlockComponents.Sources.Sine(offset = 1, amplitude = 10, frequency = 5) {^source}
+  "Ideal voltage source whose output is controlled by the 'source' signal."
+  voltage = ElectricalComponents.Analog.Sources.VoltageSource() {^voltage}
+  "Electrical resistor with a fixed resistance value."
+  resistor = ElectricalComponents.Analog.Basic.Resistor(R = 1) {^resistor}
+  "Electrical capacitor with a fixed capacitance value."
+  capacitor = ElectricalComponents.Analog.Basic.Capacitor(C = 1) {^capacitor}
+  "Electrical ground reference (0V)."
+  ground = ElectricalComponents.Analog.Basic.Ground() {^ground}
+  "Sensor to measure voltage difference between its 'p' and 'n' terminals."
+  voltage_sensor = ElectricalComponents.Analog.Sensors.VoltageSensor() {^voltage_sensor}
+  "Sensor to measure current flowing through it from 'p' to 'n'."
+  current_sensor = ElectricalComponents.Analog.Sensors.CurrentSensor() {^current_sensor}
+  "Sensor to measure electrical power, based on voltage (pv, nv) and current (pc, nc) measurements."
+  power_sensor = ElectricalComponents.Analog.Sensors.PowerSensor() {^power_sensor}
+relations
+  connect(source.y, voltage.V) {^id9}
+  connect(voltage.p, resistor.p) {^id10}
+  connect(resistor.n, current_sensor.p) {^id11}
+  connect(current_sensor.n, power_sensor.pc) {^id12}
+  connect(power_sensor.nc, capacitor.p) {^id13}
+  connect(capacitor.n, voltage.n, ground.g) {^id14}
+  connect(capacitor.p, voltage_sensor.p, power_sensor.pv) {^id15}
+  connect(capacitor.n, voltage_sensor.n, power_sensor.nv) {^id16}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://ElectricalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 20,
+        "initial": {"capacitor.v": 10},
+        "expect": {
+          "final": {
+            "current_sensor.i": "0.31798707833424167",
+            "voltage_sensor.v": "0.6820129216657976",
+            "power_sensor.power": "0.21687129634670702"
+          }
+        }
+      }
+    }
+  },
+  "_links": {
+    "source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 0, "y1": 450, "x2": 100, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "voltage": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 180, "y1": 540, "x2": 280, "y2": 640, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "resistor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 490, "y1": 640, "x2": 590, "y2": 740, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "capacitor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 180, "y1": 320, "x2": 280, "y2": 420, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 630, "y1": 500, "x2": 730, "y2": 600, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "voltage_sensor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 190, "y1": 160, "x2": 290, "y2": 260, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "current_sensor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 640, "y1": 640, "x2": 740, "y2": 740, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "power_sensor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 810, "y1": 640, "x2": 910, "y2": 740, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 230, "y": 500}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 150, "y": 590}, {"x": 150, "y": 690}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id12": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 1000, "y": 690},
+              {"x": 1000, "y": 110},
+              {"x": 20, "y": 110},
+              {"x": 20, "y": 370}
+            ],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 450, "y": 370}], "E": -1},
+          {"S": -1, "M": [{"x": 450, "y": 590}], "E": 2},
+          {"S": -1, "M": [{"x": 680, "y": 460}], "E": 3}
+        ],
+        "junctions": [{"x": 450, "y": 460}],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 20, "y": 370}, {"x": 20, "y": 110}], "E": -1},
+          {"S": -1, "M": [{"x": 160, "y": 210}], "E": 2},
+          {"S": -1, "M": [], "E": -2},
+          {"S": -2, "M": [{"x": 860, "y": 110}], "E": 3}
+        ],
+        "junctions": [{"x": 160, "y": 110}, {"x": 160, "y": 110}],
+        "renderStyle": "standard"
+      }
+    },
+    "id16": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 450, "y": 370}], "E": -1},
+          {"S": -1, "M": [{"x": 450, "y": 210}], "E": 2},
+          {"S": -1, "M": [{"x": 450, "y": 950}, {"x": 860, "y": 950}], "E": 3}
+        ],
+        "junctions": [{"x": 450, "y": 230}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

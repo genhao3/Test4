@@ -1,0 +1,75 @@
+"""
+Test of the Speed source component with all ReferenceType enum variants.
+
+Three Speed instances are driven by a common Sine reference (amplitude=1 m/s, frequency=1 Hz)
+and each drives a Mass (m=1 kg) with support grounded to Fixed:
+
+- speed_filtered: default Filtered mode (f_crit=50 Hz)
+- speed_exact: Exact mode — flange velocity equals input directly
+- speed_filtered_low: Filtered mode with low critical frequency (f_crit=5 Hz) to show visible filtering
+"""
+test component Speed
+  "Sine reference speed signal (amplitude=1 m/s, frequency=1 Hz)"
+  sine = BlockComponents.Sources.Sine(amplitude = 1.0, frequency = 1.0)
+  "Speed source — Filtered with default filter (f_crit=50 Hz)"
+  speed_filtered = TranslationalComponents.Sources.Speed()
+  "Mass driven by filtered speed source"
+  mass_filtered = TranslationalComponents.Components.Mass(m = 1.0)
+  "Speed source — Exact (flange tracks input directly)"
+  speed_exact = TranslationalComponents.Sources.Speed(ref_type = TranslationalComponents.Sources.ReferenceType.Exact())
+  "Mass driven by exact speed source"
+  mass_exact = TranslationalComponents.Components.Mass(m = 1.0)
+  "Speed source — Filtered with low critical frequency (f_crit=5 Hz)"
+  speed_filtered_low = TranslationalComponents.Sources.Speed(ref_type = TranslationalComponents.Sources.ReferenceType.Filtered(f_crit = 5.0))
+  "Mass driven by low-f_crit filtered speed source"
+  mass_filtered_low = TranslationalComponents.Components.Mass(m = 1.0)
+  "Fixed ground for all supports"
+  ground = TranslationalComponents.Components.Fixed()
+relations
+  # --- Filtered (default) ---
+  connect(sine.y, speed_filtered.v_ref)
+  connect(speed_filtered.flange, mass_filtered.flange_a)
+  connect(speed_filtered.support, ground.flange)
+  # --- Exact ---
+  connect(sine.y, speed_exact.v_ref)
+  connect(speed_exact.flange, mass_exact.flange_a)
+  connect(speed_exact.support, ground.flange)
+  # --- Filtered low f_crit ---
+  connect(sine.y, speed_filtered_low.v_ref)
+  connect(speed_filtered_low.flange, mass_filtered_low.flange_a)
+  connect(speed_filtered_low.support, ground.flange)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1.1,
+        "atol": {
+          "mass_exact.v": 0.001,
+          "mass_exact.s": 0.001,
+          "mass_filtered.v": 0.001,
+          "mass_filtered.s": 0.001,
+          "mass_filtered_low.v": 0.01,
+          "mass_filtered_low.s": 0.01
+        },
+        "expect": {
+          "final": {
+            "mass_exact.v": 0.5877852522924736,
+            "mass_exact.s": 0.030395889391774417,
+            "mass_filtered.v": 0.5713763618836489,
+            "mass_filtered.s": 0.02857703022540215
+          },
+          "signals": [
+            "mass_exact.v",
+            "mass_exact.s",
+            "mass_filtered.v",
+            "mass_filtered.s",
+            "mass_filtered_low.v",
+            "mass_filtered_low.s"
+          ]
+        }
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,16 @@
+"""
+Generates a continuous time signal that starts counting from a specified time.
+
+A clock component that outputs a continuously increasing signal starting from a
+specified time. The output equals the `offset` value until the simulation time
+reaches `start_time`, after which it increases linearly with time. The output
+value is calculated as `offset` + (`time` - `start_time`) when `time` exceeds
+`start_time`, otherwise it remains at the `offset` value.
+"""
+component ContinuousClock
+  extends BlockComponents.Interfaces.Signal
+relations
+  "Output equals `offset` if `time` < `start_time`, otherwise increases with time"
+  y = ifelse(start_time < time, offset + time - start_time, offset)
+metadata {"Dyad": {"icons": {"default": "dyad://BlockComponents/ContinuousClock.svg"}}}
+end

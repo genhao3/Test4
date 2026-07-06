@@ -1,0 +1,19 @@
+"""
+Multiplies two input signals and outputs their product.
+
+The Product component multiplies two input signals, producing a single output
+that is the result of u1*u2. This is a fundamental mathematical operation used in many control and signal
+processing applications.
+"""
+component Product
+  extends BlockComponents.Interfaces.SI2SO
+relations
+  "Calculates the output as the product of the two input signals"
+  y = u1 * u2
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Product.svg"}
+  }
+}
+end

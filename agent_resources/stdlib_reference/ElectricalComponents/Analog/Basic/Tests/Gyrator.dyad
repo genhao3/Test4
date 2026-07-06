@@ -1,0 +1,160 @@
+"""
+MSL validation test: Gyrator.
+
+Recreates `ModelicaTest.Electrical.Analog.TestGyrator` from MSL.
+Two constant voltage sources (v1=1 V, v2=1 V) drive a gyrator with
+G1=1 S and G2=2 S. Both sides are grounded.
+
+Expected steady-state values (algebraic, constant for all t):
+- gyrator.i1 = G2 * v2 =  2 A
+- gyrator.i2 = -G1 * v1 = -1 A
+
+MSL reference: tolerance=1e-6, StopTime=1.
+"""
+test component Gyrator
+  "Constant signal for primary voltage source (1 V)"
+  const1 = BlockComponents.Sources.Constant(k = 1) {^const1}
+  "Constant signal for secondary voltage source (1 V)"
+  const2 = BlockComponents.Sources.Constant(k = 1) {^const2}
+  "Primary voltage source"
+  v1 = ElectricalComponents.Analog.Sources.VoltageSource() {^v1}
+  "Secondary voltage source"
+  v2 = ElectricalComponents.Analog.Sources.VoltageSource() {^v2}
+  "Gyrator: G1=1 S, G2=2 S"
+  gyrator = ElectricalComponents.Analog.Basic.Gyrator(G1 = 1, G2 = 2) {^gyrator}
+  "Primary ground"
+  ground1 = ElectricalComponents.Analog.Basic.Ground() {^ground1}
+  "Secondary ground"
+  ground2 = ElectricalComponents.Analog.Basic.Ground() {^ground2}
+relations
+  connect(const1.y, v1.V) {^id8}
+  connect(const2.y, v2.V) {^id9}
+  connect(v1.p, gyrator.p1) {^id10}
+  connect(v1.n, ground1.g) {^id11}
+  connect(v2.p, gyrator.p2) {^id12}
+  connect(v2.n, gyrator.n2) {^id13}
+  connect(v2.n, ground2.g) {^id14}
+  connect(v1.n, gyrator.n1) {^id15}
+metadata {
+  "_links": {
+    "const1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 0, "y1": 310, "x2": 100, "y2": 410, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "const2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 1000, "y1": 320, "x2": 900, "y2": 420, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "v1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 410, "x2": 260, "y2": 310, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "v2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 730, "y1": 320, "x2": 830, "y2": 420, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "gyrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 320, "x2": 550, "y2": 420, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 580, "x2": 260, "y2": 680, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 720, "y1": 600, "x2": 820, "y2": 700, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id8": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id10": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 210, "y": 250}, {"x": 391, "y": 250}, {"x": 391, "y": 321}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 780, "y": 250}, {"x": 590, "y": 250}, {"x": 590, "y": 321}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 780, "y": 470}, {"x": 571, "y": 470}, {"x": 571, "y": 420}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 780, "y": 515}, {"x": 770, "y": 515}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 210, "y": 470},
+              {"x": 390, "y": 470},
+              {"x": 390, "y": 420},
+              {"x": 451, "y": 420}
+            ],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

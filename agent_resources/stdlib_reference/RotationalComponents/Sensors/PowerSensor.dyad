@@ -1,0 +1,37 @@
+"""
+Measures the instantaneous rotational power transmitted between two mechanical rotational splines.
+
+This component acts as an ideal sensor to determine the power flowing through a
+rotational mechanical connection. Relative angular displacement between its two
+connectors is zero.
+```math
+\\phi_a = \\phi_b
+```
+The output signal, `power`, represents the instantaneous power. It is calculated
+as the product of the torque at `spline_a` and the angular velocity of `spline_a`.
+The angular velocity is the time derivative of the angle of `spline_a`
+(\$\\dot{\\phi}_a\$) which corresponds to `der(spline_a.phi)` in the
+model's equations. The power is thus defined by the equation:
+```math
+P = \\tau_a \\cdot \\dot{\\phi_a}
+```
+where `P` is the output power, \$\tau_a\$ is the torque at `spline_a`, and \$\\dot{\\phi}_a\$ is the angular velocity of `spline_a`.
+"""
+component PowerSensor
+  extends RotationalComponents.Interfaces.PartialRelativeSensor
+  "Power in spline `spline_a` as output signal"
+  power = RealOutput() {^power}
+relations
+  spline_a.phi = spline_b.phi
+  power = spline_a.tau * der(spline_a.phi)
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/Sensor-Power-Torque.svg"}},
+  "_links": {
+    "power": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 100, "y1": 950, "x2": 200, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

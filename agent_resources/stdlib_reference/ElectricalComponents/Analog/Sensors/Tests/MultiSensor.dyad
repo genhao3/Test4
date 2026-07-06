@@ -1,0 +1,180 @@
+"""
+A test circuit designed to verify the behavior of a MultiSensor component within
+a series R-C circuit driven by a sinusoidal voltage source.
+
+This component models an electrical test bench. A `VoltageSource`, whose voltage
+$V_{in}(t)$ is dictated by a `BlockComponents.Sources.Sine` signal generator, applies a
+sinusoidal voltage to a circuit.
+This circuit comprises a `Resistor` (R) in series with a `Capacitor` (C).
+The `MultiSensor` component, which is the device under test, is placed to measure
+the current $i(t)$ flowing through the resistor and capacitor, and the voltage
+$v_C(t)$ across the capacitor. The `Ground` component provides a common reference
+potential (0 V).
+The circuit dynamics are governed by the differential equation for the capacitor
+voltage $v_C(t)$: $R C \frac{d v_C(t)}{dt} + v_C(t) = V_{in}(t)$ and
+the current is $i(t) = C \frac{d v_C(t)}{dt}$.
+The `MultiSensor` is expected to report $v_C(t)$ as its voltage measurement and
+$i(t)$ as its current measurement.
+"""
+test component MultiSensor
+  "Signal generator providing a sinusoidal input waveform with specified offset, amplitude, and frequency."
+  source = BlockComponents.Sources.Sine(offset = 1, amplitude = 10, frequency = 5) {^source}
+  "Ideal voltage source component; its voltage is controlled by an external signal."
+  voltage = ElectricalComponents.Analog.Sources.VoltageSource() {^voltage}
+  "Resistor component with a resistance value R=1 Ohm."
+  resistor = ElectricalComponents.Analog.Basic.Resistor(R = 1) {^resistor}
+  "Capacitor component with a capacitance value C=1 Farad."
+  capacitor = ElectricalComponents.Analog.Basic.Capacitor(C = 1) {^capacitor}
+  "Electrical ground component, providing a zero-volt reference potential."
+  ground = ElectricalComponents.Analog.Basic.Ground() {^ground}
+  "The multi-functional sensor component under test; it measures voltage, current and calculates power."
+  multi_sensor = ElectricalComponents.Analog.Sensors.MultiSensor() {^multi_sensor}
+relations
+  connect(source.y, voltage.V) {^id7}
+  connect(voltage.p, resistor.p) {^id8}
+  connect(resistor.n, multi_sensor.pc) {^id9}
+  connect(multi_sensor.nc, capacitor.p) {^id10}
+  connect(ground.g, voltage.n) {^id11}
+  connect(capacitor.p, multi_sensor.pv) {^id12}
+  connect(capacitor.n, multi_sensor.nv) {^id13}
+  connect(capacitor.n, voltage.n) {^id14}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://ElectricalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 20,
+        "initial": {"capacitor.v": 10},
+        "expect": {
+          "final": {
+            "multi_sensor.i": "0.31798707833424167",
+            "multi_sensor.v": "0.6820129216657976",
+            "multi_sensor.power": "0.21687129634670702"
+          }
+        }
+      }
+    }
+  },
+  "_links": {
+    "source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 290, "y1": 110, "x2": 390, "y2": 210, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "voltage": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 510, "y1": 200, "x2": 610, "y2": 300, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "resistor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 520, "y1": 500, "x2": 620, "y2": 600, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "capacitor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 510, "y1": 340, "x2": 610, "y2": 440, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 740, "y1": 150, "x2": 840, "y2": 250, "rot": 270}
+        },
+        "tags": []
+      }
+    },
+    "multi_sensor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 850, "y1": 330, "x2": 950, "y2": 430, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 560, "y": 160}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 450, "y": 250}, {"x": 450, "y": 550}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 700, "y": 550}, {"x": 700, "y": 380}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 1000, "y": 380},
+              {"x": 1000, "y": 680},
+              {"x": 240, "y": 680},
+              {"x": 240, "y": 390}
+            ],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 650, "y": 200}, {"x": 650, "y": 250}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 240, "y": 390}, {"x": 240, "y": 90}, {"x": 900, "y": 90}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 700, "y": 390}, {"x": 700, "y": 520}, {"x": 900, "y": 520}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 700, "y": 390}, {"x": 700, "y": 250}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

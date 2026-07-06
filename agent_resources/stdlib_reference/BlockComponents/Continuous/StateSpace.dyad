@@ -1,0 +1,88 @@
+"""
+Linear state-space system with operating point support.
+
+Implements a linear, time-invariant state-space system of the form:
+
+```math
+\dot{x} = Ax + B(u - u_0)
+```
+```math
+y = Cx + D(u - u_0) + y_0
+```
+
+where:
+- `A` is the system matrix (nx × nx)
+- `B` is the input matrix (nx × nu)
+- `C` is the output matrix (ny × nx)
+- `D` is the feedthrough matrix (ny × nu)
+- `x` is the state vector (nx × 1)
+- `u` is the input vector (nu × 1)
+- `y` is the output vector (ny × 1)
+- `u0` is the input operating point
+- `y0` is the output operating point
+
+The operating point feature allows the system to operate around a specific
+steady-state condition, which is useful for linearization around an equilibrium.
+"""
+component StateSpace
+  "Input connectors"
+  u = [RealInput() for i in 1:nu] {^u}
+  "Output connectors"
+  y = [RealOutput() for i in 1:ny] {^y}
+  "Dimension of state vector"
+  structural parameter nx::Integer = 2
+  "Number of inputs"
+  structural parameter nu::Integer = 1
+  "Number of outputs"
+  structural parameter ny::Integer = 1
+  "System matrix (nx × nx)"
+  parameter A::Real[nx, nx] = fill(0.0, nx, nx)
+  "Input matrix (nx × nu)"
+  parameter B::Real[nx, nu] = fill(1.0, nx, nu)
+  "Output matrix (ny × nx)"
+  parameter C::Real[ny, nx] = fill(1.0, ny, nx)
+  "Feedthrough matrix (ny × nu)"
+  parameter D::Real[ny, nu] = fill(0.0, ny, nu)
+  "Initial state vector"
+  parameter x0::Real[nx] = fill(0.0, nx)
+  "Input operating point"
+  parameter u0::Real[nu] = fill(0.0, nu)
+  "Output operating point"
+  parameter y0::Real[ny] = fill(0.0, ny)
+  "State vector"
+  variable x::Real[nx]
+  variable Δu::Real[nu]
+  variable Δy::Real[ny]
+relations
+  initial x = x0
+  Δu = u - u0
+  Δy = y - y0
+  "State equation: dx/dt = A*x + B*(u - u0)"
+  der(x) = A * x + B * Δu
+  "Output equation: y = C*x + D*(u - u0) + y0"
+  Δy = C * x + D * Δu
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/StateSpace.svg"}
+  },
+  "_links": {
+    "u": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 450, "x2": 0, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -100, "y1": 450, "x2": 0, "y2": 550, "rot": 0}
+        }
+      }
+    },
+    "y": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

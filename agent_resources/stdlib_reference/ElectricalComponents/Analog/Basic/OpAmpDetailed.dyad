@@ -1,0 +1,223 @@
+"""
+A detailed operational amplifier, incorporating input/output characteristics,
+frequency response, slew rate, and supply voltage limitations.
+
+This operational amplifier model provides a comprehensive representation of an
+op-amp's behavior. It features differential input pins (p, n), an output pin (outp),
+and positive (p_supply) and negative (n_supply) supply pins that enforce output
+voltage saturation. The input stage models differential resistance ($Rdm$),
+common-mode resistance ($Rcm$), input capacitance ($Cin$), offset
+voltage ($Vos$), bias current ($Ib$), and offset current
+($Ios$). The AC characteristics are defined by a dominant pole ($fp1$)
+and additional frequency shaping terms involving poles ($fp2, fp3, fp4$)
+and a zero ($fz$). The voltage $v_in$ across the differential
+input resistance, after accounting for offset voltage, serves as the input to the
+frequency shaping network. The frequency response is modeled by the following
+relations in the time domain:
+
+```math
+\frac{d(q_{fr1})}{dt} = 2.0 \cdot \pi \cdot fp2 \cdot (v_{in} - q_{fr1})
+```
+```math
+q_{fr2} + \frac{1}{2.0 \cdot \pi \cdot fp3} \cdot \frac{d(q_{fr2})}{dt} = q_{fr1} + \frac{1}{2.0 \cdot \pi \cdot fz} \cdot \frac{d(q_{fr1})}{dt}
+```
+```math
+\frac{d(q_{fr3})}{dt} = 2.0 \cdot \pi \cdot fp4 \cdot (q_{fr2} - q_{fr3})
+```
+The gain stage applies differential gain ($Avd0$) and considers common-mode rejection ($CMRR$) to the processed signal $q_{fr3}$ and the common-mode
+input component. The resulting sum $q_{sum}$ is then passed through a dominant pole filter:
+```math
+\frac{d(q_{fp1})}{dt} = 2.0 \cdot \pi \cdot fp1 \cdot (q_{sum\_help} - q_{fp1})
+```
+where $q_{sum\_help}$ is $q_{sum}$ limited by the supply rails. Slew rate limitations for rising ($sr_p$) and falling ($sr_m$) output signals are
+applied to the signal $v_{source}$, which is derived from $q_{fp1}$. The slew rate limiting mechanism is described by:
+```math
+\frac{d(v_{source})}{dt} = \text{ifelse}(\frac{dx}{dt} > sr_{p\_val}, sr_{p\_val}, \text{ifelse}(\frac{dx}{dt} < sr_{m\_val}, sr_{m\_val}, \frac{dx}{dt}))
+```
+where $\frac{dx}{dt} = (q_{fp1}-v_{source})/Ts$. The output stage is characterized by an output resistance ($Rout$) and maximum source ($Imaxso$) and sink
+($Imaxsi$) currents, which limit the output current $i_{out}$.
+"""
+component OpAmpDetailed
+  "Positive differential input terminal"
+  p = Pin() {^p}
+  "Negative differential input terminal"
+  n = Pin() {^n}
+  "Output terminal"
+  outp = Pin() {^outp}
+  "Positive power supply input terminal"
+  p_supply = Pin() {^p_supply}
+  "Negative power supply input terminal"
+  n_supply = Pin() {^n_supply}
+  "Input resistance (differential input mode)"
+  parameter Rdm::Resistance = 2.0e6
+  "Input resistance (common mode)"
+  parameter Rcm::Resistance = 2.0e9
+  "Input capacitance"
+  parameter Cin::Capacitance = 1.4e-12
+  "Input offset voltage"
+  parameter Vos::Voltage = 1.0e-3
+  "Input bias current"
+  parameter Ib::Current = 80.0e-9
+  "Input offset current"
+  parameter Ios::Current = 20.0e-9
+  "Correction value for limiting by `p_supply`"
+  parameter vcp::Voltage = 0.0
+  "Correction value for limiting by `n_supply`"
+  parameter vcm::Voltage = 0.0
+  "Differential amplifier [dB]"
+  parameter Avd0::SoundPowerLevel = 106.0
+  "Common-mode rejection [dB]"
+  parameter CMRR::SoundPowerLevel = 90.0
+  "Dominant pole"
+  parameter fp1::Frequency = 5.0
+  "Pole frequency"
+  parameter fp2::Frequency = 2.0e6
+  "Pole frequency"
+  parameter fp3::Frequency = 20.0e6
+  "Pole frequency"
+  parameter fp4::Frequency = 100.0e6
+  "Zero frequency"
+  parameter fz::Frequency = 5.0e6
+  "Slew rate for increase"
+  parameter sr_p::VoltageSlope = 0.5e6
+  "Slew rate for decrease"
+  parameter sr_m::VoltageSlope = 0.5e6
+  "Output resistance"
+  parameter Rout::Resistance = 75.0
+  "Maximal output current (source current)"
+  parameter Imaxso::Current = 25.0e-3
+  "Maximal output current (sink current)"
+  parameter Imaxsi::Current = 25.0e-3
+  "Sampling Time | number of intervals: 2500, stop time: 0.003"
+  parameter Ts::Time = 0.0000012
+  "Absolute value of voltage drop for positive output saturation limiting"
+  final parameter vcp_abs::Voltage = abs(vcp)
+  "Absolute value of voltage drop for negative output saturation limiting"
+  final parameter vcm_abs::Voltage = abs(vcm)
+  "Bias current component for the non-inverting input path including offset"
+  final parameter I1::Current = Ib + Ios / 2.0
+  "Bias current component for the inverting input path including offset"
+  final parameter I2::Current = Ib - Ios / 2.0
+  "Linear differential voltage gain (converted from dB)"
+  final parameter Avd0_val::Real = 10.0 ^ (Avd0 / 20.0)
+  "Linear common-mode voltage gain (converted from dB and halved)"
+  final parameter Avcm_val::Real = (Avd0_val / (10.0 ^ (CMRR / 20.0))) / 2.0
+  "Effective positive slew rate value (absolute)"
+  final parameter sr_p_val::VoltageSlope = abs(sr_p)
+  "Effective negative slew rate value (negative absolute)"
+  final parameter sr_m_val::VoltageSlope = -abs(sr_m)
+  "Effective maximum output source current (absolute)"
+  final parameter Imaxso_val::Current = abs(Imaxso)
+  "Effective maximum output sink current (absolute)"
+  final parameter Imaxsi_val::Current = abs(Imaxsi)
+  "Voltage of the positive power supply pin"
+  variable v_pos::Voltage
+  "Voltage of the negative power supply pin"
+  variable v_neg::Voltage
+  "Internal representation of the input offset voltage Vos"
+  variable v_vos::Voltage
+  "Voltage at the non-inverting input after accounting for Vos"
+  variable v_3::Voltage
+  "Effective differential input voltage (p.v - n.v - Vos)"
+  variable v_in::Voltage
+  "Voltage at the inverting input n.v"
+  variable v_4::Voltage
+  "Current flowing into the positive input terminal p"
+  variable i_vos::Current
+  "Current component through Rcm from the non-inverting input path"
+  variable i_3::Current
+  "Current through the differential input resistance Rdm"
+  variable i_r2::Current
+  "Current through the input capacitance Cin"
+  variable i_c3::Current
+  "Current component through Rcm from the inverting input path"
+  variable i_4::Current
+  "State variable representing output of the pole fp2 filter stage"
+  variable q_fr1::Real
+  "State variable representing output of the zero fz and pole fp3 filter stage"
+  variable q_fr2::Real
+  "State variable representing output of the pole fp4 filter stage; input to gain stage"
+  variable q_fr3::Real
+  "Internal summed voltage after gain stage, before dominant pole and limiting"
+  variable q_sum::Voltage
+  "Internal summed voltage after gain stage and output voltage limiting"
+  variable q_sum_help::Voltage
+  "State variable representing output of the dominant pole fp1 filter stage"
+  variable q_fp1::Voltage
+  "Internal voltage after dominant pole and slew rate limiting, driving output resistance"
+  variable v_source::Voltage
+  "Auxiliary variable for slew rate"
+  variable x::Voltage
+  "Voltage at the output pin outp.v"
+  variable v_out::Voltage
+  "Current flowing from the output pin outp.i"
+  variable i_out::Current
+relations
+  initial v_source = q_fp1
+  initial x = 0
+  "power supply"
+  v_pos = p_supply.v
+  v_neg = n_supply.v
+  "input stage"
+  p.i = i_vos
+  n.i = i_4 - i_r2 - i_c3
+  0 = i_3 + i_r2 + i_c3 - i_vos
+  p.v - n.v = v_vos + v_in
+  v_4 = n.v
+  v_3 = p.v - v_vos
+  v_vos = Vos
+  i_3 = I1 + v_3 / Rcm
+  v_in = Rdm * i_r2
+  i_c3 = Cin * der(v_in)
+  i_4 = I2 + v_4 / Rcm
+  "Frequency response"
+  der(q_fr1) = 2.0 * π * fp2 * (v_in - q_fr1)
+  q_fr2 + (1.0 / (2.0 * π * fp3)) * der(q_fr2) = q_fr1 + (1.0 / (2.0 * π * fz)) * der(q_fr1)
+  der(q_fr3) = 2.0 * π * fp4 * (q_fr2 - q_fr3)
+  "gain stage"
+  q_sum = Avd0_val * q_fr3 + Avcm_val * (v_3 + v_4)
+  q_sum_help = ElectricalComponents.limit_q_sum(q_sum, q_fp1, v_pos, v_neg, vcp_abs, vcm_abs)
+  der(q_fp1) = 2.0 * π * fp1 * (q_sum_help - q_fp1)
+  "slew rate stage"
+  der(x) = (q_fp1 - v_source) / Ts
+  der(v_source) = ifelse(der(x) > sr_p_val, sr_p_val, ifelse(der(x) < sr_m_val, sr_m_val, der(x)))
+  "output stage"
+  v_out = outp.v
+  i_out = outp.i
+  i_out = ElectricalComponents.limit_out_current(v_source, v_out, Rout, Imaxsi_val, Imaxso_val)
+  p_supply.i = 0
+  n_supply.i = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/OpAmpDetailed.svg"}
+  },
+  "_links": {
+    "p": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": -50, "y1": 650, "x2": 50, "y2": 750}}
+      }
+    },
+    "n": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "neg", "x1": -50, "y1": 250, "x2": 50, "y2": 350}}
+      }
+    },
+    "outp": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    },
+    "p_supply": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": 450, "y1": -50, "x2": 550, "y2": 50}}
+      }
+    },
+    "n_supply": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "neg", "x1": 450, "y1": 950, "x2": 550, "y2": 1050}}
+      }
+    }
+  }
+}
+end

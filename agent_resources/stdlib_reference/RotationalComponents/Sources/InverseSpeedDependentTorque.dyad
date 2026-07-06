@@ -1,0 +1,32 @@
+"""
+Torque reciprocal dependent on speed.
+
+Model of inverse speed dependent torque. Parameter TorqueDirection chooses
+whether direction of torque is the same in both directions of rotation or not.
+If TorqueDirection = false, regularization near zero speed avoids numerical
+problems.
+"""
+component InverseSpeedDependentTorque
+  extends RotationalComponents.Interfaces.PartialTorque
+  "Nominal torque (if negative, torque is acting as load in positive direction of rotation)"
+  parameter tau_nominal::Torque
+  "Same direction of torque in both directions of rotation"
+  structural parameter TorqueDirection::Boolean = true
+  "Nominal speed"
+  parameter w_nominal::AngularVelocity(min = eps(Float64))
+  "Regularization below w0"
+  parameter w0::AngularVelocity(min = eps(Float64)) = 0.1
+  "Angular velocity of spline with respect to support (= der(phi))"
+  variable w::AngularVelocity
+  "Accelerating torque acting at spline (= -spline.tau)"
+  variable tau::Torque
+relations
+  w = der(phi)
+  tau = -spline.tau
+  if TorqueDirection
+    tau = ifelse(abs(w) < w0, tau_nominal * w_nominal / w0, tau_nominal * w_nominal / abs(w))
+  else
+    tau = ifelse(abs(w) < w0, tau_nominal * w / w0, tau_nominal * w_nominal / w)
+  end
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/InverseSpeedDepTorque.svg"}}}
+end

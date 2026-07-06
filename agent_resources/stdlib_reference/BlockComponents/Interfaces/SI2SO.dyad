@@ -1,0 +1,46 @@
+"""
+Partial component definition with two inputs and one output.
+
+A base component that defines connectivity for blocks with two real-valued inputs and one real-valued output.
+This serves as a partial component to be extended by components that process two input signals to produce
+a single output signal.
+"""
+partial component SI2SO
+  "First real-valued input signal"
+  u1 = RealInput() {^u1}
+  "Second real-valued input signal"
+  u2 = RealInput() {^u2}
+  "Real-valued output signal"
+  y = RealOutput() {^y}
+relations
+metadata {
+  "Dyad": {"labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}]},
+  "_links": {
+    "u1": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 150, "x2": 0, "y2": 250, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -100, "y1": 150, "x2": 0, "y2": 250, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "u2": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 750, "x2": 0, "y2": 850, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -100, "y1": 750, "x2": 0, "y2": 850, "rot": 0}
+        }
+      }
+    },
+    "y": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

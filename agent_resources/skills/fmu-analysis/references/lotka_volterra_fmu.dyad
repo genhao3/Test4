@@ -1,0 +1,57 @@
+"""
+Lotka-Volterra predator-prey model.
+
+  dx₁/dt = α*x₁ - β*x₁*x₂ + u₁
+  dx₂/dt = δ*x₁*x₂ - γ*x₂ - u₂
+
+where x₁ is prey population, x₂ is predator population,
+u₁ and u₂ are external input signals, and α, β, γ, δ are model parameters.
+"""
+component LotkaVolterra
+  "Prey input signal"
+  u_1 = RealInput()
+  "Predator input signal"
+  u_2 = RealInput()
+  "Prey population output"
+  x_1 = RealOutput()
+  "Predator population output"
+  x_2 = RealOutput()
+
+  "Prey birth rate"
+  parameter alpha::Real = 2.0
+  "Predation rate"
+  parameter beta::Real = 1.875
+  "Predator death rate"
+  parameter gamma::Real = 2.0
+  "Predator reproduction rate"
+  parameter delta::Real = 1.875
+
+  variable prey::Real
+  variable predator::Real
+relations
+  initial prey = 1.0
+  initial predator = 1.0
+
+  der(prey) = alpha * prey - beta * prey * predator + u_1
+  der(predator) = delta * prey * predator - gamma * predator - u_2
+
+  x_1 = prey
+  x_2 = predator
+end
+
+test component TestLotkaVolterra
+  lv = LotkaVolterra()
+relations
+  lv.u_1 = 0.01
+  lv.u_2 = 0.01
+end
+
+analysis TestLotkaVolterraTransient
+  extends TransientAnalysis(stop = 10.0)
+  model = TestLotkaVolterra()
+end
+
+analysis LotkaVolterraFMU
+  extends DyadFMUGeneration.FMUAnalysis(fmu_type = "FMI_CS", n_inputs = 2, inputs = ["u_1", "u_2"], n_outputs = 2, outputs = ["x_1", "x_2"])
+  model = LotkaVolterra()
+end

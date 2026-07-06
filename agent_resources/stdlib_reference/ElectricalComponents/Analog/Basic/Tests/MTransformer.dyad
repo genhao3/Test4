@@ -1,0 +1,191 @@
+"""
+Test circuit for MTransformer with N=2.
+
+Replicates the primary-side circuit from the MSL CompareTransformers example:
+  SineVoltage → R1 → Transformer primary → Ground (primary side)
+  Transformer secondary → R2 → Load → Ground (secondary side)
+
+With these parameters the MTransformer(N=2) should behave identically
+to the MSL Basic.Transformer(L1, L2, M).
+
+Parameters (from MSL CompareTransformers):
+  f = 10 Hz, Vpeak = 0.1 V, Vdc = 0.1 V, phase = pi/2
+  n = 2 (turns ratio)
+  R1 = 0.01 Ω, R2 = 0.0025 Ω, RL = 0.25 Ω
+  L1 ≈ 0.16 H, L2 ≈ 0.04 H, M ≈ 0.07958 H
+"""
+test component MTransformer
+  # Sine voltage source (primary side)
+  sine = BlockComponents.Sources.Sine(offset = 0.1, amplitude = 0.1, frequency = 10.0, phase = 1.5707963267948966) {^sine}
+  source = ElectricalComponents.Analog.Sources.VoltageSource() {^source}
+  # Primary winding resistance
+  r1 = ElectricalComponents.Analog.Basic.Resistor(R = 0.01) {^r1}
+  # The MTransformer with N=2
+  transformer = ElectricalComponents.Analog.Basic.MTransformer(N = 2, L = [0.15996, 0.07958, 0.03999]) {^transformer}
+  # Secondary winding resistance
+  r2 = ElectricalComponents.Analog.Basic.Resistor(R = 0.0025) {^r2}
+  # Load resistor
+  load = ElectricalComponents.Analog.Basic.Resistor(R = 0.25) {^load}
+  # Separate grounds for primary and secondary (galvanic isolation)
+  gnd1 = ElectricalComponents.Analog.Basic.Ground() {^gnd1}
+  gnd2 = ElectricalComponents.Analog.Basic.Ground() {^gnd2}
+relations
+  # Drive voltage source with sine
+  connect(sine.y, source.V) {^id9}
+  # Primary side: source → R1 → transformer winding 1 → ground
+  connect(source.p, r1.p) {^id10}
+  connect(r1.n, transformer.p[1]) {^id11}
+  connect(transformer.n[1], gnd1.g, source.n) {^id12}
+  # Secondary side: transformer winding 2 → R2 → load → ground
+  connect(transformer.p[2], r2.p) {^id13}
+  connect(r2.n, load.p) {^id14}
+  connect(load.n, gnd2.g, transformer.n[2]) {^id15}
+metadata {
+  "Dyad": {
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "expect": {
+          "signals": ["transformer.i[1]", "transformer.i[2]", "transformer.v[1]", "transformer.v[2]"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "sine": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 155, "y1": 125, "x2": 255, "y2": 225, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "r1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 285, "y1": 236, "x2": 385, "y2": 336, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "transformer": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 414, "y1": 236, "x2": 514, "y2": 336, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "r2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 630, "y1": 500, "x2": 730, "y2": 600, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "load": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 155, "y1": 356, "x2": 255, "y2": 456, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "gnd1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 620, "y1": 350, "x2": 720, "y2": 450, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "gnd2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 290, "y1": 500, "x2": 390, "y2": 600, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 205, "y": 70}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 140, "y": 175}, {"x": 140, "y": 286}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [{"x": 670, "y": 286}], "E": 2},
+          {
+            "S": -1,
+            "M": [{"x": 540, "y": 246}, {"x": 600, "y": 246}, {"x": 600, "y": 175}],
+            "E": 3
+          }
+        ],
+        "junctions": [{"x": 540, "y": 286}],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {
+            "S": -1,
+            "M": [{"x": 400, "y": 500}, {"x": 500, "y": 500}, {"x": 500, "y": 550}],
+            "E": 2
+          }
+        ],
+        "junctions": [{"x": 400, "y": 286}],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 750, "y": 550},
+              {"x": 750, "y": 690},
+              {"x": 140, "y": 690},
+              {"x": 140, "y": 406}
+            ],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [{"x": 335, "y": 433.5}, {"x": 340, "y": 433.5}], "E": 2},
+          {"S": -1, "M": [{"x": 600, "y": 406}, {"x": 600, "y": 286}], "E": 3}
+        ],
+        "junctions": [{"x": 335, "y": 406}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

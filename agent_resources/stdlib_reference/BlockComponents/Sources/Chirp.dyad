@@ -1,0 +1,75 @@
+" This enum defines the available chirp types"
+enum ChirpLaw =
+  | Linear
+  | Quadratic
+  | Exponential
+
+"""
+The `Chirp` block generates a time-varying frequency sweep signal (chirp).
+
+A chirp is a sinusoidal signal whose frequency increases over time.
+This block supports three chirp laws:
+
+**1. Linear chirp**
+Frequency increases linearly from `fmin` to `fmax` over duration `T`.
+Phase law:
+φ(t) = fmin·t + (fmax − fmin)/(2·T) · t²
+
+**2. Quadratic chirp**
+Frequency increases quadratically over time, producing a slower start and faster rise.
+Phase law:
+φ(t) = fmin·t + (fmax − fmin)/(3·T²) · t³
+
+**3. Exponential chirp**
+Frequency increases exponentially, spending equal time per octave.
+Phase law:
+φ(t) = fmin·T / ln(fmax/fmin) · ((fmax/fmin)^(t/T) − 1)
+
+The output is always:
+y(t) = amplitude · sin(2π·φ(t) + phase)
+"""
+component Chirp
+  extends BlockComponents.Interfaces.SO
+  "Initial frequency"
+  parameter fmin::Frequency = 0.1
+  "Frequency at duration"
+  parameter fmax::Frequency = 5
+  "Signal duration"
+  parameter T::Time = 100
+  "Amplitude"
+  parameter amplitude::Real = 1
+  "Phase"
+  parameter phase::Real = 0
+  "Choice of chirp law"
+  structural parameter law::ChirpLaw = ChirpLaw.Quadratic()
+  variable phi::Real
+relations
+  y = amplitude * sin(2 * pi * phi + phase)
+  switch law
+    case Linear
+      phi = fmin * time + (fmax - fmin) / (2 * T) * time ^ 2
+    case Quadratic
+      phi = fmin * time + (fmax - fmin) / (3 * T ^ 2) * time ^ 3
+    case Exponential
+      phi = fmin * T / log(fmax / fmin) * ((fmax / fmin) ^ (time / T) - 1)
+  end
+metadata {
+  "Dyad": {
+    "experiments": {},
+    "tests": {},
+    "labels": [
+      {
+        "label": "$(instance)",
+        "x": 500,
+        "y": 1100,
+        "rot": 0,
+        "layer": "icon",
+        "attrs": {}
+      }
+    ],
+    "icons": {"default": "dyad://BlockComponents/Chirp.svg"},
+    "path": {},
+    "doc": {"behavior": true}
+  }
+}
+end

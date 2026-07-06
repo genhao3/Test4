@@ -1,0 +1,40 @@
+"""
+Measures the electrical potential at a connection point.
+
+This component represents an ideal sensor that measures the electrical potential (voltage)
+at a single electrical pin `p`. It is characterized by an infinite input impedance,
+meaning it draws no current (`p.i = 0`) from the circuit it is connected to.
+The measured potential at pin `p` (`p.v`) is then made available as an output
+signal `phi`. This ensures that the sensor does not affect the circuit's behavior
+while providing an accurate potential reading. The defining equations are
+```math
+p.i = 0 \\
+\phi = p.v
+```
+"""
+component PotentialSensor
+  "Electrical connection pin to the circuit."
+  p = Pin() {^p}
+  "Output signal representing the measured potential (voltage)."
+  phi = RealOutput() {^phi}
+relations
+  p.i = 0
+  phi = p.v
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "V", "x": 606, "y": 676, "rot": 0}
+    ],
+    "icons": {"default": "dyad://ElectricalComponents/TwoPinSensor.svg"}
+  },
+  "_links": {
+    "p": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "phi": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}}
+  }
+}
+end

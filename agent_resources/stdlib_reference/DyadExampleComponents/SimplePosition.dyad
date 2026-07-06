@@ -1,0 +1,25 @@
+component SimplePosition
+  s = RealInput() {^s}
+  flange = Flange() {^flange}
+  variable a::Acceleration
+  variable v::Velocity
+relations
+  v = der(s)
+  a = der(v)
+  flange.s = s
+metadata {
+  "Dyad": {"icons": {"default": "dyad://DyadExampleComponents/position.svg"}},
+  "_links": {
+    "s": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "input", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "flange": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "flange", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    }
+  }
+}
+end

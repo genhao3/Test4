@@ -1,0 +1,64 @@
+"""
+Ideal sensor measuring absolute velocity, transmitted force, and power flow between two mechanical flanges.
+
+This sensor measures key physical quantities between its two mechanical connection
+ports, `flange_a` and `flange_b`. It assumes an ideal connection where the positions
+of the flanges are identical (`flange_a.s = flange_b.s`). The component outputs:
+- The absolute velocity `v` of `flange_a`, calculated as $v = \frac{d(flange\_a.s)}{dt}$.
+- The force `f` transmitted from `flange_a` to `flange_b`, taken as $f = flange\_a.f$.
+- The power `power` flowing from `flange_a` to `flange_b`, calculated as $power = f \cdot v$.
+These quantities are made available as real output signals for monitoring or control purposes.
+"""
+component MultiSensor
+  extends TranslationalComponents.Interfaces.PartialRelativeSensor
+  "Power flowing from `flange_a` to `flange_b` as output signal"
+  power = RealOutput(units="W") {^power}
+  "Force transmitted from `flange_a` to `flange_b` as output signal"
+  f = RealOutput(units="N") {^f}
+  "Absolute velocity of `flange_a` as output signal"
+  v = RealOutput(units="m/s") {^v}
+relations
+  flange_a.s = flange_b.s
+  f = flange_a.f
+  v = der(flange_a.s)
+  power = f * v
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/MultiSensor.svg"},
+    "labels": [
+      {"label": "W", "x": 250, "y": 864, "rot": 0},
+      {"label": "N", "x": 500, "y": 864, "rot": 0},
+      {"label": "m/s", "x": 750, "y": 864, "rot": 0}
+    ]
+  },
+  "_links": {
+    "power": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 150, "y1": 1000, "x2": 250, "y2": 1100, "rot": 90},
+          "diagram": {"iconName": "default", "x1": 150, "y1": 1000, "x2": 250, "y2": 1100, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "f": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 450, "y1": 1000, "x2": 550, "y2": 1100, "rot": 90},
+          "diagram": {"iconName": "default", "x1": 450, "y1": 1000, "x2": 550, "y2": 1100, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "v": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 750, "y1": 1000, "x2": 850, "y2": 1100, "rot": 90},
+          "diagram": {"iconName": "default", "x1": 750, "y1": 1000, "x2": 850, "y2": 1100, "rot": 90}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

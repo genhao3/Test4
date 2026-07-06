@@ -1,0 +1,199 @@
+"""
+MSL validation test: ShowVariableResistor.
+
+Recreates `Modelica.Electrical.Analog.Examples.ShowVariableResistor` from MSL v4.0.0.
+A sine voltage source drives two parallel branches: a fixed 3-resistor chain
+(R1-R2-R3, each 1 Ohm) and a variable-resistor chain (R4-VR-R5).
+The variable resistor's value is swept by a ramp from 2 to 7 Ohm over 2 s.
+The VariableResistor branch should be compared with R2 in the fixed branch.
+
+MSL reference: tolerance=1e-6, StopTime=1.
+"""
+example component ShowVariableResistor
+  "Sine voltage source: V=1 V, f=1 Hz"
+  sine = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1) {^sine}
+  "Voltage source driven by the sine signal"
+  voltage_source = ElectricalComponents.Analog.Sources.VoltageSource() {^voltage_source}
+  "Ground at source negative terminal"
+  ground1 = ElectricalComponents.Analog.Basic.Ground() {^ground1}
+  "Ground at return path (right side)"
+  ground2 = ElectricalComponents.Analog.Basic.Ground() {^ground2}
+  "Fixed resistor chain (top branch)"
+  R1 = ElectricalComponents.Analog.Basic.Resistor(R = 1) {^R1}
+  R2 = ElectricalComponents.Analog.Basic.Resistor(R = 1) {^R2}
+  R3 = ElectricalComponents.Analog.Basic.Resistor(R = 1) {^R3}
+  "Variable resistor chain (bottom branch)"
+  R4 = ElectricalComponents.Analog.Basic.Resistor(R = 1) {^R4}
+  variable_resistor = ElectricalComponents.Analog.Basic.VariableResistor() {^variable_resistor}
+  R5 = ElectricalComponents.Analog.Basic.Resistor(R = 1) {^R5}
+  "Ramp signal for variable resistance: offset=2, height=5, duration=2 s"
+  ramp = BlockComponents.Sources.Ramp(height = 5, offset = 2, duration = 2) {^ramp}
+  "Fixed temperature to ground the thermal port (alpha=0, so T is irrelevant)"
+  fixed_temp = ThermalComponents.Sources.FixedTemperature(T = 300.15) {^fixed_temp}
+relations
+  guess variable_resistor.i = 0
+  "Signal to voltage source"
+  connect(sine.y, voltage_source.V) {^id13}
+  "Source positive to ground1 (matches MSL SineVoltage1.p -> Ground1)"
+  connect(voltage_source.p, ground1.g) {^id14}
+  "Source negative to both branches (matches MSL SineVoltage1.n -> R1.p, R4.p)"
+  connect(voltage_source.n, R1.p) {^id15}
+  connect(voltage_source.n, R4.p) {^id16}
+  "Top branch: R1 -> R2 -> R3 -> ground2"
+  connect(R1.n, R2.p) {^id17}
+  connect(R2.n, R3.p) {^id18}
+  connect(R3.n, ground2.g) {^id19}
+  "Bottom branch: R4 -> VR -> R5 -> ground2"
+  connect(R4.n, variable_resistor.p) {^id20}
+  connect(R5.n, ground2.g) {^id21}
+  connect(variable_resistor.n, R5.p) {^id22}
+  connect(ramp.y, variable_resistor.R) {^id23}
+  connect(fixed_temp.port, variable_resistor.heat_port) {^id24}
+metadata {
+  "_links": {
+    "sine": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "voltage_source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 100, "y1": 230, "x2": 200, "y2": 330, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 10, "y1": 660, "x2": 110, "y2": 760, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 900, "y1": 690, "x2": 1000, "y2": 790, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "R1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 300, "y1": 230, "x2": 400, "y2": 330, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "R2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 500, "y1": 230, "x2": 600, "y2": 330, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "R3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 700, "y1": 230, "x2": 800, "y2": 330, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "R4": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 290, "y1": 530, "x2": 390, "y2": 630, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "variable_resistor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 500, "y1": 530, "x2": 600, "y2": 630, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "R5": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 700, "y1": 530, "x2": 800, "y2": 630, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ramp": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 380, "y1": 370, "x2": 480, "y2": 470, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed_temp": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 320, "y1": 740, "x2": 420, "y2": 840, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 150, "y": 70}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 60, "y": 280}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id16": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 270, "y": 280}, {"x": 270, "y": 580}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id17": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id18": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id19": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 950, "y": 280}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id20": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id21": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 950, "y": 580}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id22": {"Dyad": {"renderStyle": "standard", "edges": [{"S": 1, "E": 2, "M": []}]}},
+    "id23": {
+      "Dyad": {
+        "renderStyle": "standard",
+        "edges": [{"S": 1, "M": [{"x": 550, "y": 420}], "E": 2}]
+      }
+    },
+    "id24": {
+      "Dyad": {
+        "renderStyle": "standard",
+        "edges": [{"S": 1, "M": [{"x": 551, "y": 790}], "E": 2}]
+      }
+    }
+  }
+}
+end

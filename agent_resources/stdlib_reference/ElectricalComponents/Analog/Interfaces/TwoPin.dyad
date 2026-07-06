@@ -1,0 +1,34 @@
+"""
+A base model for two-terminal electrical components, defining voltage relationship.
+
+This partial component serves as a foundational building block for creating various two-pin electrical devices.
+It establishes a common interface with a positive pin (`p`) and a negative pin (`n`).
+The voltage across the component (`v`) is defined as the potential difference between these pins:
+```math
+v = p.v - n.v
+```
+"""
+partial component TwoPin
+  "Positive electrical pin."
+  p = Pin() {^p}
+  "Negative electrical pin."
+  n = Pin() {^n}
+  "Voltage across the component (between pin p and pin n)."
+  variable v::Voltage
+relations
+  v = p.v - n.v
+metadata {
+  "_links": {
+    "p": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "n": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "neg", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    }
+  }
+}
+end

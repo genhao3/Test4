@@ -1,0 +1,28 @@
+type Real2RealInterpolator = func(::Real)::Real
+
+"""
+Performs interpolation on input values using a specified dataset and interpolation method.
+
+Takes an input value and produces an output by interpolating within a dataset according to the
+specified interpolation type. The component creates an interpolator object from the dataset and
+interpolation parameters, then applies this interpolator to map input values to output values
+through lookup and interpolation.
+"""
+component ScalarInterpolation
+  extends BlockComponents.Interfaces.SISO
+  "Dataset containing the data points to be interpolated"
+  structural parameter filepath::String
+  structural parameter independent_var::String
+  structural parameter dependent_var::String
+  structural parameter interpolation_type::String
+  final parameter interpolator::Real2RealInterpolator = dataset_interpolation(interpolation_type, filepath, dependent_var, independent_var)
+relations
+  y = interpolator(u)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Interpolation.svg"},
+    "doc": {"behavior": false}
+  }
+}
+end

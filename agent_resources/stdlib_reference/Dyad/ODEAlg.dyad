@@ -1,0 +1,6 @@
+enum ODEAlg =
+  | Auto
+  | AutoImplicit
+  | Rodas5P
+  | FBDF
+  | Tsit5

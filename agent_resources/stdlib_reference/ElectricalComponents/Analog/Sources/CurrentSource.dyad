@@ -1,0 +1,30 @@
+"""
+Ideal current source driven by an external signal.
+
+This component models an ideal current source where the current `i` flowing
+from its positive pin (`p`) to its negative pin (`n`) is directly determined
+by an external real input signal `I`. The component inherits the electrical
+pins `p` and `n`, the through-variable current `i`, and the across-variable
+voltage `v` from the `TwoPin` base component. The input signal `I` is a
+causal signal, typically provided by a control system or another signal source.
+"""
+component CurrentSource
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "External real input signal that controls the magnitude of the current source."
+  I = RealInput() {^I}
+  "Unit parameter to balance units in current relation."
+  final parameter uI::Current = 1.0
+relations
+  i = I * uI
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1000, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/CurrentSource.svg"}
+  },
+  "_links": {
+    "I": {
+      "Dyad": {"placement": {"icon": {"x1": 450, "y1": -50, "x2": 550, "y2": 50, "rot": 90}}}
+    }
+  }
+}
+end

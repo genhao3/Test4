@@ -1,0 +1,35 @@
+"""
+Filtered derivative approximation with configurable time constant and gain.
+
+Implements a filtered derivative that approximates the differentiation operation while avoiding
+noise amplification. The derivative approximation is implemented using a first-order filter with
+configurable time constant and gain parameters.
+
+```math
+G(s) = \frac{Y(s)}{U(s)} = \frac{ks}{sT + 1}
+```
+
+The smaller the time constant T, the closer the approximation to an ideal derivative, though this
+increases sensitivity to noise.
+"""
+component Derivative
+  extends BlockComponents.Interfaces.SISO
+  "Internal state variable of the first-order filter"
+  variable x::Real
+  "Initial value of the derivative-filter state"
+  parameter x0::Real = 0
+  "Time constant of the filter (smaller values give better derivative approximation but more noise sensitivity)"
+  parameter T::Real
+  "Gain factor applied to the derivative approximation"
+  parameter k::Real = 1.0
+relations
+  initial x = x0
+  der(x) = (u - x) / T
+  y = (k / T) * (u - x)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Derivative.svg"}
+  }
+}
+end

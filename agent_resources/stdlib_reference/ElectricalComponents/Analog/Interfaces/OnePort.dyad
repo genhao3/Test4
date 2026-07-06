@@ -1,0 +1,29 @@
+"""
+A base model for two-terminal electrical components, defining voltage and current relationships.
+
+This partial component serves as a foundational building block for creating various two-pin electrical devices.
+It establishes a common interface with a positive pin (`p`) and a negative pin (`n`).
+By extending `TwoPin`, it defines voltage across the component (`v`) as the potential difference between these pins:
+```math
+v = p.v - n.v
+```
+The current (`i`) flowing through the component is taken as the current entering the positive pin (`p`):
+```math
+i = p.i
+```
+Conservation of charge is maintained by enforcing Kirchhoff's Current Law,
+ensuring that the current entering one pin exits through the other:
+```math
+p.i + n.i = 0
+```
+This model is intended to be extended by specific components like resistors, capacitors, etc.,
+which will add their own constitutive equations relating `v` and `i`.
+"""
+partial component OnePort
+  extends ElectricalComponents.Analog.Interfaces.TwoPin
+  "Current flowing through the component (from pin p to pin n)."
+  variable i::Current
+relations
+  i = p.i
+  p.i + n.i = 0
+end

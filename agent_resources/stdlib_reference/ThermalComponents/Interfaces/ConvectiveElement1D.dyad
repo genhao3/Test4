@@ -1,0 +1,52 @@
+"""
+ConvectiveElement1D is baseclass for 1D convective heat transfer elements, defining temperature drop and heat flow between solid and fluid interfaces without energy storage.
+
+This partial component provides the foundational structure for modeling
+one-dimensional convective heat transfer. It establishes two connection
+ports, `solid` and `fluid`, to interface with respective thermal domains.
+The core behavior involves calculating the temperature difference `\Delta T`
+(defined as `solid.T - fluid.T`) and the heat flow rate `Q_flow` that is
+transferred from the `solid` port to the `fluid` port.
+
+The defining equations are:
+```math
+\Delta T = solid.T - fluid.T
+```
+```math
+solid.Q_{flow} = Q_{flow}
+```
+```math
+fluid.Q_{flow} = -Q_{flow}
+```
+These ensure that `Q_flow` represents heat flowing from the `solid` (e.g., `solid.T` and `solid.Q_flow`)
+to the `fluid` (e.g., `fluid.T` and `fluid.Q_flow`). The component itself does not
+model any internal energy storage, focusing purely on the heat exchange interface.
+"""
+partial component ConvectiveElement1D
+  "Connector representing the solid side of the heat transfer interface."
+  solid = HeatPort() {^solid}
+  "Connector representing the fluid side of the heat transfer interface."
+  fluid = HeatPort() {^fluid}
+  "Temperature difference across the element, defined as solid.T - fluid.T."
+  variable ΔT::Temperature
+  "Heat flow rate from the solid node to the fluid node."
+  variable Q_flow::HeatFlowRate
+relations
+  ΔT = solid.T - fluid.T
+  solid.Q_flow = Q_flow
+  fluid.Q_flow = -Q_flow
+metadata {
+  "_links": {
+    "solid": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "heat_port_a", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "fluid": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "heat_port_b", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,22 @@
+"""
+Base component providing two independent spline instances.
+
+This partial component serves as a base class that encapsulates two distinct instances of a `Spline` component,
+declared as `spline_a` and `spline_b`. It is intended to be extended by more complex components that
+require dual spline functionalities. `PartialTwoSplines` itself does not define any specific dynamic behavior,
+equations, or direct connections; its primary role is to provide these two spline subcomponents and their
+associated graphical placement information for a modeling environment.
+"""
+partial component PartialTwoSplines
+  "First spline"
+  spline_a = Spline() {^spline_a}
+  "Second spline"
+  spline_b = Spline() {^spline_b}
+relations
+metadata {
+  "_links": {
+    "spline_a": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}},
+    "spline_b": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}}
+  }
+}
+end

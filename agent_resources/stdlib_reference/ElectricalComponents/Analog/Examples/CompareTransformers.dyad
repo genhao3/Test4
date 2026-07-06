@@ -1,0 +1,220 @@
+"""
+MSL validation test: CompareTransformers (basic transformer part).
+
+Recreates the basic-transformer subcircuit from
+`Modelica.Electrical.Analog.Examples.CompareTransformers`.
+A sine voltage source (Vpeak=0.1 V, f=10 Hz, phase=π/2, offset=0.1 V) drives
+a transformer through a primary resistor R1. The secondary side has a series
+resistor R2 and a load resistor RL. Both sides are grounded.
+
+The full MSL example also compares against an IdealTransformer, which is not
+yet available in this library. Only the basic-transformer signals are validated
+here. The IdealTransformer comparison can be added once that component exists.
+
+Transformer parameters are derived from a turns ratio `n` and magnetizing
+inductance `Lm1`, following the MSL parameterisation:
+- M    = Lm1 / n
+- L1   = L1sigma + M·n  (primary leakage + mutual)
+- L2   = L2sigma + M/n  (secondary leakage + mutual)
+
+With the default values (n=2, f=10 Hz) the coupling coefficient is ≈ 0.995,
+so the inductance matrix is non-singular.
+
+MSL reference: tolerance=1e-6, StopTime=50.
+"""
+example component CompareTransformers
+  "Sine signal: Vpeak amplitude, f Hz, phase phi0, offset Vdc"
+  sine1 = BlockComponents.Sources.Sine(amplitude = Vpeak, frequency = f, phase = phi0, offset = Vdc) {^sine1}
+  "Voltage source driven by sine"
+  voltage_source1 = ElectricalComponents.Analog.Sources.VoltageSource() {^voltage_source1}
+  "Primary ground"
+  ground11 = ElectricalComponents.Analog.Basic.Ground() {^ground11}
+  "Secondary ground"
+  ground12 = ElectricalComponents.Analog.Basic.Ground() {^ground12}
+  "Primary series resistor"
+  resistor11 = ElectricalComponents.Analog.Basic.Resistor(R = R1) {^resistor11}
+  "Secondary series resistor"
+  resistor12 = ElectricalComponents.Analog.Basic.Resistor(R = R2) {^resistor12}
+  "Secondary load"
+  load1 = ElectricalComponents.Analog.Basic.Resistor(R = RL) {^load1}
+  "Transformer with mutual inductance coupling"
+  basic_transformer = ElectricalComponents.Analog.Basic.Transformer(L1 = L1_val, L2 = L2_val, M = M_val) {^basic_transformer}
+  "DC offset of voltage source"
+  parameter Vdc::Voltage = 0.1
+  "Peak voltage of voltage source"
+  parameter Vpeak::Voltage = 0.1
+  "Frequency of voltage source"
+  parameter f::Frequency = 10
+  "Phase of voltage source"
+  parameter phi0::Angle = pi / 2
+  "Turns ratio primary:secondary voltage"
+  parameter n::Real = 2
+  "Primary resistance w.r.t. primary side"
+  parameter R1::Resistance = 0.01
+  "Primary leakage inductance w.r.t. primary side"
+  parameter L1sigma::Inductance = 0.05 / (2 * pi * f)
+  "Magnetizing inductance w.r.t. primary side"
+  parameter Lm1::Inductance = 10.0 / (2 * pi * f)
+  "Secondary leakage inductance w.r.t. secondary side"
+  parameter L2sigma::Inductance = 0.05 / (2 * pi * f * n ^ 2)
+  "Secondary resistance w.r.t. secondary side"
+  parameter R2::Resistance = R1 / n ^ 2
+  "Load resistance"
+  parameter RL::Resistance = 1.0 / n ^ 2
+  "Mutual inductance"
+  final parameter M_val::Inductance = Lm1 / n
+  "Primary no-load inductance"
+  final parameter L1_val::Inductance = L1sigma + M_val * n
+  "Secondary no-load inductance"
+  final parameter L2_val::Inductance = L2sigma + M_val / n
+relations
+  initial basic_transformer.i1 = 0
+  initial basic_transformer.i2 = 0
+  "Sine drives voltage source"
+  connect(sine1.y, voltage_source1.V) {^id9}
+  "Source negative to primary ground"
+  connect(voltage_source1.n, ground11.g) {^id10}
+  "Primary resistor to transformer port 1 positive"
+  connect(resistor11.n, basic_transformer.p1) {^id11}
+  "Transformer port 1 negative to primary ground"
+  connect(basic_transformer.n1, ground11.g) {^id12}
+  "Transformer port 2 positive to secondary resistor"
+  connect(basic_transformer.p2, resistor12.p) {^id13}
+  "Secondary resistor to load"
+  connect(resistor12.n, load1.p) {^id14}
+  "Load to secondary ground"
+  connect(load1.n, ground12.g) {^id15}
+  "Transformer port 2 negative to secondary ground"
+  connect(basic_transformer.n2, ground12.g) {^id16}
+  connect(resistor11.p, voltage_source1.p) {^id17}
+metadata {
+  "_links": {
+    "sine1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 0, "y1": 0, "x2": 100, "y2": 100, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "voltage_source1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 170, "y1": 130, "x2": 70, "y2": 230, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground11": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 60, "y1": 400, "x2": 160, "y2": 500, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground12": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 890, "y1": 400, "x2": 990, "y2": 500, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "resistor11": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 290, "y1": 130, "x2": 390, "y2": 230, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "resistor12": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 720, "y1": 130, "x2": 820, "y2": 230, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "load1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 890, "y1": 200, "x2": 990, "y2": 300, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "basic_transformer": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 180, "x2": 550, "y2": 280, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 120, "y": 50}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 30, "y": 180}, {"x": 30, "y": 330}, {"x": 110, "y": 330}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 400, "y": 180}, {"x": 400, "y": 181}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 330, "y": 279}, {"x": 330, "y": 330}, {"x": 110, "y": 330}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 720, "y": 181}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 940, "y": 180}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id16": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 581, "y": 280}, {"x": 581, "y": 330}, {"x": 940, "y": 330}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id17": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

@@ -1,0 +1,125 @@
+"""
+Test circuit for VariableCapacitor.
+
+A sine voltage source (1 V, 1 Hz) drives an RC circuit where the
+capacitance ramps from 1e-3 F to 6e-3 F over 2 s. A 10 Ω series
+resistor provides the current path.
+
+The charge-based formulation should produce smooth current despite
+the time-varying capacitance.
+"""
+test component VariableCapacitor
+  "Sine signal source: 1 V amplitude, 1 Hz"
+  sine = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1) {^sine}
+  "Voltage source driven by the sine signal"
+  vs = ElectricalComponents.Analog.Sources.VoltageSource() {^vs}
+  "Series resistor (10 Ω)"
+  R1 = ElectricalComponents.Analog.Basic.Resistor(R = 10) {^R1}
+  "Variable capacitor under test"
+  vc = ElectricalComponents.Analog.Basic.VariableCapacitor() {^vc}
+  "Ramp for capacitance: 1e-3 F to 6e-3 F over 2 s"
+  ramp = BlockComponents.Sources.Ramp(height = 5e-3, offset = 1e-3, duration = 2) {^ramp}
+  "Ground reference"
+  ground = ElectricalComponents.Analog.Basic.Ground() {^ground}
+relations
+  initial vc.v = 0
+  connect(sine.y, vs.V) {^id7}
+  connect(vs.p, R1.p) {^id8}
+  connect(R1.n, vc.p) {^id9}
+  connect(vc.n, ground.g) {^id10}
+  connect(vs.n, ground.g) {^id11}
+  connect(ramp.y, vc.C) {^id12}
+metadata {
+  "Dyad": {
+    "tests": {"case1": {"stop": 1, "expect": {"signals": ["vc.v", "vc.i", "vc.Q"]}}}
+  },
+  "_links": {
+    "sine": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 420, "y1": 170, "x2": 320, "y2": 270, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "vs": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 320, "y1": 310, "x2": 220, "y2": 410, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "R1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 310, "x2": 550, "y2": 410, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "vc": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 690, "y1": 310, "x2": 790, "y2": 410, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ramp": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 530, "y1": 170, "x2": 630, "y2": 270, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 500, "x2": 550, "y2": 600, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 270, "y": 220}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id8": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id10": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 870, "y": 360}, {"x": 870, "y": 450}, {"x": 500, "y": 450}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 120, "y": 360}, {"x": 120, "y": 450}, {"x": 500, "y": 450}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id12": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 740, "y": 220}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

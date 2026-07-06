@@ -1,0 +1,30 @@
+"""
+BodyRadiation models radiative heat transfer between two surfaces.
+
+This component calculates the heat flow due to thermal radiation
+between two surfaces, represented by `port_a` and `port_b`. The heat transfer
+is determined by the Stefan-Boltzmann law, where the net heat flow rate `Q_flow`
+is proportional to the difference between the fourth powers of the absolute
+temperatures of the two surfaces and the net radiation conductance `Gr`.
+The parameter `Gr` encapsulates factors such as surface emissivities, areas,
+and the view factor between the surfaces.
+The governing equation is:
+```math
+Q_{flow} = Gr \cdot \sigma \cdot (port\_a.T^4 - port\_b.T^4)
+```
+"""
+component BodyRadiation
+  extends ThermalComponents.Interfaces.Element1D
+  "Net radiation conductance, incorporating view factors, surface areas, and emissivities."
+  parameter Gr::Real
+  "Stefan-Boltzmann constant (W·m⁻²·K⁻⁴)."
+  final parameter σ::Real(units = "W/(m2.K4)") = 5.670374419e-8
+relations
+  Q_flow = Gr * σ * (port_a.T ^ 4 - port_b.T ^ 4)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ThermalComponents/BodyRadiation.svg"}
+  }
+}
+end

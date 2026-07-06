@@ -1,0 +1,74 @@
+"A solenoid coil with RL electrical dynamics and magnetic field computation in 3D world frame"
+component Coil
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "X position of coil center in world frame [m]"
+  parameter pos_x::Length = 0.0
+  "Y position of coil center in world frame [m]"
+  parameter pos_y::Length = 0.0
+  "Z position of coil center in world frame [m]"
+  parameter pos_z::Length = 0.0
+  "X component of coil axis unit normal"
+  parameter norm_x::Real = 0.0
+  "Y component of coil axis unit normal"
+  parameter norm_y::Real = 0.0
+  "Z component of coil axis unit normal"
+  parameter norm_z::Real = 1.0
+  "Number of turns"
+  parameter N::Real = 100.0
+  "Coil radius"
+  parameter radius::Length = 0.01
+  "Coil length"
+  parameter coil_length::Length = 0.05
+  "Wire resistance"
+  parameter R_coil::Resistance = 5.0
+  "Permeability of free space"
+  final parameter mu0::Permeability = 1.2566370614359173e-6
+  "Inductance computed from coil geometry: L = mu0 * N^2 * pi * r^2 / l"
+  final parameter L::Inductance = mu0 * N ^ 2 * 3.14159265358979 * radius ^ 2 / coil_length
+  "Magnetic flux density magnitude at coil center"
+  variable B::MagneticFluxDensity
+  "B field x-component in world frame"
+  variable B_x::MagneticFluxDensity
+  "B field y-component in world frame"
+  variable B_y::MagneticFluxDensity
+  "B field z-component in world frame"
+  variable B_z::MagneticFluxDensity
+relations
+  # RL electrical dynamics
+  L * der(i) = v - R_coil * i
+  # Solenoid magnetic field at center: B = mu0 * N * i / l
+  B = mu0 * N * i / coil_length
+  # Project B onto world coordinate axes via coil normal
+  B_x = B * norm_x
+  B_y = B * norm_y
+  B_z = B * norm_z
+end
+
+"Linked Mirror Configuration with 42 coils: 2 straight segments (11 each) + 2 semicircular segments (10 each)"
+test component LMC_Configuration
+  "Step voltage signals – one per coil, voltage set by Julia helper for correct steady-state current"
+  step_signals = [BlockComponents.Sources.Step(height = Test4.racetrack_get_voltage(i), start_time = 0.001) for i in 1:42]
+  "Voltage sources – one per coil"
+  vsources = [ElectricalComponents.Analog.Sources.VoltageSource() for i in 1:42]
+  "42 coils with geometry from racetrack helpers"
+  coils = [Coil(pos_x = Test4.racetrack_get_px(i), pos_y = Test4.racetrack_get_py(i), pos_z = Test4.racetrack_get_pz(i), norm_x = Test4.racetrack_get_nx(i), norm_y = Test4.racetrack_get_ny(i), norm_z = Test4.racetrack_get_nz(i), N = 100.0, radius = 1.0, coil_length = 0.05, R_coil = 5.0) for i in 1:42]
+  "Ground reference"
+  ground = ElectricalComponents.Analog.Basic.Ground()
+  "Number of coils"
+  structural parameter N_coils::Integer = 42
+relations
+  # Wire each coil circuit: Step → VoltageSource → Coil → Ground
+  for i in 1:42
+    connect(step_signals[i].y, vsources[i].V)
+    connect(vsources[i].p, coils[i].p)
+    connect(coils[i].n, vsources[i].n, ground.g)
+    initial coils[i].i = 0.0
+  end
+end
+
+"Transient analysis: simulate LMC current ramp-up (5 time constants ≈ 0.8 s)"
+analysis LMC_TransientAnalysis
+  extends TransientAnalysis(stop = 1.0)
+  model = LMC_Configuration()
+relations
+end

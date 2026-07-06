@@ -1,0 +1,36 @@
+"""
+Single input single output (SISO) base block, a partial component that defines the interface for blocks with one input and one output signal.
+
+This component serves as a base class for various continuous system blocks, providing a standardized
+interface with input and output ports. Components that extend SISO implement specific behaviors that
+transform the input signal to produce the output signal, such as filters, gains, integrators, or
+transfer functions.
+"""
+partial component SISO
+  "Input signal port"
+  u = RealInput() {^u}
+  "Output signal port"
+  y = RealOutput() {^y}
+relations
+metadata {
+  "Dyad": {"labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}]},
+  "_links": {
+    "u": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "input", "x1": -100, "y1": 450, "x2": 0, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "input", "x1": -100, "y1": 450, "x2": 0, "y2": 550, "rot": 0}
+        }
+      }
+    },
+    "y": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "output", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "output", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

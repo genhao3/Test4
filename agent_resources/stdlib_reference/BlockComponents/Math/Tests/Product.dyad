@@ -1,0 +1,60 @@
+"""
+Multiplies two constant values together.
+
+This component takes two constant values (3 and 2) and multiplies them together using a Product block,
+resulting in an output value of 6. The component demonstrates the basic connection patterns for creating
+a multiplication operation between constant signals in the modeling language.
+"""
+test component Product
+  "Constant block that outputs the value 3"
+  c1 = BlockComponents.Sources.Constant(k = 3) {^c1}
+  "Constant block that outputs the value 2"
+  c2 = BlockComponents.Sources.Constant(k = 2) {^c2}
+  "Product block that multiplies its two inputs"
+  product = BlockComponents.Math.Product() {^product}
+relations
+  connect(c1.y, product.u1) {^id4}
+  connect(product.u2, c2.y) {^id5}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {"case1": {"stop": 5, "expect": {"final": {"product.y": 6}}}}
+  },
+  "_links": {
+    "c1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 320, "y1": 340, "x2": 420, "y2": 440, "rot": 0}
+        }
+      }
+    },
+    "c2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 320, "y1": 550, "x2": 420, "y2": 650, "rot": 0}
+        }
+      }
+    },
+    "product": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "product", "x1": 950, "y1": 450, "x2": 1050, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "product", "x1": 580, "y1": 450, "x2": 680, "y2": 550, "rot": 0}
+        }
+      }
+    },
+    "id4": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 390}, {"x": 500, "y": 470}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id5": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 530}, {"x": 500, "y": 600}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

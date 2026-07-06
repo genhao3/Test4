@@ -1,0 +1,78 @@
+"""
+Generic transformer with N mutually coupled inductors.
+
+Each inductor has a positive pin `p[j]` and negative pin `n[j]`. The voltage
+across each inductor depends on the rate of change of current in ALL inductors,
+coupled through the symmetric inductance matrix `Lm`:
+```math
+v = Lm \cdot \frac{di}{dt}
+```
+The user supplies the upper-triangular entries of `Lm` as a flat vector `L`
+in row-major order:
+```
+L = [L_{11}, L_{12}, \ldots, L_{1N}, L_{22}, L_{23}, \ldots, L_{2N}, \ldots, L_{NN}]
+```
+with length `N_L = N*(N+1)/2`. The model constructs the full symmetric matrix
+internally via `ElectricalComponents.build_inductance_matrix`, guaranteeing
+`Lm[j,k] = Lm[k,j]`.
+
+For example, with `N = 3` and `L = [1, 0.1, 0.2, 2, 0.3, 3]`:
+```math
+Lm = \begin{bmatrix} 1 & 0.1 & 0.2 \\ 0.1 & 2 & 0.3 \\ 0.2 & 0.3 & 3 \end{bmatrix}
+```
+
+Corresponds to `Modelica.Electrical.Analog.Basic.M_Transformer`.
+"""
+component MTransformer
+  "Positive pins of each inductor"
+  p = [Pin() for i in 1:N] {^p}
+  "Negative pins of each inductor"
+  n = [Pin() for i in 1:N] {^n}
+  "Number of coupled inductors"
+  structural parameter N::Integer = 3
+  "Length of the inductance vector L, computed as N*(N+1)/2"
+  final structural parameter N_L::Integer = div(N * (N + 1), 2)
+  "Inductances and coupling inductances (upper-triangular, row-major)"
+  parameter L::Real[N_L] = [1.0, 0.1, 0.2, 2.0, 0.3, 3.0]
+  "Complete symmetric inductance matrix, computed from L"
+  final parameter Lm::Real[N, N] = ElectricalComponents.build_inductance_matrix(L, N)
+  "Voltage across each inductor"
+  variable v::Voltage[N]
+  "Current through each inductor"
+  variable i::Current[N]
+relations
+  # Port equations: voltage, current, and KCL for each inductor
+  for j in 1:N
+    v[j] = p[j].v - n[j].v
+    0 = p[j].i + n[j].i
+    i[j] = p[j].i
+  end
+  # Initial conditions on full array (avoid per-element AtomicArrayDict issue)
+  initial i = zeros(N)
+  # Inductance matrix equation
+  v = Lm * der(i)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/MTransformer.svg"}
+  },
+  "_links": {
+    "p": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -40, "y1": 450, "x2": 60, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "n": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 960, "y1": 450, "x2": 1060, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

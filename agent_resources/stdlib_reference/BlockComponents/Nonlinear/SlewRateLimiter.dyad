@@ -1,0 +1,31 @@
+"""
+Limits the rate of change of a signal between specified rising and falling rates.
+
+A slew rate limiter that constrains how quickly the output signal can change in response
+to input variations. It ensures the derivative of the output remains between the specified
+maximum rising and falling rates. The output initially equals the input, and thereafter
+changes at a rate determined by the difference between input and output, scaled by the time
+derivative constant, and limited by the `rising` and `falling` rate parameters.
+
+```math
+\frac{dy}{dt} = \text{clamp}\left(\frac{u-y}{td}, \text{falling}, \text{rising}\right)
+```
+"""
+component SlewRateLimiter
+  extends BlockComponents.Interfaces.SISO
+  "Maximum allowable positive rate of change for the output signal"
+  parameter rising::DecayConstant
+  "Maximum allowable negative rate of change for the output signal"
+  parameter falling::DecayConstant = -rising
+  "Time constant that scales the response speed to input changes"
+  parameter td::Time
+relations
+  initial y = u
+  der(y) = clamp((u - y) / td, falling, rising)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/SlewRateLimiter.svg"}
+  }
+}
+end

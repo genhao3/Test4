@@ -1,0 +1,51 @@
+"""
+Test that evaluates a continuous clock signal integrated over time.
+
+This test component connects a continuous clock signal to an integrator to validate the
+clock's behavior. The continuous clock starts at time 0.5 with an offset of 1.0, generating
+a signal that increases linearly with time (y = t + offset when t ≥ start_time). The integrator
+accumulates this signal, resulting in a quadratic response. The test verifies both the clock
+output and the integrated value against expected results at t=5.
+"""
+test component ContinuousClock
+  "Integrator that accumulates the clock signal"
+  integrator = BlockComponents.Continuous.Integrator() {^integrator}
+  "Continuous clock with 0.5 start time and 1.0 offset"
+  signal = BlockComponents.Sources.ContinuousClock(start_time = 0.5, offset = 1.0) {^signal}
+relations
+  "Connects the clock output to the integrator input"
+  connect(signal.y, integrator.u) {^id3}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "atol": {"integrator.x": 0.001},
+        "expect": {
+          "initial": {"signal.y": 1},
+          "signals": ["signal.y", "integrator.x"],
+          "final": {"signal.y": 5.5, "integrator.x": 15.125}
+        }
+      }
+    }
+  },
+  "_links": {
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 150, "y1": 20, "x2": 250, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

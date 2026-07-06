@@ -1,0 +1,34 @@
+"""
+Second-order linear system for testing control designs.
+
+A linear dynamic system with second-order behavior that exhibits damped oscillations in response to inputs.
+
+The system is described by the state-space representation:
+
+```math
+\begin{align}
+\dot{x}_1 &= x_2 \\
+\dot{x}_2 &= -x_1 - 0.5x_2 + u \\
+y &= 0.5x_1 + x_2
+\end{align}
+```
+
+where states `x1` and `x2` represent position and velocity in a mechanical system analogy.
+"""
+component Plant
+  extends BlockComponents.Interfaces.SISO
+  "First state variable (position in mechanical analogy)"
+  variable x1::Real
+  "Second state variable (velocity in mechanical analogy)"
+  variable x2::Real
+relations
+  der(x1) = x2
+  der(x2) = -x1 - 0.5 * x2 + u
+  y = 0.5 * x1 + x2
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/SecondOrder.svg"},
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}]
+  }
+}
+end

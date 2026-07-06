@@ -1,0 +1,39 @@
+"""
+Represents a lumped thermal element that stores heat energy.
+
+This component models the thermal behavior of a body with a given heat capacity `C`.
+The temperature `T` of the component changes over time based on the heat flow rate `Q_{flow}`
+into the component through its thermal `port`. The fundamental relationship governing
+this behavior is:
+```math
+C \frac{dT}{dt} = Q_{flow}
+```
+where `dT/dt` is the rate of change of temperature, represented by `dT` in the model.
+The component's temperature is initialized to `T0`.
+"""
+component HeatCapacitor
+  "Thermal port (connector) for heat exchange"
+  port = HeatPort() {^port}
+  "Heat capacity of the element"
+  parameter C::HeatCapacity
+  "Temperature of the element"
+  variable T::Temperature
+  "Initial temperature of the element"
+  parameter T0::Temperature
+  "Time derivative of temperature `T`"
+  variable dT::TemperatureSlope
+relations
+  initial T = T0
+  T = port.T
+  der(T) = dT
+  dT = port.Q_flow / C
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ThermalComponents/HeatCapacitor.svg"}
+  },
+  "_links": {
+    "port": {"Dyad": {"placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050}}}}
+  }
+}
+end

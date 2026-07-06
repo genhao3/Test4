@@ -1,0 +1,30 @@
+"""
+Gyrator two-port element.
+
+A gyrator couples the voltage of one port to the current of the other
+via gyration conductances:
+```math
+i_1 =  G_2 \cdot v_2
+```
+```math
+i_2 = -G_1 \cdot v_1
+```
+
+Corresponds to `Modelica.Electrical.Analog.Basic.Gyrator`.
+"""
+component Gyrator
+  extends ElectricalComponents.Analog.Interfaces.TwoPort
+  "Primary gyration conductance"
+  parameter G1::Conductance = 1
+  "Secondary gyration conductance"
+  parameter G2::Conductance = 1
+relations
+  i1 = G2 * v2
+  i2 = -G1 * v1
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/Gyrator.svg"}
+  }
+}
+end

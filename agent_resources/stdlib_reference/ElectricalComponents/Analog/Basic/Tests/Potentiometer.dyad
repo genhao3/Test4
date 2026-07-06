@@ -1,0 +1,178 @@
+"""
+Test circuit for Potentiometer.
+
+A constant 10 V source is applied across pin_p and pin_n of a 100 Ω
+potentiometer. A 1 kΩ load resistor is connected from the contact
+(wiper) to ground. The wiper position ramps from 0 to 1 over 1 s.
+
+At r=0 the contact is at pin_n (ground), so V_contact ≈ 0 V.
+At r=1 the contact is at pin_p, and V_contact = V_source * R_load / (Rp + R_load)
+where Rp → 0 as r → 1, so V_contact → 10 V.
+
+A small capacitor across the load provides a differential state.
+"""
+test component Potentiometer
+  "Constant signal: 10 V"
+  const_sig = BlockComponents.Sources.Constant(k = 10) {^const_sig}
+  "Voltage source"
+  vs = ElectricalComponents.Analog.Sources.VoltageSource() {^vs}
+  "Potentiometer under test (100 Ω)"
+  pot = ElectricalComponents.Analog.Basic.Potentiometer(R = 100) {^pot}
+  "Load resistor (1 kΩ) on wiper"
+  R_load = ElectricalComponents.Analog.Basic.Resistor(R = 1000) {^R_load}
+  "Small capacitor for dynamics"
+  cap = ElectricalComponents.Analog.Basic.Capacitor(C = 1e-6) {^cap}
+  "Ramp for wiper position: 0.01 to 0.99 over 1 s"
+  ramp = BlockComponents.Sources.Ramp(height = 0.98, offset = 0.01, duration = 1) {^ramp}
+  "Fixed temperature for thermal port"
+  fixed_temp = ThermalComponents.Sources.FixedTemperature(T = 293.15) {^fixed_temp}
+  "Ground reference"
+  ground = ElectricalComponents.Analog.Basic.Ground() {^ground}
+relations
+  initial cap.v = 0
+  guess pot.pin_p.i = 0.1
+  guess pot.pin_n.i = 0
+  guess pot.contact.i = 0
+  connect(const_sig.y, vs.V) {^id9}
+  connect(vs.p, pot.pin_p) {^id10}
+  connect(vs.n, ground.g) {^id11}
+  connect(pot.pin_n, ground.g) {^id12}
+  connect(R_load.n, cap.n, ground.g) {^id13}
+  connect(ramp.y, pot.r) {^id14}
+  connect(fixed_temp.port, pot.heat_port) {^id15}
+  connect(pot.contact, R_load.p, cap.p) {^id16}
+metadata {
+  "Dyad": {
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "expect": {"signals": ["pot.contact.v", "pot.Rp", "pot.Rn", "R_load.i"]}
+      }
+    }
+  },
+  "_links": {
+    "const_sig": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -20, "y1": 380, "x2": 80, "y2": 480, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "vs": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 120, "y1": 480, "x2": 220, "y2": 380, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "pot": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 410, "x2": 550, "y2": 310, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "R_load": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 550, "y1": 500, "x2": 450, "y2": 600, "rot": 270}
+        },
+        "tags": []
+      }
+    },
+    "cap": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 740, "y1": 500, "x2": 640, "y2": 600, "rot": 270}
+        },
+        "tags": []
+      }
+    },
+    "ramp": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 190, "y1": 220, "x2": 290, "y2": 320, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed_temp": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 90, "x2": 550, "y2": 190, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 840, "x2": 550, "y2": 940, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 170, "y": 360}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 170, "y": 810}, {"x": 500, "y": 810}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 870, "y": 360}, {"x": 870, "y": 810}, {"x": 500, "y": 810}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 500, "y": 625}], "E": -1},
+          {"S": -1, "M": [{"x": 690, "y": 625}], "E": 2},
+          {"S": 3, "M": [{"x": 500, "y": 732.5}, {"x": 590, "y": 732.5}], "E": -1}
+        ],
+        "junctions": [{"x": 590, "y": 625}],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 450, "y": 270}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id16": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 550, "y": 260}, {"x": 640, "y": 260}, {"x": 640, "y": 450}],
+            "E": -1
+          },
+          {"S": -1, "M": [{"x": 500, "y": 450}], "E": 2},
+          {"S": 3, "M": [{"x": 690, "y": 450}], "E": -1}
+        ],
+        "junctions": [{"x": 550, "y": 450}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

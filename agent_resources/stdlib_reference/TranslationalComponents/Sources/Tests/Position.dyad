@@ -1,0 +1,191 @@
+"""
+Test of the Position source component with all ReferenceType enum variants.
+
+Replicates the structure of ModelicaTest.Translational.AllComponents (Position portion)
+and ModelicaTest.Translational.TestFrictionPosition.
+
+Three Position instances are driven by a common Sine reference (amplitude=1, frequency=1 Hz)
+and each drives a Mass (m=1 kg) with support grounded to Fixed:
+
+- pos_filtered: default Filtered mode (f_crit=50 Hz, af=1.3617, bf=0.6180)
+- pos_exact: Exact mode — flange position equals input directly
+- pos_filtered_low: Filtered mode with low critical frequency (f_crit=5 Hz) to show visible filtering
+"""
+test component Position
+  "Sine reference position signal (amplitude=1 m, frequency=1 Hz)"
+  sine = BlockComponents.Sources.Sine(amplitude = 1.0, frequency = 1.0) {^sine}
+  "Position source — Filtered with default Bessel filter (f_crit=50 Hz)"
+  pos_filtered = TranslationalComponents.Sources.Position() {^pos_filtered}
+  "Mass driven by filtered position source"
+  mass_filtered = TranslationalComponents.Components.Mass(m = 1.0) {^mass_filtered}
+  "Position source — Exact (flange tracks input directly)"
+  pos_exact = TranslationalComponents.Sources.Position(ref_type = TranslationalComponents.Sources.ReferenceType.Exact()) {^pos_exact}
+  "Mass driven by exact position source"
+  mass_exact = TranslationalComponents.Components.Mass(m = 1.0) {^mass_exact}
+  "Position source — Filtered with low critical frequency (f_crit=5 Hz)"
+  pos_filtered_low = TranslationalComponents.Sources.Position(ref_type = TranslationalComponents.Sources.ReferenceType.Filtered(f_crit = 5.0)) {^pos_filtered_low}
+  "Mass driven by low-f_crit filtered position source"
+  mass_filtered_low = TranslationalComponents.Components.Mass(m = 1.0) {^mass_filtered_low}
+  "Fixed ground for all supports"
+  ground = TranslationalComponents.Components.Fixed() {^ground}
+relations
+  # --- Filtered (default) ---
+  connect(sine.y, pos_filtered.s_ref) {^id9}
+  connect(pos_filtered.flange, mass_filtered.flange_a) {^id10}
+  initial pos_filtered.v = 0
+  # --- Exact ---
+  connect(sine.y, pos_exact.s_ref) {^id11}
+  connect(pos_exact.flange, mass_exact.flange_a) {^id12}
+  # --- Filtered low f_crit ---
+  connect(sine.y, pos_filtered_low.s_ref) {^id13}
+  connect(pos_filtered_low.flange, mass_filtered_low.flange_a) {^id14}
+  initial pos_filtered_low.v = 0
+  connect(pos_exact.support, ground.flange) {^id15}
+  connect(pos_filtered_low.support, ground.flange) {^id16}
+  connect(pos_filtered.support, ground.flange) {^id17}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1.1,
+        "atol": {
+          "mass_filtered.s": 0.001,
+          "mass_filtered.v": 0.01,
+          "mass_exact.s": 0.001,
+          "mass_exact.v": 0.01,
+          "mass_filtered_low.s": 0.01,
+          "mass_filtered_low.v": 0.1
+        },
+        "expect": {
+          "final": {
+            "mass_exact.s": 0.5877852522924736,
+            "mass_filtered.s": 0.56546731378663295,
+            "mass_filtered.v": 5.1812448946651894,
+            "mass_filtered_low.s": 0.34420529736606295
+          },
+          "signals": ["mass_filtered.s", "mass_filtered.v", "mass_exact.s", "mass_exact.v", "mass_filtered_low.s", "mass_filtered_low.v"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "sine": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 30, "y1": 450, "x2": 130, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "pos_filtered": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 340, "y1": 640, "x2": 440, "y2": 740, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass_filtered": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 590, "y1": 640, "x2": 690, "y2": 740, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "pos_exact": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 330, "y1": 210, "x2": 430, "y2": 310, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass_exact": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 590, "y1": 210, "x2": 690, "y2": 310, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "pos_filtered_low": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 320, "y1": 450, "x2": 420, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass_filtered_low": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 600, "y1": 450, "x2": 700, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 890, "y1": 450, "x2": 990, "y2": 550, "rot": 270}
+        },
+        "tags": []
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 140, "y": 500}, {"x": 140, "y": 690}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id11": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 140, "y": 500}, {"x": 140, "y": 260}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id12": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id13": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id14": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id15": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 380, "y": 400}, {"x": 850, "y": 400}, {"x": 850, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id16": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 370, "y": 600}, {"x": 850, "y": 600}, {"x": 850, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id17": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 390, "y": 830}, {"x": 850, "y": 830}, {"x": 850, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,46 @@
+"""
+Establishes a pressure boundary condition dictated by an external signal.
+
+This component models a boundary in a fluid system where the pressure is explicitly
+defined by an external input signal. It contains a `Port` for connection to
+the fluid network and a 'RealInput' named 'p' that provides the pressure value.
+The core behavior is defined by the equation:
+```math
+port.p = p
+```
+This means the pressure variable within the 'port' is directly equated to the
+external input 'p'.
+"""
+component BoundaryPressure
+  "Fluid port representing the connection to the system"
+  port = HydraulicComponents.Interfaces.Port() {^port}
+  "External real input signal defining the prescribed pressure at the boundary"
+  p = RealInput() {^p}
+relations
+  port.p = p
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://HydraulicComponents/BoundaryPressure.svg"},
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "P", "x": -20, "y": 200, "rot": 0}
+    ]
+  },
+  "_links": {
+    "port": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": 980, "x2": 1020, "y1": 480, "y2": 520, "sh": 1, "sw": 1, "rot": 0}
+        }
+      }
+    },
+    "p": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": -40, "x2": 0, "y1": 480, "y2": 520, "sh": 0.04, "sw": 0.04, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

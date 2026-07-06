@@ -1,0 +1,23 @@
+"""
+Multiplies input signal by a constant gain factor.
+
+Multiplies the input signal by a constant parameter `k`. The relationship
+between the input u and output y is simply y = k*u, where `k` is the gain factor. This block is useful
+for scaling signals or converting between different units.
+"""
+component Gain
+  extends BlockComponents.Interfaces.SISO
+  "Constant gain factor that multiplies the input signal"
+  parameter k::Real
+relations
+  y = k * u
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "k=$(k)", "x": 500, "y": 500, "rot": 0}
+    ],
+    "icons": {"default": "dyad://BlockComponents/Gain.svg"}
+  }
+}
+end

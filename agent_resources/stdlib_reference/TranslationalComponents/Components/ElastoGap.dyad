@@ -1,0 +1,74 @@
+"""
+1D translational spring damper combination with gap.
+
+This component models a spring damper combination that can lift off.
+It can be connected between a sliding mass and the housing (model Fixed),
+to describe the contact of a sliding mass with the housing.
+
+As long as `s_rel > s_rel0`, no force is exerted (`s_rel = flange_b.s - flange_a.s`).
+If `s_rel ≤ s_rel0`, the contact force is basically computed with a linear
+spring/damper characteristic. With parameter `n ≥ 1` (exponent of spring force),
+a nonlinear spring force can be modeled:
+
+```math
+desiredContactForce = f_{ref} \cdot \left|\frac{s_{rel} - s_{rel0}}{s_{ref}}\right|^n + d \cdot \dot{s}_{rel}
+```
+
+Hertzian contact is described by:
+- Contact between two metallic spheres: `n = 1.5`
+- Contact between two metallic plates: `n = 1`
+
+The damping force is bounded by the spring force (`|f_d| ≤ |f_c|`) to prevent
+unphysical pulling/sticking forces and ensure continuity at the contact transition.
+
+Dissipated power is exported through the `heat_port` connector. Connect it to a
+thermal network (e.g., `FixedTemperature`) to close the energy balance.
+"""
+component ElastoGap
+  extends TranslationalComponents.Interfaces.PartialCompliantWithRelativeStates
+  "Spring constant"
+  parameter c::TranslationalSpringConstant(min = 0)
+  "Damping constant"
+  parameter d::TranslationalDampingConstant(min = 0)
+  "Unstretched spring length"
+  parameter s_rel0::Dyad.Position = 0
+  "Reference relative compression at which f_c = f_ref"
+  parameter s_ref::Length(min = eps(Float64)) = 1
+  "Reference spring force at s_ref"
+  parameter f_ref::Dyad.Force(min = 0) = c * s_ref
+  "Exponent of spring force (f_c = -f_ref * |ratio|^n)"
+  parameter n::Real(min = 1) = 1
+  "Thermal port for dissipated losses"
+  heat_port = HeatPort() {^heat_port}
+  "Spring force"
+  variable f_c::Dyad.Force
+  "Linear damping force"
+  variable f_d2::Dyad.Force
+  "Damping force limited by spring force (|f_d| <= |f_c|)"
+  variable f_d::Dyad.Force
+  "Scaling ratio of relative compression to s_ref"
+  variable ratio::Real
+  "Loss power leaving component via heat_port (> 0 if heat is flowing out)"
+  variable lossPower::Power
+relations
+  # Contact force: pushing only, continuous at transition
+  ratio = (s_rel - s_rel0) / s_ref
+  f_c = ifelse(s_rel < s_rel0, -f_ref * abs(ratio) ^ n, 0)
+  f_d2 = ifelse(s_rel < s_rel0, d * v_rel, 0)
+  f_d = ifelse(s_rel < s_rel0, min(max(f_d2, f_c), -f_c), 0)
+  f = f_c + f_d
+  lossPower = f_d * v_rel
+  heat_port.Q_flow = -lossPower
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/ElastoGap.svg"}},
+  "_links": {
+    "heat_port": {
+      "Dyad": {
+        "placement": {
+          "icon": {"x1": -50, "y1": 950, "x2": 50, "y2": 1050}
+        }
+      }
+    }
+  }
+}
+end

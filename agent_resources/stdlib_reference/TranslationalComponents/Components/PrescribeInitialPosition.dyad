@@ -1,0 +1,32 @@
+"""
+Sets the initial position of a translational mechanical flange.
+
+This component is used to define the starting position for a one-dimensional translational mechanical system connected to its `flange`.
+It uses an `initial equation` to set the `flange.s` (position) to the specified parameter `s0` at the very beginning of a simulation.
+During the simulation, the component exerts no force, as defined by the equation:
+```math
+flange.f = 0
+```
+The initial position is set using:
+```math
+flange.s(0) = s0
+```
+"""
+component PrescribeInitialPosition
+  "Translational mechanical connector"
+  flange = Flange() {^flange}
+  "Prescribed initial position for the flange"
+  parameter s0::Dyad.Position
+relations
+  initial flange.s = s0
+  flange.f = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "initial s = $(s0)", "x": 500, "y": 800, "rot": 0}],
+    "icons": {"default": "dyad://TranslationalComponents/Position.svg"}
+  },
+  "_links": {
+    "flange": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

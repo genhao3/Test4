@@ -1,0 +1,29 @@
+"""
+Linear electrical resistor following Ohm's Law.
+
+This component represents an ideal linear resistor. The relationship between the
+voltage (`v`) across its terminals and the current (`i`) flowing through it is
+defined by Ohm's Law:
+```math
+v = i \R
+```
+The resistance `R` is a configurable parameter. This component is intended to be
+used in electrical circuits where a constant resistance behavior is required.
+"""
+component Resistor
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "The electrical resistance value of the component."
+  parameter R::Resistance
+relations
+  "Ohm's Law"
+  v = i * R
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "R=$(R)Ω", "x": 500, "y": 150, "rot": 0}
+    ],
+    "icons": {"default": "dyad://ElectricalComponents/Resistor.svg"}
+  }
+}
+end

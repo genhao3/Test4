@@ -1,0 +1,159 @@
+"""
+Test circuit for CCC (current-controlled current source).
+
+A sine voltage source (amplitude=1 V, frequency=1 Hz) drives a 5 Ω series
+resistor into the CCC input port (port 1). Since v1=0, the full source
+voltage drops across the resistor, producing i1 = V_source/R_series.
+A 10 Ω resistor loads the output port (port 2).
+CCC gain = 3.
+
+Expected (algebraic, holds for all t):
+- v1 = 0  (zero input impedance)
+- i1 = sin(2π·t)/5 = 0.2·sin(2π·t)
+- i2 = gain·i1 = 0.6·sin(2π·t)
+- v2 = −R_load·i2 = −6·sin(2π·t)
+"""
+test component CCC
+  "Sine signal: amplitude=1, frequency=1 Hz"
+  sine = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1) {^sine}
+  "Input voltage source"
+  vs = ElectricalComponents.Analog.Sources.VoltageSource() {^vs}
+  "Series resistor to convert voltage to current"
+  r_series = ElectricalComponents.Analog.Basic.Resistor(R = 5) {^r_series}
+  "CCC with gain=3"
+  ccc = ElectricalComponents.Analog.Basic.CCC(gain = 3) {^ccc}
+  "Output load resistor"
+  r_load = ElectricalComponents.Analog.Basic.Resistor(R = 10) {^r_load}
+  "Input-side ground"
+  gnd1 = ElectricalComponents.Analog.Basic.Ground() {^gnd1}
+  "Output-side ground"
+  gnd2 = ElectricalComponents.Analog.Basic.Ground() {^gnd2}
+relations
+  connect(sine.y, vs.V) {^id8}
+  connect(vs.p, r_series.p) {^id9}
+  connect(r_series.n, ccc.p1) {^id10}
+  connect(vs.n, gnd1.g) {^id11}
+  connect(vs.n, ccc.n1) {^id12}
+  connect(ccc.p2, r_load.p) {^id13}
+  connect(r_load.n, ccc.n2) {^id14}
+  connect(gnd2.g, ccc.n2) {^id15}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://ElectricalComponents/Example.svg"},
+    "tests": {"case1": {"stop": 1, "expect": {"signals": ["ccc.v1", "ccc.i1", "ccc.i2"]}}}
+  },
+  "_links": {
+    "sine": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 0, "y1": 310, "x2": 100, "y2": 410, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "vs": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 410, "x2": 260, "y2": 310, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "r_series": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 310, "y1": 200, "x2": 410, "y2": 300, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ccc": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 510, "y1": 320, "x2": 610, "y2": 420, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "r_load": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 790, "y1": 410, "x2": 890, "y2": 310, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "gnd1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 580, "x2": 260, "y2": 680, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "gnd2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 580, "y1": 580, "x2": 680, "y2": 680, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id8": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 210, "y": 250}, {"x": 310, "y": 250}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 460, "y": 250}, {"x": 460, "y": 321}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 210, "y": 470},
+              {"x": 450, "y": 470},
+              {"x": 450, "y": 420},
+              {"x": 511, "y": 420}
+            ],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 611, "y": 250}, {"x": 840, "y": 250}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 840, "y": 470}, {"x": 631, "y": 470}, {"x": 631, "y": 420}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {
+      "Dyad": {
+        "renderStyle": "standard",
+        "edges": [{"S": 1, "M": [{"x": 630, "y": 420}], "E": 2}]
+      }
+    }
+  }
+}
+end

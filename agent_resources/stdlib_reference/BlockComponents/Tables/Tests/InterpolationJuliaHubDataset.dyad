@@ -1,0 +1,39 @@
+"""
+Test time-dependent interpolation of JuliaHub dataset values.
+
+Creates a time-based interpolation from a JuliaHub dataset, integrating the interpolated values to
+produce the output variable.
+
+The component loads time-series data from a specified JuliaHub dataset and uses quadratic
+interpolation to approximate the data at simulation time points. The derivative of the output variable
+is set equal to the interpolated value, causing the output to be the integral of the dataset values.
+"""
+test component InterpolationJuliaHubDataset
+  "Interpolation block configured to use quadratic interpolation on the specified dataset"
+  interp = BlockComponents.Tables.Interpolation(interpolation_type = InterpolationType.QuadraticInterpolation(),
+    dataset = dataset) {^interp}
+  "Reference to a dataset stored on JuliaHub, specifying the collection, dataset name, and which variables to extract"
+  structural parameter dataset::DyadData.DyadTimeseries = DyadTimeseries("dyad+juliahub://internal.juliahub.com/datasets/juliasimtutorials/circuit_data", dependent_vars = ["ampermeter.i(t)"], independent_var = "timestamp")
+  "Output variable that integrates the interpolated dataset values"
+  variable y::Real
+relations
+  interp.u = time
+  interp.y = der(y)
+  initial y = 0
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {"case1": {"start": 0.001, "stop": 0.1, "expect": {"signals": ["y"]}}},
+    "doc": {"behavior": false}
+  },
+  "_links": {
+    "interp": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 150, "y1": 150, "x2": 250, "y2": 250, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

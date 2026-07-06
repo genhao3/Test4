@@ -1,0 +1,13 @@
+"""
+Type of regularization near zero speed for sign-dependent torque models.
+
+- Exp: Exponential approximation (default, smooth everywhere)
+- Sine: Sine approximation (C1 at ±w0)
+- Linear: Linear approximation (C0 at ±w0)
+- Cosine: Cosine approximation (C1 at ±w0)
+"""
+enum Regularization =
+  | Exp
+  | Sine
+  | Linear
+  | Cosine

@@ -1,0 +1,39 @@
+"""
+A one-dimensional translational mechanical system composed of a mass, spring, and damper connected to a fixed point.
+
+This component represents a classic damped harmonic oscillator. A mass (`body`) is attached to
+one end of a parallel combination of a linear spring (`spring`) and a viscous damper (`damper`).
+The other end of this spring-damper combination is connected to a fixed reference point (`ground`).
+The `L=0` parameter for the `Mass` subcomponent, and the initial condition `body.flange_b.s = 0`
+for the mass's second flange (often specified in simulation setup or test metadata), imply that
+`body.flange_a.s` directly represents the absolute displacement `x` of the mass.
+"""
+test component MassDamperSpringFixed
+  "The viscous damper subcomponent."
+  damper = TranslationalComponents.Components.Damper(d = 1)
+  "The linear spring subcomponent."
+  spring = TranslationalComponents.Components.Spring(c = 1)
+  "The translational mass subcomponent."
+  body = TranslationalComponents.Components.Mass(m = 1, L = 0)
+  "The fixed mechanical ground subcomponent."
+  ground = TranslationalComponents.Components.Fixed()
+relations
+  connect(spring.flange_a, body.flange_a, damper.flange_a)
+  connect(spring.flange_b, damper.flange_b, ground.flange)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 20,
+        "initial": {"body.flange_b.s": 0, "damper.flange_b.f": 0},
+        "atol": {"body.v": 0.001},
+        "expect": {
+          "final": {"body.v": 0},
+          "signals": ["body.v"]
+        }
+      }
+    }
+  }
+}
+end

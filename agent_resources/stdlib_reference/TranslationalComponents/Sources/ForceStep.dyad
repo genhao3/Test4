@@ -1,0 +1,21 @@
+"""
+Force step at a given time.
+
+Model of a force step at time `startTime`. Positive force accelerates in positive
+direction of flange translation. The force is:
+```math
+f = -offsetForce - \\begin{cases} 0 & \\text{if } t < startTime \\\\ stepForce & \\text{otherwise} \\end{cases}
+```
+"""
+component ForceStep
+  extends TranslationalComponents.Interfaces.PartialForce
+  "Height of force step (if negative, force is acting as load)"
+  parameter stepForce::Dyad.Force = 1.0
+  "Offset of force"
+  parameter offsetForce::Dyad.Force = 0.0
+  "Force = offset for time < startTime"
+  parameter startTime::Time = 0.0
+relations
+  f = -offsetForce - ifelse(time < startTime, 0.0, stepForce)
+metadata {"Dyad": {"icons": {"default": "dyad://TranslationalComponents/ForceStep.svg"}}}
+end

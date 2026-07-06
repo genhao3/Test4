@@ -1,0 +1,312 @@
+"""
+PID controller with limited output, anti-windup, and an external derivative input.
+
+A variant of `LimPID` where the internal filtered derivative block is removed entirely.
+Instead, the derivative contribution is supplied externally via the `u_d` input, which
+feeds directly into the PID summation with no internal filtering or differentiation.
+The derivative passed to the derivative input should be that of the control error
+`u_s - u_m`, potentially applying set-point weighting. To use a derivative of the
+measurement signal only, the gain should be -1, i.e., pass the derivative of `-u_m`.
+
+Use this component when the derivative signal is already available from the plant
+(e.g., a velocity sensor, a model state, or an observer output) and internal
+numerical differentiation is unnecessary or undesirable.
+
+The output is:
+
+```math
+y = k \left[e_p + \dfrac{1}{T_is}\left(e + \dfrac{y_{sat} - y}{N_iT_i}\right) + u_d \right] + k_{ff}u_{ff}
+```
+
+where `e_p = w_p \cdot u_s - u_m`, `e = u_s - u_m`, and `u_d` is the externally
+supplied derivative signal passed through without modification.
+"""
+component LimPIDExternalDerivative
+  extends BlockComponents.Interfaces.SingleVariableController
+  "Feed-forward input"
+  u_ff = RealInput() {^u_ff}
+  "External derivative input"
+  u_d = RealInput() {^u_d}
+  add_p = BlockComponents.Math.Add(k1 = wp, k2 = -1) {^add_p}
+  add_i = BlockComponents.Math.Add3(k2 = -1) {^add_i}
+  proportional = BlockComponents.Math.Gain(k = 1) {^proportional}
+  integrator = Integrator(k = 1 / Ti, x0 = xi0) {^integrator}
+  add_pid = BlockComponents.Math.Add3() {^add_pid}
+  gain_pid = BlockComponents.Math.Gain(k = k) {^gain_pid}
+  add_ff = BlockComponents.Math.Add(k2 = k_ff) {^add_ff}
+  limiter = BlockComponents.Nonlinear.Limiter(y_max = y_max, y_min = y_min) {^limiter}
+  add_sat = BlockComponents.Math.Add(k1 = 1, k2 = -1) {^add_sat}
+  gain_track = BlockComponents.Math.Gain(k = 1 / (k * Ni)) {^gain_track}
+  variable control_error::Real
+  "Gain of controller"
+  parameter k::Real = 1
+  "Time constant of the integrator block"
+  parameter Ti::Time = 0.5
+  "Maximum output"
+  parameter y_max::Real = 1e300
+  "Minimum output"
+  parameter y_min::Real = -y_max
+  "Set-point weight for proportional block"
+  parameter wp::Real = 1
+  "`Ni*Ti` is time constant of anti-windup compensation"
+  parameter Ni::Real = 0.9
+  "Gain of the feed-forward input"
+  parameter k_ff::Real = 1
+  "Initial guess value for integrator output"
+  parameter xi0::Real = 0
+relations
+  control_error = u_s - u_m
+  connect(add_p.y, proportional.u) {^id13}
+  connect(add_i.y, integrator.u) {^id14}
+  connect(proportional.y, add_pid.u1) {^id15}
+  connect(integrator.y, add_pid.u3) {^id16}
+  connect(add_pid.y, gain_pid.u) {^id17}
+  connect(gain_pid.y, add_ff.u1) {^id18}
+  connect(add_ff.y, limiter.u) {^id19}
+  connect(limiter.y, add_sat.u1) {^id20}
+  connect(add_sat.y, gain_track.u) {^id21}
+  connect(gain_track.y, add_i.u3) {^id22}
+  connect(add_sat.u2, add_ff.y) {^id23}
+  connect(limiter.y, y) {^id24}
+  connect(add_ff.u2, u_ff) {^id25}
+  connect(add_pid.u2, u_d) {^id26}
+  connect(add_p.u1, u_s) {^id27}
+  connect(add_i.u1, u_s) {^id28}
+  connect(add_p.u2, u_m) {^id29}
+  connect(add_i.u2, u_m) {^id30}
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/LimPID.svg"}
+  },
+  "_links": {
+    "u_ff": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "input", "x1": 450, "y1": -100, "x2": 550, "y2": 0, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "u_d": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "input", "x1": 450, "y1": 1000, "x2": 550, "y2": 1100, "rot": -90}
+        },
+        "tags": []
+      }
+    },
+    "add_p": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "input", "x1": 100, "y1": 100, "x2": 200, "y2": 200, "rot": 0},
+          "diagram": {"iconName": "input", "x1": 80, "y1": 100, "x2": 180, "y2": 200, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "add_i": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "input", "x1": 100, "y1": 500, "x2": 200, "y2": 600}}
+      }
+    },
+    "proportional": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "input", "x1": 300, "y1": 100, "x2": 400, "y2": 200, "rot": 0},
+          "diagram": {"iconName": "input", "x1": 260, "y1": 100, "x2": 360, "y2": 200, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "input", "x1": 300, "y1": 500, "x2": 400, "y2": 600, "rot": 0},
+          "diagram": {"iconName": "input", "x1": 260, "y1": 500, "x2": 360, "y2": 600, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "add_pid": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "input", "x1": 500, "y1": 300, "x2": 600, "y2": 400}}
+      }
+    },
+    "gain_pid": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "input", "x1": 700, "y1": 300, "x2": 800, "y2": 400, "rot": 0},
+          "diagram": {"iconName": "input", "x1": 540, "y1": 100, "x2": 640, "y2": 200, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "add_ff": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "input", "x1": 900, "y1": 300, "x2": 1000, "y2": 400, "rot": 0},
+          "diagram": {"iconName": "input", "x1": 700, "y1": 130, "x2": 800, "y2": 230, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "limiter": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "input", "x1": 1100, "y1": 300, "x2": 1200, "y2": 400, "rot": 0},
+          "diagram": {"iconName": "input", "x1": 840, "y1": 130, "x2": 940, "y2": 230, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "add_sat": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "input", "x1": 1100, "y1": 500, "x2": 1200, "y2": 600, "rot": 90},
+          "diagram": {"iconName": "input", "x1": 830, "y1": 290, "x2": 930, "y2": 390, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "gain_track": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "input", "x1": 500, "y1": 700, "x2": 600, "y2": 800, "rot": 180},
+          "diagram": {"iconName": "input", "x1": 260, "y1": 690, "x2": 360, "y2": 790, "rot": 180}
+        },
+        "tags": []
+      }
+    },
+    "id13": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id14": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id15": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 450, "y": 150}, {"x": 450, "y": 320}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id16": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 450, "y": 550}, {"x": 450, "y": 380}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id17": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 630, "y": 350},
+              {"x": 630, "y": 260},
+              {"x": 500, "y": 260},
+              {"x": 500, "y": 150}
+            ],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id18": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id19": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id20": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 970, "y": 180}, {"x": 970, "y": 250}, {"x": 910, "y": 250}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id21": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 880, "y": 740}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id22": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 75, "y": 740}, {"x": 75, "y": 580}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id23": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 850, "y": 245}, {"x": 820, "y": 245}, {"x": 820, "y": 180}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id24": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 970, "y": 180}, {"x": 970, "y": 500}, {"x": 1050, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id25": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 670, "y": 210}, {"x": 670, "y": 70}, {"x": 500, "y": 70}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id26": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 410, "y": 350}, {"x": 410, "y": 860}, {"x": 500, "y": 860}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id27": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 20, "y": 120}, {"x": 20, "y": 270}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id28": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 20, "y": 520}, {"x": 20, "y": 270}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id29": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 50, "y": 180}, {"x": 50, "y": 730}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id30": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 50, "y": 550}, {"x": 50, "y": 730}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

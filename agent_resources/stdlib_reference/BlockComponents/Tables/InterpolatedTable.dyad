@@ -1,0 +1,37 @@
+type TableInterpolator = func(::Real, ::Real)::Real
+
+"""
+Specifies the interpolation method for each dimension in 2D table interpolation (`InterpolatedTable`).
+
+Variants:
+- `LinearInterpolationDimension`: Linear interpolation along this axis.
+- `ConstantInterpolationDimension`: Constant (piecewise step) interpolation along this axis.
+- `BSplineInterpolationDimension(max_derivative_order_eval)`: B-spline interpolation along this axis,
+  where `max_derivative_order_eval` specifies the maximum derivative order that can be evaluated.
+"""
+enum InterpolationDimension =
+  | LinearInterpolationDimension
+  | ConstantInterpolationDimension
+  | BSplineInterpolationDimension(max_derivative_order_eval::Integer)
+
+component InterpolatedTable
+  "Input signal port"
+  extends BlockComponents.Interfaces.SI2SO
+  structural parameter axis1::Real[:]
+  structural parameter axis2::Real[:]
+  "Dataset containing the data points to be interpolated"
+  structural parameter data::Real[:, :]
+  "Type of interpolation to be used (e.g., linear, cubic)"
+  structural parameter interpolation_dim1::InterpolationDimension
+  structural parameter interpolation_dim2::InterpolationDimension
+  parameter interpolator::TableInterpolator = dataset_interpolation(interpolation_dim1, axis1, interpolation_dim2, axis2, data)
+relations
+  y = interpolator(u1, u2)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Interpolation.svg"},
+    "doc": {"behavior": false}
+  }
+}
+end

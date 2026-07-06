@@ -1,0 +1,47 @@
+"A current-carrying circular coil positioned and oriented in 3D space"
+component CustomCoil
+  "X position of coil center in world frame [m]"
+  parameter pos_x::Real = 0.0
+  "Y position of coil center in world frame [m]"
+  parameter pos_y::Real = 0.0
+  "Z position of coil center in world frame [m]"
+  parameter pos_z::Real = 0.0
+  "X component of coil-plane unit normal"
+  parameter norm_x::Real = 0.0
+  "Y component of coil-plane unit normal"
+  parameter norm_y::Real = 0.0
+  "Z component of coil-plane unit normal"
+  parameter norm_z::Real = 1.0
+  "Coil radius [m]"
+  parameter coil_radius::Real = 1.0
+  "Number of turns"
+  parameter n_turns::Real = 1.0
+  "Current flowing through the coil [A]"
+  parameter current::Real = 1.0
+  "Magnetic moment magnitude [A·m²]"
+  variable mag_moment::Real
+  "Axial magnetic field at coil center [T]"
+  variable B_center::Real
+relations
+  mag_moment = n_turns * current * 3.14159265358979 * coil_radius ^ 2
+  B_center = 2e-7 * 3.14159265358979 * n_turns * current / coil_radius
+end
+
+"42-coil racetrack assembly with computed positions, normals, and currents"
+test component RacetrackAssembly
+  coils = [CustomCoil(pos_x = Test4.racetrack_get_px(i), pos_y = Test4.racetrack_get_py(i), pos_z = Test4.racetrack_get_pz(i), norm_x = Test4.racetrack_get_nx(i), norm_y = Test4.racetrack_get_ny(i), norm_z = Test4.racetrack_get_nz(i), coil_radius = coil_radius, n_turns = n_turns, current = Test4.racetrack_get_current(i)) for i in 1:N]
+  structural parameter N::Integer = 42
+  parameter coil_radius::Real = 1.0
+  parameter n_turns::Real = 1.0
+  "Dummy state to enable transient analysis"
+  variable time_state::Real
+relations
+  initial time_state = 0.0
+  der(time_state) = 1.0
+end
+
+analysis RacetrackAnalysis
+  extends TransientAnalysis(stop = 0.01)
+  model = RacetrackAssembly()
+relations
+end

@@ -1,0 +1,22 @@
+"""
+Defines relative angular states for compliant rotational connections.
+
+This partial component extends a base compliant model by explicitly defining the relative angular velocity ($w_{rel}$) and relative angular acceleration ($a_{rel}$) between two connected rotational elements. These variables are intended to be used as preferred state variables. The core dynamics are described by the differential equations:
+```math
+\begin{align*}
+\frac{d\phi_{rel}}{dt} = w_{rel}\\
+\frac{dw_{rel}}{dt} = a_{rel}
+\end{align*}
+```
+where $\phi_{rel}$ (relative angle) is assumed to be defined in the extended or extending components. This formulation is common in mechanical systems where relative motion is of primary interest.
+"""
+partial component PartialCompliantWithRelativeStates
+  extends RotationalComponents.Interfaces.PartialCompliant
+  "Relative angular velocity between splines"
+  variable w_rel::AngularVelocity
+  "Relative angular acceleration between splines"
+  variable a_rel::AngularAcceleration
+relations
+  der(phi_rel) = w_rel
+  der(w_rel) = a_rel
+end

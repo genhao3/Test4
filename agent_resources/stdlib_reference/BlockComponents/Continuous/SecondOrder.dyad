@@ -1,0 +1,37 @@
+"""
+Second-order filter with configurable gain, bandwidth, and damping ratio.
+
+A filter that implements a second-order transfer function with configurable gain k,
+bandwidth w, and relative damping d. The filter can be configured to achieve different
+response characteristics by adjusting the damping ratio: critically damped (d=1),
+under-damped (d<1), or over-damped (d>1). A damping value of d=1/√2 creates a Butterworth
+filter with maximally flat frequency response. The filter is characterized by the transfer
+function
+
+```math
+Y(s)/U(s) = \frac{k \cdot w^2}{s^2 + 2d \cdot w \cdot s + w^2}
+```
+"""
+component SecondOrder
+  extends BlockComponents.Interfaces.SISO
+  "State of SecondOrder filter"
+  variable x::Real
+  "Derivative state of SecondOrder filter"
+  variable xd::Real
+  "Gain"
+  parameter k::Real = 1.0
+  "Bandwidth (angular frequency)"
+  parameter w::Real = 1.0
+  "Relative damping"
+  parameter d::Real = 1.0
+relations
+  der(x) = xd
+  der(xd) = w * (w * (k * u - x) - 2 * d * xd)
+  y = x
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/SecondOrder.svg"}
+  }
+}
+end

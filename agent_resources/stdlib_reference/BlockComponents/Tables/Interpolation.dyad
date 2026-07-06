@@ -1,0 +1,69 @@
+"""
+Specifies the interpolation method used for 1D interpolation in the `Interpolation` component.
+
+Variants:
+- `ConstantInterpolation`: Piecewise constant interpolation (step function, uses left value).
+- `SmoothedConstantInterpolation`: Smoothed version of constant interpolation with continuous transitions.
+- `LinearInterpolation`: Piecewise linear interpolation between data points.
+- `QuadraticInterpolation`: Piecewise quadratic polynomial interpolation.
+- `LagrangeInterpolation(n)`: Lagrange polynomial interpolation of degree `n`.
+- `QuadraticSpline`: Quadratic spline interpolation with continuous first derivatives.
+- `CubicSpline`: Cubic spline interpolation with continuous first and second derivatives.
+- `AkimaInterpolation`: Akima spline interpolation, which reduces oscillations near outliers.
+"""
+enum InterpolationType =
+  | ConstantInterpolation
+  | SmoothedConstantInterpolation
+  | LinearInterpolation
+  | QuadraticInterpolation
+  | LagrangeInterpolation(n::Integer)
+  | QuadraticSpline
+  | CubicSpline
+  | AkimaInterpolation
+
+"""
+Specifies the extrapolation method used for the 1D innterpolation when trying to access values outside of the given data.
+
+Variants:
+- `None`: This extrapolation type will throw an error when the input t is beyond the data in the specified direction.
+- `Constant`: This extrapolation type extends the interpolation with the boundary values of the data.
+- `Linear`: This extrapolation type extends the interpolation with a linear continuation of the interpolation, making it $C^1$ smooth at the data boundaries.
+- `Extension`: This extrapolation type extends the interpolation with a continuation of the expression for the interpolation at the boundary intervals for maximum smoothness.
+- `Periodic`: This extrapolation type extends the interpolation such that `A(t + T) == A(t) for all t`, where the period is given by `T = last(A.t) - first(A.t)`.
+- `Reflective`: This extrapolation type extends the interpolation such that `A(t_ + t) == A(t_ - t)` for all `t_, t` such that `(t_ - first(A.t)) % T == 0` and `0 < t < T`, where `T = last(A.t) - first(A.t)`.
+"""
+enum ExtrapolationType =
+  | None
+  | Constant
+  | Linear
+  | Extension
+  | Periodic
+  | Reflective
+
+"""
+Performs interpolation on input values using a specified dataset and interpolation method.
+
+Takes an input value and produces an output by interpolating within a dataset according to the
+specified interpolation type. The component creates an interpolator object from the dataset and
+interpolation parameters, then applies this interpolator to map input values to output values
+through lookup and interpolation.
+"""
+component Interpolation
+  extends BlockComponents.Interfaces.SISO
+  structural parameter dataset::DyadData.DyadTimeseries
+  "Type of interpolation to be used (e.g., linear, cubic)"
+  structural parameter interpolation_type::InterpolationType
+  "Type of the extrapolation to be used (defaults to `ExtrapolationType.None`)"
+  structural parameter extrapolation_type::ExtrapolationType = ExtrapolationType.None()
+  "Interpolator object created from the dataset and interpolation type"
+  parameter interpolator::Real2RealInterpolator = dataset_interpolation(interpolation_type, dataset[only(get_dependent_vars(dataset))], dataset[get_independent_var(dataset)], extrapolation_type)
+relations
+  y = interpolator(u)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Interpolation.svg"},
+    "doc": {"behavior": false}
+  }
+}
+end

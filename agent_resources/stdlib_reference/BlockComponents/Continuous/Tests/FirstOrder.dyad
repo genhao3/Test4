@@ -1,0 +1,48 @@
+"""
+Test fixture for evaluating first-order system response to constant input.
+
+This component connects a constant value (1.0) to a first-order system with gain 1.2 and
+time constant 0.1, allowing observation of the step response. The first-order system is
+expected to reach its steady state value of 1.2 after approximately 5 time constants (0.5 seconds).
+The metadata includes a test case that verifies this expected behavior after 10 seconds of simulation.
+"""
+test component FirstOrder
+  "Constant block that provides a unit step input with value k=1"
+  c = BlockComponents.Sources.Constant(k = 1) {^c}
+  "First-order system with gain 1.2 and time constant 0.1 seconds"
+  pt1 = BlockComponents.Continuous.FirstOrder(k = 1.2, T = 0.1) {^pt1}
+relations
+  "Connects the constant output to the first-order system input"
+  connect(c.y, pt1.u) {^id3}
+  initial pt1.y = 0
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "experiments": {},
+    "tests": {
+      "case1": {
+        "stop": 10,
+        "atol": {"pt1.y": 0.001},
+        "expect": {"final": {"pt1.y": 1.2}, "signals": ["pt1.y"]}
+      }
+    }
+  },
+  "_links": {
+    "c": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 70, "y1": 110, "x2": 170, "y2": 210, "rot": 0}
+        }
+      }
+    },
+    "pt1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 310, "y1": 110, "x2": 410, "y2": 210, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

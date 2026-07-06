@@ -1,0 +1,51 @@
+"""
+Forced movement of a spline according to a reference angular velocity signal.
+
+The input signal `w_ref` defines the reference angular velocity in [rad/s]. The spline is
+forced to move relative to the support connector according to this reference motion. The
+parameter `ref_type` selects between two modes:
+
+1. **Exact**: The reference speed is treated exactly. This is only possible if
+   the input signal is defined by an analytical function which can be differentiated at
+   least once.
+2. **Filtered** (default): The reference speed is filtered and the first derivative of the
+   filtered curve is used to compute the reference acceleration of the spline. For filtering,
+   a first order filter is used:
+   ```math
+   a = (w_{ref} - w) \\cdot w_{crit}
+   ```
+   where `w_crit = 2π f_crit` is the critical angular frequency. The critical frequency
+   `f_crit` should be selected higher than the essential low frequencies in the input signal.
+"""
+component SpeedSource
+  extends RotationalComponents.Interfaces.PartialElementaryOneSplineAndSupport
+  "Reference angular velocity of spline with respect to support as input signal"
+  w_ref = RealInput() {^w_ref}
+  "Type of reference signal handling"
+  structural parameter ref_type::RotationalComponents.Sources.ReferenceType = RotationalComponents.Sources.ReferenceType.Filtered()
+  "Rotation angle of spline with respect to support"
+  variable phi::Angle(statePriority = 10)
+  "Angular velocity of spline with respect to support"
+  variable w::AngularVelocity(statePriority = 10)
+  "Angular acceleration of spline with respect to support"
+  variable a::AngularAcceleration
+relations
+  phi = spline.phi - phi_support
+  w = der(phi)
+  switch ref_type
+    case Exact
+      w = w_ref
+      a = 0
+    case Filtered
+      initial phi = 0
+      initial w = w_ref
+      a = der(w)
+      a = (w_ref - w) * 2 * π * getproperty(ref_type, Symbol("f_crit"))
+  end
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/Pos-Speed-Acc-Move.svg"}},
+  "_links": {
+    "w_ref": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

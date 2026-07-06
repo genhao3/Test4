@@ -1,0 +1,29 @@
+"""
+First-order filter with a single real pole and adjustable gain.
+
+Implements a dynamic system with transfer function
+
+```math
+\frac{k}{sT + 1}
+```
+where `T` is the time constant and `k` is the gain. The filter has a single real pole at s = -1/T
+and smoothly tracks the input signal with the specified time constant.
+"""
+component FirstOrder
+  extends BlockComponents.Interfaces.SISO
+  "State variable representing the filtered value"
+  variable x::Real
+  "Time constant controlling the speed of response"
+  parameter T::Real
+  "Gain factor applied to the input"
+  parameter k::Real = 1.0
+relations
+  der(x) = (k * u - x) / T
+  y = x
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/FirstOrder.svg"}
+  }
+}
+end

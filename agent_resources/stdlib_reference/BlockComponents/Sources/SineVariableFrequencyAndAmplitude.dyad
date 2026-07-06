@@ -1,0 +1,71 @@
+"""
+Sine voltage source with adjustable frequency and amplitude through external signals.
+
+Generates a sine wave whose amplitude and frequency can be controlled dynamically through
+input connections. The component integrates the input frequency to compute the phase angle,
+then uses this phase to produce a sine wave output signal. The output formula is:
+
+```math
+y = offset + amplitude*sin(phi)
+```
+where phi evolves according to `der(phi) = 2*π*frequency`. This allows for creating time-varying
+oscillating signals with controllable parameters.
+
+```
+amplitude
+↓
++-----+
+frequency --→ |     | --→ y
++-----+
+```
+"""
+component SineVariableFrequencyAndAmplitude
+  "Input for controlling the amplitude of the sine wave"
+  amplitude = RealInput() {^amplitude}
+  "Input for controlling the frequency of the sine wave"
+  frequency = RealInput() {^frequency}
+  "Output representing the resulting sine wave signal"
+  y = RealOutput() {^y}
+  "Initial phase of the sine wave"
+  parameter phi0::Real = 0
+  "Offset of the sine wave"
+  parameter offset::Real = 0
+  "Phase of the sine wave"
+  variable phi::Angle
+relations
+  initial phi = phi0
+  der(phi) = 2 * π * frequency
+  y = offset + amplitude * sin(phi)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/SineVariableFrequencyAndAmplitude.svg"}
+  },
+  "_links": {
+    "amplitude": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 170, "x2": 0, "y2": 270, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -100, "y1": 170, "x2": 0, "y2": 270, "rot": 0}
+        }
+      }
+    },
+    "frequency": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 680, "x2": 0, "y2": 780, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -100, "y1": 680, "x2": 0, "y2": 780, "rot": 0}
+        }
+      }
+    },
+    "y": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0},
+          "icon": {"iconName": "default", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

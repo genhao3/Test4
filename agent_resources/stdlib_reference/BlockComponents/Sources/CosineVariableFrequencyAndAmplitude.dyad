@@ -1,0 +1,95 @@
+"""
+Cosine voltage source with variable frequency and amplitude
+
+Variable cosine generator with externally controlled amplitude and frequency inputs.
+The component generates a cosine waveform based on integration of the frequency input:
+
++------------+
+| amplitude  |
++-----+------+
+|
+v
++------------+
+|            |
+|  Cosine    +----> y
+| Generator  |
+|            |
++------------+
+^
+|
++-----+------+
+| frequency  |
++------------+
+
+```math
+\frac{d\phi}{dt} = 2\pi \cdot frequency
+```
+
+```math
+y = offset + amplitude \cdot \cos(\phi)
+```
+"""
+component CosineVariableFrequencyAndAmplitude
+  "Input port for the amplitude of the cosine wave"
+  amplitude = RealInput() {^amplitude}
+  "Input port for the frequency of the cosine wave in Hz"
+  frequency = RealInput() {^frequency}
+  "Output port for the resulting cosine waveform"
+  y = RealOutput() {^y}
+  "Initial phase of the cosine wave"
+  parameter phi0::Real = 0
+  "Offset of the cosine wave"
+  parameter offset::Real = 0
+  "Phase of the cosine wave"
+  variable phi::Angle
+relations
+  initial phi = phi0
+  der(phi) = 2 * π * frequency
+  y = offset + amplitude * cos(phi)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/CosineVariableFrequencyAndAmplitude.svg"}
+  },
+  "_links": {
+    "amplitude": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 190, "x2": 0, "y2": 290, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -100, "y1": 190, "x2": 0, "y2": 290, "rot": 0}
+        }
+      }
+    },
+    "frequency": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": -100, "y1": 680, "x2": 0, "y2": 780, "rot": 0},
+          "diagram": {"iconName": "default", "x1": -100, "y1": 680, "x2": 0, "y2": 780, "rot": 0}
+        }
+      }
+    },
+    "y": {
+      "Dyad": {
+        "placement": {
+          "icon": {
+            "iconName": "default",
+            "x1": 1100,
+            "y1": 450,
+            "x2": 1000,
+            "y2": 550,
+            "rot": 180
+          },
+          "diagram": {
+            "iconName": "default",
+            "x1": 1100,
+            "y1": 450,
+            "x2": 1000,
+            "y2": 550,
+            "rot": 180
+          }
+        }
+      }
+    }
+  }
+}
+end

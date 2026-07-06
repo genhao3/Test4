@@ -1,0 +1,25 @@
+"""
+Linear voltage-controlled current source.
+
+The right port current is controlled by the left port voltage:
+```math
+i_2 = v_1 \cdot \text{transConductance}
+```
+The left port current is zero (infinite input impedance).
+
+Corresponds to `Modelica.Electrical.Analog.Basic.VCC`.
+"""
+component VCC
+  extends ElectricalComponents.Analog.Interfaces.TwoPort
+  "Transconductance: output current per input voltage (A/V)"
+  parameter transConductance::Conductance = 1
+relations
+  i2 = v1 * transConductance
+  i1 = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/VCC.svg"}
+  }
+}
+end

@@ -1,0 +1,28 @@
+"""
+Measures the absolute linear position of a mechanical translational flange.
+
+This sensor provides the absolute translational position of its connection point.
+It inherits from `PartialAbsoluteSensor`, which defines a mechanical
+translational `flange`. The sensor's `RealOutput` signal, named `s`, directly
+reflects the position variable `s` associated with this `flange`.
+The fundamental behavior is captured by the equation:
+```math
+s = flange.s
+```
+Here, the `s` on the left side of the equation is the sensor's output signal,
+and `flange.s` is the position variable of the connector inherited from
+`PartialAbsoluteSensor`.
+"""
+component PositionSensor
+  extends TranslationalComponents.Interfaces.PartialAbsoluteSensor
+  "Output signal representing the measured absolute position"
+  s = RealOutput(units="m") {^s}
+relations
+  flange.s = s
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/AbsoluteSensor.svg"}},
+  "_links": {
+    "s": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}}
+  }
+}
+end

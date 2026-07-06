@@ -1,0 +1,63 @@
+"""
+Adds two constant values to produce a sum of 3.
+
+This component demonstrates basic component composition by connecting two constant sources
+(with values 1 and 2) to an adder block. The output of the adder (add.y) equals the sum of
+the two inputs (3).
+"""
+test component Add
+  "Constant source with value 1"
+  c1 = BlockComponents.Sources.Constant(k = 1) {^c1}
+  "Constant source with value 2"
+  c2 = BlockComponents.Sources.Constant(k = 2) {^c2}
+  "Adder that sums its two inputs"
+  add = BlockComponents.Math.Add() {^add}
+relations
+  "Connects the output of constant 1 to the first input of the adder"
+  connect(add.u1, c1.y) {^id4}
+  "Connects the output of constant 2 to the second input of the adder"
+  connect(add.u2, c2.y) {^id5}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {"stop": 5, "expect": {"final": {"add.y": 3}}}
+    }
+  },
+  "_links": {
+    "c1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 290, "y1": 370, "x2": 390, "y2": 470, "rot": 0}
+        }
+      }
+    },
+    "c2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 300, "y1": 550, "x2": 400, "y2": 650, "rot": 0}
+        }
+      }
+    },
+    "add": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 590, "y1": 450, "x2": 690, "y2": 550, "rot": 0}
+        }
+      }
+    },
+    "id4": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 470}, {"x": 500, "y": 420}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id5": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 530}, {"x": 500, "y": 600}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

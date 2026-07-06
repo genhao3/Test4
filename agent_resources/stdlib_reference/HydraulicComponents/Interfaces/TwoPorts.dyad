@@ -1,0 +1,54 @@
+"""
+A base model for generic two-port fluid dynamic components.
+
+This partial component establishes the common interface and conservation laws for elements with two fluid connection ports.
+It defines the pressure difference across these ports, denoted as $\\Delta p$, and ensures the conservation of mass flow.
+Key relationships include:
+
+Mass Conservation:
+```math
+port\\_a.m\\_flow + port\\_b.m\\_flow = 0
+```
+This equation signifies that the sum of mass flow rates at the two ports is zero, adhering to the convention where flow into the component is positive at one port and negative (outflow) at the other, or vice-versa.
+
+Pressure Difference:
+```math
+\\Delta p = port\\_a.p - port\\_b.p
+```
+This defines the pressure drop from `port_a` to `port_b`.
+
+Additionally, a `continuity` relation (`continuity(port_a.medium, port_b.medium)`) ensures that the medium properties are consistent between the ports.
+Being a `partial` component, it is designed as a base for more specialized two-port device models.
+"""
+partial component TwoPorts
+  "The first fluid port of the component"
+  port_a = Port() {^port_a}
+  "The second fluid port of the component"
+  port_b = Port() {^port_b}
+  "Pressure difference across the component, defined as port_a.p - port_b.p"
+  variable Δp::AbsolutePressure
+  "Overall mass flow rate through the component"
+  variable m_flow::MassFlowRate
+relations
+  continuity(port_a.medium, port_b.medium)
+  port_a.m_flow + port_b.m_flow = 0
+  Δp = port_a.p - port_b.p
+metadata {
+  "_links": {
+    "port_a": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": -20, "x2": 20, "y1": 480, "y2": 520, "sh": 1, "sw": 1, "rot": 0}
+        }
+      }
+    },
+    "port_b": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": 980, "x2": 1020, "y1": 480, "y2": 520, "sh": 0.04, "sw": 0.04, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

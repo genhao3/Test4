@@ -1,0 +1,37 @@
+"""
+Input signal acting as torque on two splines.
+
+The input signal `tau` defines an external torque in [Nm] which acts at both spline connectors,
+i.e., the components connected to these splines are driven by torque `tau`.
+A positive value accelerates `spline_a` and decelerates `spline_b`.
+
+The equations are:
+```math
+spline\_a.\tau = \tau
+```
+```math
+spline\_b.\tau = -\tau
+```
+"""
+component Torque2
+  extends RotationalComponents.Interfaces.PartialTwoSplines
+  "Torque driving the two splines (a positive value accelerates spline_a)"
+  tau = RealInput() {^tau}
+relations
+  spline_a.tau = tau
+  spline_b.tau = -tau
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/Torque.svg"}},
+  "_links": {
+    "tau": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 450, "y1": -100, "x2": 550, "y2": 0, "rot": 90},
+          "diagram": {"iconName": "default", "x1": 450, "y1": -100, "x2": 550, "y2": 0, "rot": 90}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

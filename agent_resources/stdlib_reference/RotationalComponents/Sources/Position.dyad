@@ -1,0 +1,55 @@
+"""
+Forced movement of a spline according to a reference angle signal.
+
+The input signal `phi_ref` defines the reference angle in [rad]. The spline is forced to move
+relative to the support connector according to this reference motion. The parameter `ref_type`
+selects between two modes:
+
+1. **Exact**: The reference angle is treated exactly. This is only possible if
+   the input signal is defined by an analytical function which can be differentiated at
+   least twice.
+2. **Filtered** (default): The reference angle is filtered and the second derivative of the
+   filtered curve is used to compute the reference acceleration of the spline. For filtering,
+   a second order Bessel filter is used. The critical frequency `f_crit` in [Hz] should be
+   selected higher than the essential low frequencies in the signal.
+
+   ```math
+   \\frac{bf}{w_{crit}^2} \\frac{d^2\\phi}{dt^2} + \\frac{af}{w_{crit}} \\frac{d\\phi}{dt} + \\phi = \\phi_{ref}
+   ```
+"""
+component Position
+  extends RotationalComponents.Interfaces.PartialElementaryOneSplineAndSupport
+  "Reference angle of spline with respect to support as input signal"
+  phi_ref = RealInput() {^phi_ref}
+  "Type of reference signal handling"
+  structural parameter ref_type::RotationalComponents.Sources.ReferenceType = RotationalComponents.Sources.ReferenceType.Filtered()
+  "s-coefficient of the second order Bessel filter"
+  final parameter a_f::Real = 1.3617
+  "s²-coefficient of the second order Bessel filter"
+  final parameter b_f::Real = 0.6180
+  "Rotation angle of spline with respect to support"
+  variable phi::Angle
+  "Angular velocity of spline with respect to support"
+  variable w::AngularVelocity
+  "Angular acceleration of spline with respect to support"
+  variable a::AngularAcceleration
+relations
+  phi = spline.phi - phi_support
+  switch ref_type
+    case Exact
+      phi = phi_ref
+      w = 0
+      a = 0
+    case Filtered
+      initial phi = phi_ref
+      w = der(phi)
+      a = der(w)
+      a = ((phi_ref - phi) * 2 * π * getproperty(ref_type, Symbol("f_crit")) - a_f * w) * (2 * π * getproperty(ref_type, Symbol("f_crit")) / b_f)
+  end
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/Pos-Speed-Acc-Move.svg"}},
+  "_links": {
+    "phi_ref": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

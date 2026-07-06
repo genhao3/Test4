@@ -1,0 +1,33 @@
+"""
+Models a linear 1D rotational spring and damper acting in parallel.
+
+This component represents a parallel combination of a linear rotational spring and a linear rotational damper. It calculates the total torque based on the relative angular displacement and velocity between its mechanical connection flanges.
+The spring torque (\$\tau_c\$) is proportional to the angular displacement from an unstretched reference angle (\$\\phi_{rel0}\$), defined by the spring constant (\$c\$).
+The damper torque (\$\tau_d\$) is proportional to the relative angular velocity (\$w_{rel}\$), defined by the damping constant (\$d\$).
+The governing equations are:
+```math
+\begin{align*}
+\tau_c &= c (\\phi_{rel} - \\phi_{rel0}) \\
+\tau_d &= d w_{rel} \\
+\tau &= \tau_c + \tau_d
+\end{align*}
+```
+"""
+component SpringDamper
+  extends RotationalComponents.Interfaces.PartialCompliantWithRelativeStates
+  "Spring torque contribution"
+  variable tau_c::Torque
+  "Damper torque contribution"
+  variable tau_d::Torque
+  "Damping constant of the rotational damper"
+  parameter d::RotationalDampingConstant
+  "Spring constant of the rotational spring"
+  parameter c::RotationalSpringConstant
+  "Unstretched (zero torque) relative angle of the spring"
+  parameter phi_rel0::Angle = 0.0
+relations
+  tau_c = c * (phi_rel - phi_rel0)
+  tau_d = d * w_rel
+  tau = tau_c + tau_d
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/SpringDamper.svg"}}}
+end

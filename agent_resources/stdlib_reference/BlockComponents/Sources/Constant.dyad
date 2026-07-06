@@ -1,0 +1,23 @@
+"""
+Provides a constant output signal of value k.
+
+Generates a constant signal that doesn't change over time. The output y is always equal
+to the parameter k, regardless of simulation time or system state. This is often used
+as a reference signal, bias term, or fixed input to other components in a control system or simulation.
+"""
+component Constant
+  extends BlockComponents.Interfaces.SO
+  "The constant value to output"
+  parameter k::Real
+relations
+  y = k
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "k = $(k)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "$(instance)", "x": 500, "y": -150, "rot": 0}
+    ],
+    "icons": {"default": "dyad://BlockComponents/Constant.svg"}
+  }
+}
+end

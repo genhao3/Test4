@@ -1,0 +1,117 @@
+"""
+Test component that verifies linear, quadratic, and exponential chirp signal generators.
+
+This component instantiates three Chirp blocks — one with linear, one with quadratic,
+and one with exponential frequency sweep law — and connects each to an Integrator to validate the time-domain integration
+of the chirp signals. With default parameters (fmin=0.1 Hz, fmax=5 Hz, T=100 s, amplitude=1),
+the linear chirp sweeps frequency uniformly while the quadratic chirp sweeps with a slow start
+and fast rise.
+"""
+test component Chirp
+  "Integrator for the linear chirp signal"
+  linear_integrator = BlockComponents.Continuous.Integrator() {^linear_integrator}
+  "Integrator for the quadratic chirp signal"
+  quadratic_integrator = BlockComponents.Continuous.Integrator() {^quadratic_integrator}
+  "Linear chirp signal generator"
+  linear = BlockComponents.Sources.Chirp(law = BlockComponents.Sources.ChirpLaw.Linear()) {^linear}
+  "Quadratic chirp signal generator"
+  quadratic = BlockComponents.Sources.Chirp() {^quadratic}
+  "Integrator for the exponential chirp signal"
+  exponential_integrator = BlockComponents.Continuous.Integrator() {^exponential_integrator}
+  "Exponential chirp signal generator"
+  exponential = BlockComponents.Sources.Chirp(law = BlockComponents.Sources.ChirpLaw.Exponential()) {^exponential}
+relations
+  "Connects the linear chirp output to its integrator"
+  connect(linear.y, linear_integrator.u) {^id7}
+  "Connects the quadratic chirp output to its integrator"
+  connect(quadratic.y, quadratic_integrator.u) {^id8}
+  "Connects the exponential chirp output to its integrator"
+  connect(exponential.y, exponential_integrator.u) {^id9}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 100,
+        "atol": {
+          "linear.y": 0.001,
+          "quadratic.y": 0.001,
+          "exponential.y": 0.001,
+          "linear_integrator.x": 0.01,
+          "quadratic_integrator.x": 0.01,
+          "exponential_integrator.x": 0.01
+        },
+        "expect": {
+          "initial": {"linear.y": 0, "quadratic.y": 0, "exponential.y": 0},
+          "signals": [
+            "linear.y",
+            "quadratic.y",
+            "exponential.y",
+            "linear_integrator.x",
+            "quadratic_integrator.x",
+            "exponential_integrator.x"
+          ],
+          "final": {
+            "linear.y": 0,
+            "quadratic.y": 0.866,
+            "exponential.y": 0.9995,
+            "linear_integrator.x": 1.12,
+            "quadratic_integrator.x": 1.66,
+            "exponential_integrator.x": 1.58
+          }
+        }
+      }
+    }
+  },
+  "_links": {
+    "linear_integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 200, "y1": 20, "x2": 300, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "quadratic_integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 200, "y1": 170, "x2": 300, "y2": 270, "rot": 0}
+        }
+      }
+    },
+    "linear": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "quadratic": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 170, "x2": 120, "y2": 270, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "exponential_integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 200, "y1": 320, "x2": 300, "y2": 420, "rot": 0}
+        }
+      }
+    },
+    "exponential": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 320, "x2": 120, "y2": 420, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id7": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id8": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id9": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

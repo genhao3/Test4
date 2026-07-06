@@ -1,0 +1,35 @@
+"""
+Ideal voltage source whose output voltage is determined by a real input signal and a scaling parameter.
+
+This component models an ideal voltage source. The voltage `v` across its positive and
+negative pins (inherited from the `TwoPin` base component) is determined by an
+external real input signal connected to its `V` input port, and a unit
+parameter `uV`. The signal at input `V` is treated as a dimensionless value,
+which is then multiplied by the parameter `uV` (which has units of Voltage)
+to produce the actual output voltage `v` across the pins.
+The relationship is given by:
+```math
+v = V uV
+```
+Where `V` is the value of the signal at the `RealInput` port.
+"""
+component VoltageSource
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "External real input signal that provides the base value for the source voltage."
+  V = RealInput() {^V}
+  "Unit parameter to balance units in voltage relation."
+  final parameter uV::Voltage = 1.0
+relations
+  v = V * uV
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/Voltage.svg"}
+  },
+  "_links": {
+    "V": {
+      "Dyad": {"placement": {"icon": {"x1": 450, "y1": -50, "x2": 550, "y2": 50, "rot": 90}}}
+    }
+  }
+}
+end

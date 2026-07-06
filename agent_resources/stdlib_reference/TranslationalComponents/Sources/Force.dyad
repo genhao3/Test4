@@ -1,0 +1,33 @@
+"""
+An ideal force source that applies equal and opposite forces to two translational mechanical flanges, controlled by an external signal.
+
+This component models an ideal source of force acting between its two translational mechanical flanges, `flange_a` and `flange_b` (inherited from `PartialTwoFlanges`).
+The magnitude and direction of the force are determined by the external input signal `f`. The input `f` directly defines the force exerted by `flange_a` on the connected component.
+The core behavior is defined by the equations relating the flange forces to the input signal $f$ :
+```math
+flange\_a.f = f \\
+flange\_b.f = -f
+```
+"""
+component Force
+  extends TranslationalComponents.Interfaces.PartialTwoFlanges
+  "The external input signal defining the force magnitude and direction applied by flange_a; flange_b applies -f."
+  f = RealInput(units="N") {^f}
+relations
+  flange_a.f = f
+  flange_b.f = -f
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/Force.svg"}},
+  "_links": {
+    "f": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 450, "y1": -100, "x2": 550, "y2": 0, "rot": 90},
+          "diagram": {"iconName": "default", "x1": 450, "y1": -100, "x2": 550, "y2": 0, "rot": 90}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

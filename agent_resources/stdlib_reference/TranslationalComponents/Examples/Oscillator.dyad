@@ -1,0 +1,253 @@
+"""
+Oscillator demonstrates the use of initial conditions.
+
+Replicates the structure of Modelica.Mechanics.Translational.Examples.Oscillator.
+
+A spring–mass system is a mechanical oscillator. The resonant frequency is
+ω_res = sqrt(c / m). For c=10000 N/m and m=1 kg, f_res = ω_res/(2π) ≈ 15.9155 Hz.
+
+**System 1 (top, undamped):** A sinusoidal force at the resonant frequency
+drives mass1 through a spring to a wall. Without damping, the amplitude grows
+without bound (resonance).
+
+**System 2 (bottom, damped):** Same as system 1 but with a damper in parallel
+with the spring. Damping bounds the amplitude.
+
+Note: MSL uses a one-flange Force source. Here we use the two-flange Force
+with flange_b connected to a Fixed ground, which is equivalent to a grounded
+one-flange Force.
+"""
+example component Oscillator
+  "Sinusoidal force signal at resonance frequency"
+  sine1 = BlockComponents.Sources.Sine(amplitude = 1, frequency = 15.9155) {^sine1}
+  "Force source for system 1"
+  force1 = TranslationalComponents.Sources.Force() {^force1}
+  "Ground for force source 1"
+  force1_ground = TranslationalComponents.Components.Fixed() {^force1_ground}
+  "Mass for system 1 (undamped)"
+  mass1 = TranslationalComponents.Components.Mass(L = 1, m = 1, s = initial -0.5, v = initial 0) {^mass1}
+  "Spring for system 1"
+  spring1 = TranslationalComponents.Components.Spring(s_rel0 = 1, c = 10000) {^spring1}
+  "Wall for system 1"
+  fixed1 = TranslationalComponents.Components.Fixed(s0 = 1) {^fixed1}
+  "Sinusoidal force signal at resonance frequency"
+  sine2 = BlockComponents.Sources.Sine(amplitude = 1, frequency = 15.9155) {^sine2}
+  "Force source for system 2"
+  force2 = TranslationalComponents.Sources.Force() {^force2}
+  "Ground for force source 2"
+  force2_ground = TranslationalComponents.Components.Fixed() {^force2_ground}
+  "Mass for system 2 (damped)"
+  mass2 = TranslationalComponents.Components.Mass(L = 1, m = 1, s = initial -0.5, v = initial 0) {^mass2}
+  "Spring for system 2"
+  spring2 = TranslationalComponents.Components.Spring(s_rel0 = 1, c = 10000) {^spring2}
+  "Damper for system 2"
+  damper1 = TranslationalComponents.Components.Damper(d = 10) {^damper1}
+  "Wall for system 2"
+  fixed2 = TranslationalComponents.Components.Fixed(s0 = 1) {^fixed2}
+relations
+  # System 1: force → mass → spring → fixed
+  connect(sine1.y, force1.f) {^id14}
+  connect(force1.flange_b, mass1.flange_a) {^id15}
+  connect(force1.flange_a, force1_ground.flange) {^id16}
+  connect(mass1.flange_b, spring1.flange_a) {^id17}
+  connect(spring1.flange_b, fixed1.flange) {^id18}
+  # System 2: force → mass → [spring ‖ damper] → fixed
+  connect(sine2.y, force2.f) {^id19}
+  connect(force2.flange_b, mass2.flange_a) {^id20}
+  connect(force2.flange_a, force2_ground.flange) {^id21}
+  connect(mass2.flange_b, spring2.flange_a) {^id22}
+  connect(spring2.flange_b, fixed2.flange) {^id23}
+  connect(mass2.flange_b, damper1.flange_a) {^id24}
+  connect(damper1.flange_b, fixed2.flange) {^id25}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "atol": {
+          "damper1.s_rel": 0.001,
+          "damper1.v_rel": 0.001,
+          "mass1.s": 0.001,
+          "mass1.v": 0.01
+        },
+        "expect": {
+          "final": {
+            "damper1.s_rel": 1.00086,
+            "damper1.v_rel": 0.05020,
+            "mass1.s": -0.50433,
+            "mass1.v": -0.25276
+          },
+          "signals": ["damper1.s_rel", "damper1.v_rel", "mass1.s", "mass1.v"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "sine1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 80, "y1": 30, "x2": 180, "y2": 130, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "force1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 210, "y1": 210, "x2": 310, "y2": 310, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "force1_ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 90, "y1": 440, "x2": 190, "y2": 340, "rot": 180}
+        },
+        "tags": []
+      }
+    },
+    "mass1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 400, "y1": 210, "x2": 500, "y2": 310, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "spring1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 640, "y1": 210, "x2": 740, "y2": 310, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 830, "y1": 340, "x2": 930, "y2": 440, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "sine2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 80, "y1": 500, "x2": 180, "y2": 600, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "force2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 220, "y1": 620, "x2": 320, "y2": 720, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "force2_ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 70, "y1": 770, "x2": 170, "y2": 870, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 400, "y1": 620, "x2": 500, "y2": 720, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "spring2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 620, "y1": 770, "x2": 720, "y2": 870, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "damper1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 610, "y1": 620, "x2": 710, "y2": 720, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 830, "y1": 770, "x2": 930, "y2": 870, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 260, "y": 80}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id16": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 122.5, "y": 260}, {"x": 122.5, "y": 340}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id17": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id18": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 880, "y": 260}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id19": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 270, "y": 550}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id20": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id21": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 120, "y": 670}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id22": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [{"x": 560, "y": 670}, {"x": 560, "y": 820}], "E": 2}
+        ],
+        "junctions": [{"x": 610, "y": 670}],
+        "renderStyle": "standard"
+      }
+    },
+    "id23": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 750, "y": 820}], "E": -1},
+          {"S": -1, "M": [{"x": 880, "y": 670}], "E": 2}
+        ],
+        "junctions": [{"x": 750, "y": 670}],
+        "renderStyle": "standard"
+      }
+    },
+    "id24": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id25": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 880, "y": 670}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,44 @@
+"""
+Definition of relative state variables.
+
+This component defines **relative position** and **relative velocity** between two
+flanges as preferred state variables. It transmits zero force and is used purely
+for state selection purposes.
+
+Connect an instance of this model between two flange connectors to use
+the relative position `s_rel` and relative velocity `v_rel` as state variables
+instead of the default absolute quantities.
+
+The equations are:
+```math
+s_{rel} = flange\_b.s - flange\_a.s
+```
+```math
+v_{rel} = \\frac{d(s_{rel})}{dt}
+```
+```math
+a_{rel} = \\frac{d(v_{rel})}{dt}
+```
+```math
+flange\_a.f = 0
+```
+```math
+flange\_b.f = 0
+```
+"""
+component RelativeStates
+  extends TranslationalComponents.Interfaces.PartialTwoFlanges
+  "Relative position used as state variable"
+  variable s_rel::Distance(statePriority = 50)
+  "Relative velocity used as state variable"
+  variable v_rel::Velocity(statePriority = 50)
+  "Relative acceleration"
+  variable a_rel::Acceleration
+relations
+  s_rel = flange_b.s - flange_a.s
+  v_rel = der(s_rel)
+  a_rel = der(v_rel)
+  flange_a.f = 0
+  flange_b.f = 0
+metadata {"Dyad": {"icons": {"default": "dyad://TranslationalComponents/RelativeStates.svg"}}}
+end

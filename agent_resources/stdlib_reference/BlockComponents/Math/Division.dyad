@@ -1,0 +1,22 @@
+"""
+Divides first input by second input.
+
+Performs division of the first input signal by the second input signal, outputting the quotient.
+The mathematical relation is:
+
+```math
+y = \frac{u1}{u2}
+```
+"""
+component Division
+  extends BlockComponents.Interfaces.SI2SO
+relations
+  "Calculates output as first input divided by second input"
+  y = u1 / u2
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Division.svg"}
+  }
+}
+end

@@ -1,0 +1,29 @@
+"""
+Coordinate system (2-dim.) fixed to the component with one cut-force and cut-torque.
+All variables are resolved in the planar world frame.
+"""
+connector Frame2D
+  "x position, resolved in world frame"
+  potential x::Position
+  "y position"
+  potential y::Position
+  "rotation angle (counter clockwise)"
+  potential phi::Angle
+  "force in the x direction, resolved in the planar world frame"
+  flow fx::Force
+  "force in the y direction, resolved in the planar world frame"
+  flow fy::Force
+  "torque (clockwise)"
+  flow tau::Torque
+metadata {
+  "Dyad": {
+    "labels": [
+      { "label": "$(instance)", "x": 500, "y": 1100, "layer": "icon" }
+    ],
+    "icons": {
+      "default": "dyad://Dyad/Frame2D.svg"
+    },
+    "path": { "stroke": "#cc3333" }
+  }
+}
+end

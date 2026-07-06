@@ -1,0 +1,33 @@
+"""
+Defines a fixed temperature boundary condition at its port.
+
+This component models an ideal thermal source that maintains a constant temperature at its connection port.
+The temperature value is specified by the parameter `T`. It acts as a boundary condition in thermal systems,
+ensuring that the connected point in the system is held at the prescribed temperature, regardless of the heat flow.
+The core behavior is defined by the equation:
+```math
+\text{port.T} = T
+```
+where `port.T` is the temperature at the port and `T` is the specified fixed temperature parameter.
+"""
+component FixedTemperature
+  "Thermal connection port where the temperature is defined."
+  port = HeatPort() {^port}
+  "The fixed temperature value (in Kelvin) for this boundary condition."
+  parameter T::Temperature
+relations
+  port.T = T
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ThermalComponents/FixedTemperature.svg"}
+  },
+  "_links": {
+    "port": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "port_b", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    }
+  }
+}
+end

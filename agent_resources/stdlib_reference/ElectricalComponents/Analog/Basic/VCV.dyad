@@ -1,0 +1,25 @@
+"""
+Linear voltage-controlled voltage source.
+
+The right port voltage is controlled by the left port voltage:
+```math
+v_2 = v_1 \cdot \text{gain}
+```
+The left port current is zero (infinite input impedance).
+
+Corresponds to `Modelica.Electrical.Analog.Basic.VCV`.
+"""
+component VCV
+  extends ElectricalComponents.Analog.Interfaces.TwoPort
+  "Voltage gain"
+  parameter gain::Real = 1
+relations
+  v2 = v1 * gain
+  i1 = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/VCV.svg"}
+  }
+}
+end

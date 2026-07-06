@@ -1,0 +1,31 @@
+"""
+Ideal electrical ground connection, providing a zero-voltage reference.
+
+This component establishes a reference potential in an electrical circuit. It
+defines a node where the voltage is explicitly set to zero. Any part of a
+circuit connected to this ground component will share this zero-voltage
+reference. The fundamental relationship defining this component is:
+
+```math
+g.v = 0
+```
+"""
+component Ground
+  "Electrical connection pin."
+  g = Pin() {^g}
+relations
+  g.v = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/Ground.svg"}
+  },
+  "_links": {
+    "g": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": 450, "y1": -50, "x2": 550, "y2": 50}}
+      }
+    }
+  }
+}
+end

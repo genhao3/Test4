@@ -1,0 +1,48 @@
+"""
+Represents a chamber with fixed-volume.
+
+This component models a control volume of fixed geometric size `vol`.
+The total mass `m` of the fluid in the volume is calculated as `m = rho * vol`.
+The component conserves mass, meaning the net mass flow rate `port.m_flow`
+through the port is equal to the rate of change of mass within the volume:
+```math
+port.m_flow = \\frac{dm}{dt}
+```
+The initial pressure in the volume is set by the parameter `p0`. The pressure `p`
+within the volume is exposed at the `port`.
+"""
+component FixedVolume
+  "Fluid port for connection, allowing mass flow and pressure exchange."
+  port = HydraulicComponents.Interfaces.Port() {^port}
+  "Initial pressure within the fixed volume."
+  parameter p0::Pressure
+  "The geometric volume of the chamber, which is constant."
+  parameter vol::Volume
+  "Density of the fluid within the volume."
+  variable rho::Density
+  "Total mass of the fluid contained within the volume."
+  variable m::Mass
+  "Instantaneous pressure of the fluid within the volume."
+  variable p::Pressure
+relations
+  initial p = p0
+  rho = density(port.medium, p)
+  m = rho * vol
+  port.m_flow = der(m)
+  port.p = p
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://HydraulicComponents/FixedVolume.svg"}
+  },
+  "_links": {
+    "port": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": 980, "x2": 1020, "y1": 480, "y2": 520, "sh": 1, "sw": 1, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,30 @@
+"""
+Exponentially damped sine wave with configurable amplitude, frequency, and damping.
+
+Generates a sinusoidal signal that exponentially decays over time based on the damping coefficient.
+The signal remains at the offset value until the start time is reached, after which it follows the
+equation:
+
+```math
+y(t) = \text{offset} + \text{amplitude} \cdot e^{-\text{damping}\cdot(t-t_{\text{start}})} \cdot \sin(2\pi \cdot \text{frequency} \cdot (t-t_{\text{start}}) + \text{phase})
+```
+"""
+component ExpSine
+  extends BlockComponents.Interfaces.Signal
+  "Maximum amplitude of the sine wave"
+  parameter amplitude::Real
+  "Coefficient controlling how quickly the sine wave decays"
+  parameter damping::DampingCoefficient
+  "Frequency of the sine wave oscillation"
+  parameter frequency::Frequency
+  "Phase angle offset of the sine wave in radians"
+  parameter phase::Angle
+relations
+  y = offset + amplitude * ifelse(time >= start_time, exp(-damping * (time - start_time)) * sin(2 * π * frequency * (time - start_time) + phase), sin(phase))
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/ExpSine.svg"}
+  }
+}
+end

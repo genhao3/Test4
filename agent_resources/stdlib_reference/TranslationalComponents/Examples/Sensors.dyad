@@ -1,0 +1,64 @@
+"""
+Demonstrate sensors for translational systems.
+
+Replicates the structure of Modelica.Mechanics.Translational.Examples.Sensors.
+
+A sinusoidal force drives a mass. Various sensors measure the system response:
+force, position, speed, acceleration, and multi-sensor (combined).
+
+Note: MSL uses a one-flange Force source with ForceSensor in series. Here we
+use the two-flange Force with flange_b connected to a Fixed ground.
+The ForceSensor is placed between the Force source and the mass.
+"""
+example component Sensors
+  "Sinusoidal force signal"
+  sine_force = BlockComponents.Sources.Sine(amplitude = 10, frequency = 4)
+  "Force source"
+  force = TranslationalComponents.Sources.Force()
+  "Ground for force source"
+  force_ground = TranslationalComponents.Components.Fixed()
+  "Force sensor"
+  force_sensor = TranslationalComponents.Sensors.ForceSensor()
+  "Multi-sensor (force, position, speed, acceleration, power)"
+  multi_sensor = TranslationalComponents.Sensors.MultiSensor()
+  "Mass"
+  mass = TranslationalComponents.Components.Mass(L = 1, m = 1, s = initial 0, v = initial 0)
+  "Position sensor at flange_a"
+  position_sensor1 = TranslationalComponents.Sensors.PositionSensor()
+  "Speed sensor"
+  speed_sensor1 = TranslationalComponents.Sensors.SpeedSensor()
+  "Acceleration sensor"
+  acc_sensor1 = TranslationalComponents.Sensors.AccelerationSensor()
+  "Position sensor at flange_b"
+  position_sensor2 = TranslationalComponents.Sensors.PositionSensor()
+relations
+  connect(sine_force.y, force.f)
+  connect(force.flange_a, force_ground.flange)
+  connect(force.flange_b, force_sensor.flange_a)
+  connect(force_sensor.flange_b, multi_sensor.flange_a)
+  connect(multi_sensor.flange_b, mass.flange_a)
+  connect(mass.flange_a, position_sensor1.flange)
+  connect(mass.flange_a, speed_sensor1.flange)
+  connect(mass.flange_a, acc_sensor1.flange)
+  connect(mass.flange_b, position_sensor2.flange)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "atol": {
+          "mass.s": 0.001,
+          "mass.v": 0.001,
+          "speed_sensor1.v": 0.001,
+          "acc_sensor1.a": 0.01
+        },
+        "expect": {
+          "final": {"mass.s": 0.3978874, "mass.v": 0, "speed_sensor1.v": 0, "acc_sensor1.a": 0},
+          "signals": ["mass.s", "mass.v", "speed_sensor1.v", "acc_sensor1.a"]
+        }
+      }
+    }
+  }
+}
+end

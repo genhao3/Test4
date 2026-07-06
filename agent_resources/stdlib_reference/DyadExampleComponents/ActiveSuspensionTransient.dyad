@@ -1,0 +1,5 @@
+analysis ActiveSuspensionTransient
+  extends TransientAnalysis(alg = ODEAlg.AutoImplicit(), abstol = 10m, reltol = 1m, start = 0, stop = 10, automatic_discontinuity_detection = true, verbose = DEVerbosity.Standard())
+  model = ActiveSuspension()
+relations
+end

@@ -1,0 +1,238 @@
+"""
+Test for braking torque sources, matching MSL ModelicaTest.Rotational.TestBraking.
+
+Five inertias (J=1) each start at w=100 rad/s and are braked by a different
+source. EddyCurrentTorque is omitted (depends on ThermalComponents).
+
+Expected behavior (all with TorqueDirection=true, the default):
+  1. LinearSpeedDependentTorque: tau = -|w| → w(t) = 100·exp(-t) → w(2) ≈ 13.534
+  2. QuadraticSpeedDependentTorque: tau = -w²/100 → w = 100/(1+t) → w(2) ≈ 33.333
+  3. ConstantTorque: tau = -100 → w = 100-100t → w(2) = -100
+  4. SignTorque (Exp): tau ≈ -100·sign(w) → brakes to 0, then regularizes near w=0
+  5. InverseSpeedDependentTorque: tau = -10000/|w| → w = 100·√(1-2t) → w hits 0 at t=0.5
+"""
+test component TestBraking
+  "Fixed ground for all source supports"
+  fixed = RotationalComponents.Components.Fixed() {^fixed}
+  "Inertia 1 for linear speed dependent braking"
+  inertia1 = RotationalComponents.Components.Inertia(J = 1) {^inertia1}
+  "Linear speed dependent torque (tau_nominal=-100, w_nominal=100)"
+  linear_speed = RotationalComponents.Sources.LinearSpeedDependentTorque(tau_nominal = -100, w_nominal = 100) {^linear_speed}
+  "Inertia 2 for quadratic speed dependent braking"
+  inertia2 = RotationalComponents.Components.Inertia(J = 1) {^inertia2}
+  "Quadratic speed dependent torque (tau_nominal=-100, w_nominal=100)"
+  quadratic_speed = RotationalComponents.Sources.QuadraticSpeedDependentTorque(tau_nominal = -100, w_nominal = 100) {^quadratic_speed}
+  "Inertia 3 for constant torque braking"
+  inertia3 = RotationalComponents.Components.Inertia(J = 1) {^inertia3}
+  "Constant torque (tau_constant=-100)"
+  constant_torque = RotationalComponents.Sources.ConstantTorque(tau_constant = -100) {^constant_torque}
+  "Inertia 4 for sign torque braking"
+  inertia4 = RotationalComponents.Components.Inertia(J = 1) {^inertia4}
+  "Sign torque with Exp regularization (tau_nominal=-100, w0=1)"
+  sign_torque = RotationalComponents.Sources.SignTorque(tau_nominal = -100, w0 = 1) {^sign_torque}
+  "Inertia 5 for inverse speed dependent braking"
+  inertia5 = RotationalComponents.Components.Inertia(J = 1) {^inertia5}
+  "Inverse speed dependent torque (tau_nominal=-100, w_nominal=100, w0=1)"
+  inverse_speed = RotationalComponents.Sources.InverseSpeedDependentTorque(tau_nominal = -100, w_nominal = 100, w0 = 1) {^inverse_speed}
+relations
+  initial inertia1.phi = 0
+  initial inertia1.w = 100
+  initial inertia2.phi = 0
+  initial inertia2.w = 100
+  initial inertia3.phi = 0
+  initial inertia3.w = 100
+  initial inertia4.phi = 0
+  initial inertia4.w = 100
+  initial inertia5.phi = 0
+  initial inertia5.w = 100
+  connect(inertia1.spline_b, linear_speed.spline) {^id12}
+  connect(linear_speed.support, fixed.spline) {^id13}
+  connect(inertia2.spline_b, quadratic_speed.spline) {^id14}
+  connect(quadratic_speed.support, fixed.spline) {^id15}
+  connect(inertia3.spline_b, constant_torque.spline) {^id16}
+  connect(constant_torque.support, fixed.spline) {^id17}
+  connect(inertia4.spline_b, sign_torque.spline) {^id18}
+  connect(sign_torque.support, fixed.spline) {^id19}
+  connect(inertia5.spline_b, inverse_speed.spline) {^id20}
+  connect(inverse_speed.support, fixed.spline) {^id21}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 2,
+        "atol": {"inertia1.w": 0.01, "inertia2.w": 0.01, "inertia3.w": 0.01},
+        "expect": {
+          "initial": {
+            "inertia1.w": 100,
+            "inertia2.w": 100,
+            "inertia3.w": 100,
+            "inertia4.w": 100,
+            "inertia5.w": 100,
+            "inertia1.phi": 0,
+            "inertia2.phi": 0,
+            "inertia3.phi": 0,
+            "inertia4.phi": 0,
+            "inertia5.phi": 0
+          },
+          "final": {"inertia1.w": 13.534, "inertia2.w": 33.333, "inertia3.w": -100},
+          "signals": ["inertia1.w", "inertia2.w", "inertia3.w", "inertia4.w", "inertia5.w"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "fixed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -90, "y1": 760, "x2": 10, "y2": 860, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "inertia1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 560, "y1": 720, "x2": 660, "y2": 820, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "linear_speed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 190, "y1": 720, "x2": 290, "y2": 820, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inertia2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 570, "y1": 450, "x2": 670, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "quadratic_speed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 180, "y1": 450, "x2": 280, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inertia3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 560, "y1": 950, "x2": 660, "y2": 1050, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "constant_torque": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 190, "y1": 950, "x2": 290, "y2": 1050, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inertia4": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 560, "y1": 200, "x2": 660, "y2": 300, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "sign_torque": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 180, "y1": 200, "x2": 280, "y2": 300, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inertia5": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 550, "y1": 0, "x2": 650, "y2": 100, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inverse_speed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 180, "y1": 0, "x2": 280, "y2": 100, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id12": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 240, "y": 870}, {"x": 50, "y": 870}], "E": -1},
+          {"S": -1, "M": [{"x": 50, "y": 810}], "E": 2}
+        ],
+        "junctions": [{"x": 50, "y": 750}],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id15": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 230, "y": 670}, {"x": 50, "y": 670}, {"x": 50, "y": 810}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id16": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id17": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 240, "y": 1120}, {"x": 50, "y": 1120}, {"x": 50, "y": 810}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id18": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id19": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 230, "y": 380}, {"x": 50, "y": 380}], "E": -1},
+          {"S": -1, "M": [{"x": 50, "y": 810}], "E": 2}
+        ],
+        "junctions": [{"x": 50, "y": 500}],
+        "renderStyle": "standard"
+      }
+    },
+    "id20": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id21": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 230, "y": 160}, {"x": 50, "y": 160}, {"x": 50, "y": 810}],
+            "E": -1
+          },
+          {"S": -1, "M": [], "E": 2}
+        ],
+        "junctions": [{"x": 20, "y": 810}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,70 @@
+"""
+Models the pressure drop in a fluid-carrying tube considering friction and optional inertia.
+
+This component calculates the pressure drop ($\\Delta p$) across a tube as a function of the mass flow rate (`m_flow`).
+The calculation includes frictional losses, represented by the `sheer` variable, based on the Darcy-Weisbach equation.
+The friction factor ($ff$) is determined from flow conditions, fluid properties (density $\\rho$ and dynamic viscosity $\\mu$),
+tube geometry (length `length`, cross-sectional area `area`, hydraulic diameter `d_h`), and a `shape_factor`.
+An additional `head_factor` can scale these frictional losses. Fluid density and viscosity are obtained from the medium properties at `port_a`.
+The hydraulic diameter is defined as:
+```math
+d_h = \\frac{4 \\cdot \\text{area}}{\\text{perimeter}}
+```
+The fluid velocity is:
+```math
+\\text{velocity} = \\frac{\\text{m_flow}}{\\rho \\cdot \\text{area}}
+```
+The pressure drop due to friction (`sheer`) is calculated as:
+```math
+\\text{sheer} = 0.5 \\cdot \\rho \\cdot \\text{velocity}^2 \\cdot ff \\cdot \\text{head_factor} \\cdot \\frac{\\text{length}}{d_h}
+```
+The total pressure drop ($\\Delta p$) can optionally incorporate fluid inertia, adding a dynamic pressure component
+proportional to the rate of change of mass flow rate (`der(m_flow)`):
+```math
+\\Delta p = \\text{sheer} + \\begin{cases} \\frac{\\text{length}}{\\text{area}} \\frac{d(\\text{m_flow})}{dt} & \\text{if add_inertia is true} \\\\ 0 & \\text{if add_inertia is false} \\end{cases}
+```
+"""
+component TubeBase
+  extends HydraulicComponents.Interfaces.TwoPorts
+  "Cross-sectional area of the tube"
+  parameter area::Area
+  "Length of the tube"
+  parameter length::Length
+  "Wetted perimeter of the tube's cross-section"
+  parameter perimeter::Length
+  "Factor accounting for non-circular cross-section in friction calculation"
+  parameter shape_factor::Real
+  "Multiplier for head losses (e.g., minor losses, bends)"
+  parameter head_factor::Real
+  "Flag to include (if true) or exclude (if false) fluid inertial effects"
+  parameter add_inertia::Boolean = false
+  "Calculated hydraulic diameter of the tube"
+  final parameter d_h::Length = 4 * area / perimeter
+  "Density of the fluid"
+  variable rho::Density
+  "Dynamic viscosity of the fluid"
+  variable mu::DynamicViscosity
+  "Average velocity of the fluid in the tube"
+  variable velocity::Velocity
+  "Pressure drop component due to frictional shear"
+  variable sheer::Pressure
+  "Darcy friction factor"
+  variable ff::Real
+  "Initial guess or value for the mass flow rate"
+  parameter m_flow0::MassFlowRate
+relations
+  initial m_flow = m_flow0
+  rho = density(port_a.medium, port_a.p)
+  mu = viscosity(port_a.medium)
+  velocity = m_flow / (rho * area)
+  ff = friction_factor(m_flow, area, d_h, mu, shape_factor)
+  sheer = 0.5 * rho * reg_pow(velocity, 2) * ff * head_factor * (length / d_h)
+  Δp = add_inertia ? sheer + (length / area) * der(m_flow) : sheer
+  m_flow = port_a.m_flow
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://HydraulicComponents/TubeBase.svg"}
+  }
+}
+end

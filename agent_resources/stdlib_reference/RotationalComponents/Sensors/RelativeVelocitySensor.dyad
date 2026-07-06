@@ -1,0 +1,41 @@
+"""
+Ideal sensor for measuring the relative angular velocity between two rotational splines.
+
+This component models an ideal sensor that measures the relative angular velocity
+between two mechanical rotational splines, named `spline_a` and `spline_b`
+The relative angle, \$\\phi_{rel}\$, is calculated as the difference
+between the absolute angles of these two splines:
+```math
+\\phi_{rel} = \\phi_{b} - \\phi_{a}
+```
+The primary output, \$w_{rel}\$, which represents the relative angular velocity,
+is then determined by the time derivative of this relative angle:
+```math
+w_{rel} = \frac{d\\phi_{rel}}{dt}
+```
+The sensor is considered ideal as it does not exert any torque on the splines
+it measures.
+"""
+component RelativeVelocitySensor
+  extends RotationalComponents.Interfaces.PartialRelativeSensor
+  "Output signal representing the relative angular velocity between spline_b and spline_a."
+  w_rel = RealOutput() {^w_rel}
+  "Internal variable representing the relative angle between spline_b and spline_a."
+  variable phi_rel::Angle
+relations
+  phi_rel = spline_b.phi - spline_a.phi
+  w_rel = der(phi_rel)
+  0 = spline_a.tau
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/RelSensor-Angle-Vel-Acc.svg"}
+  },
+  "_links": {
+    "w_rel": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

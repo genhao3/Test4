@@ -1,0 +1,130 @@
+"""
+A test circuit for a rotational electromechanical transducer (RotationalEMF) driven by a sinusoidal voltage and connected to an inertial load.
+
+This model simulates a rotational electromechanical device (`RotationalEMF`) whose electrical terminals are excited by a sinusoidal voltage. The housing of the `RotationalEMF` is mechanically fixed, while its rotor is connected to a rotational `Inertia`. A `Sine` signal generator provides the input for a `VoltageSource`, which in turn applies voltage to the `RotationalEMF`. This setup allows for testing the dynamic response of the `RotationalEMF` and the connected inertia to electrical stimulation. The primary behavior demonstrated is the conversion of electrical energy (sinusoidal voltage) into mechanical motion (rotation of the inertia) and the generation of torque.
+"""
+test component RotationalEMF
+  "Electromechanical transducer converting electrical to rotational energy and vice-versa, with coupling constant k=1."
+  rot_emf = ElectricalComponents.Analog.Basic.RotationalEMF(k = 1) {^rot_emf}
+  "Represents a mechanically fixed point, providing a stationary reference for the EMF housing."
+  fixed = RotationalComponents.Components.Fixed() {^fixed}
+  "Generates a sinusoidal signal (amplitude=1, frequency=1 rad/s, offset=0, start_time=0) to define the voltage source's behavior."
+  input_signal = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1, offset = 0, start_time = 0) {^input_signal}
+  "Ideal voltage source whose output voltage is driven by the input_signal."
+  sine_voltage = ElectricalComponents.Analog.Sources.VoltageSource() {^sine_voltage}
+  "Rotational inertia with moment of inertia J=100 kg.m^2, representing the mechanical load."
+  inertia = RotationalComponents.Components.Inertia(J = 100) {^inertia}
+  ground = ElectricalComponents.Analog.Basic.Ground() {^ground}
+relations
+  initial rot_emf.phi = 0.0
+  connect(input_signal.y, sine_voltage.V) {^id7}
+  connect(fixed.spline, rot_emf.housing) {^id8}
+  connect(rot_emf.p, sine_voltage.p) {^id9}
+  connect(sine_voltage.n, rot_emf.n) {^id10}
+  connect(rot_emf.rotor, inertia.spline_a) {^id11}
+  connect(ground.g, sine_voltage.n) {^id12}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://ElectricalComponents/Example.svg"},
+    "tests": {"case1": {"stop": 10, "expect": {"signals": ["rot_emf.tau", "rot_emf.phi"]}}}
+  },
+  "_links": {
+    "rot_emf": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 150, "y1": 350, "x2": 250, "y2": 450, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 390, "y1": 120, "x2": 490, "y2": 220, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 0, "y1": 350, "x2": 100, "y2": 450, "rot": 180},
+          "diagram": {"iconName": "default", "x1": 180, "y1": 190, "x2": 280, "y2": 290, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "input_signal": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 150, "y1": 50, "x2": 250, "y2": 150, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 0, "y1": 510, "x2": 100, "y2": 610, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "sine_voltage": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 250, "y1": 200, "x2": 350, "y2": 300, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 250, "y1": 450, "x2": 350, "y2": 350, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inertia": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 300, "y1": 350, "x2": 400, "y2": 450, "rot": 0},
+          "diagram": {"iconName": "default", "x1": 680, "y1": 120, "x2": 780, "y2": 220, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 500, "x2": 550, "y2": 600, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 300, "y": 560}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 230, "y": 100}, {"x": 350, "y": 100}, {"x": 350, "y": 170}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 440, "y": 10}, {"x": 125, "y": 10}, {"x": 125, "y": 400}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 440, "y": 400}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id12": {
+      "Dyad": {
+        "renderStyle": "standard",
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 400}], "E": 2}]
+      }
+    }
+  }
+}
+end

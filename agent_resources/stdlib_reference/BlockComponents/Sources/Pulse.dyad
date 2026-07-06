@@ -1,0 +1,31 @@
+"""
+Single pulse generator with configurable amplitude, duration, and start time.
+
+Generates a single rectangular pulse that starts at start_time and lasts for duty_cycle × period duration.
+The signal stays at amplitude value during the pulse duration and at offset value otherwise.
+Unlike a periodic pulse train, this component generates only one pulse.
+
+```math
+y(t) = \begin{cases}
+\text{amplitude}, & \text{if } t > \text{start\_time} \text{ and } t \leq \text{start\_time} + \text{duty\_cycle} \times \text{period} \\
+\text{offset}, & \text{otherwise}
+\end{cases}
+```
+"""
+component Pulse
+  extends BlockComponents.Interfaces.Signal
+  "Maximum value of the pulse signal"
+  parameter amplitude::Real
+  "Fraction of the period during which output equals amplitude (between 0 and 1)"
+  parameter duty_cycle::Real
+  "Duration parameter used with duty_cycle to determine pulse width"
+  parameter period::Time
+relations
+  y = ifelse(time > start_time, ifelse(time <= start_time + duty_cycle * period, amplitude, offset), offset)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Pulse.svg"}
+  }
+}
+end

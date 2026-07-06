@@ -1,0 +1,15 @@
+"""
+Simple 1-dim. model of an ideal rolling wheel without inertia.
+
+Couples rotational and translational motion, like an ideal rolling wheel,
+specifying the wheel radius.
+
+Matches MSL `Modelica.Mechanics.Translational.Components.IdealRollingWheel`.
+This is a re-export of `RotationalComponents.Components.IdealRollingWheel`.
+"""
+component IdealRollingWheel
+  extends RotationalComponents.Components.IdealRollingWheel
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/IdealRollingWheel.svg"}}
+}
+end

@@ -1,0 +1,63 @@
+"""
+Example to show possible usage of support flange.
+
+The gearbox is not connected rigidly to the ground, but by a spring-damper
+system. This allows examination of the gearbox housing dynamics. A multi-sensor
+measures the angular velocity, torque, and power between the housing inertia
+and the spring-damper connected to the fixed ground.
+
+Corresponds to Modelica.Mechanics.Rotational.Examples.ElasticBearing.
+StopTime=10.0, Interval=0.01.
+"""
+example component ElasticBearing
+  "Motor shaft inertia, J=1 kg.m^2."
+  shaft = RotationalComponents.Components.Inertia(J = 1) {^shaft}
+  "Load inertia, J=50 kg.m^2."
+  load = RotationalComponents.Components.Inertia(J = 50) {^load}
+  "Torsional spring between gear output and load, c=1e3 N.m/rad."
+  spring = RotationalComponents.Components.Spring(c = 1e3) {^spring}
+  "Fixed mechanical ground."
+  fixed = RotationalComponents.Components.Fixed() {^fixed}
+  "Spring-damper connecting housing to ground, c=1e5 N.m/rad, d=5 N.m.s/rad."
+  spring_damper = RotationalComponents.Components.SpringDamper(c = 1e5, d = 5) {^spring_damper}
+  "Torque source driven by ramp signal (useSupport=true in MSL)."
+  torque = RotationalComponents.Sources.TorqueSource() {^torque}
+  "Ramp signal for driving torque, height=100 N.m over 5 s."
+  ramp = BlockComponents.Sources.Ramp(duration = 5, height = 100) {^ramp}
+  "Ideal gear with ratio=3 (useSupport=true in MSL)."
+  ideal_gear = RotationalComponents.Components.IdealGear(ratio = 3) {^ideal_gear}
+  "Housing inertia, J=5 kg.m^2."
+  housing = RotationalComponents.Components.Inertia(J = 5) {^housing}
+  "Multi-sensor measuring angular velocity, torque, and power."
+  multi_sensor = RotationalComponents.Sensors.MultiSensor() {^multi_sensor}
+relations
+  initial shaft.phi = 0
+  initial shaft.w = 0
+  initial load.w = 0
+  initial spring.phi_rel = 0
+  initial spring_damper.phi_rel = 0
+  initial spring_damper.w_rel = 0
+  connect(ramp.y, torque.tau)
+  connect(torque.spline, shaft.spline_a)
+  connect(torque.support, fixed.spline)
+  connect(shaft.spline_b, ideal_gear.spline_a)
+  connect(ideal_gear.spline_b, spring.spline_a)
+  connect(spring.spline_b, load.spline_a)
+  connect(ideal_gear.support, housing.spline_b)
+  connect(housing.spline_a, multi_sensor.spline_b)
+  connect(multi_sensor.spline_a, spring_damper.spline_b)
+  connect(spring_damper.spline_a, fixed.spline)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 10,
+        "expect": {
+          "initial": {"shaft.phi": 0, "shaft.w": 0, "load.w": 0}
+        }
+      }
+    }
+  }
+}
+end

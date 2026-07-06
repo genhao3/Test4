@@ -1,0 +1,39 @@
+"""
+Models a massless, rigid connection of a defined length between two translational 1D flanges.
+
+This partial component defines an ideal rigid bar of length `L` that connects two
+translational 1D mechanical flanges, `flange_a` and `flange_b`. The component's
+position is characterized by the absolute coordinate `s` of its center point.
+The positions of the flanges are then kinematically constrained relative to this
+center point and the length `L`. The key equations governing these positions are:
+```math
+flange\_a.s = s - \frac{L}{2}
+```
+```math
+flange\_b.s = s + \frac{L}{2}
+```
+This also implies that the distance between the flanges is fixed:
+```math
+flange\_b.s - flange\_a.s = L
+```
+As a `partial component`, it is intended to be used as a base for other, more complete components.
+"""
+partial component PartialRigid
+  "Left translational 1D flange"
+  flange_a = Flange() {^flange_a}
+  "Right translational 1D flange"
+  flange_b = Flange() {^flange_b}
+  "Absolute position of center of component"
+  variable s::Dyad.Position
+  "Length of component, from left flange to right flange"
+  parameter L::Length = 0.0
+relations
+  flange_a.s = s - L / 2
+  flange_b.s = s + L / 2
+metadata {
+  "_links": {
+    "flange_a": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}},
+    "flange_b": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}}
+  }
+}
+end

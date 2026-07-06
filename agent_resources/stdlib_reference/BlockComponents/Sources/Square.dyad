@@ -1,0 +1,23 @@
+"""
+Square wave generator that alternates between positive and negative values.
+
+Generates a square wave signal that oscillates between `offset+amplitude` and `offset-amplitude`
+at the specified frequency. The square wave is generated using floor functions to create the
+periodic pattern. The output is held at the offset value until the start time is reached, after
+which the oscillation begins. The signal transitions instantaneously between high and low states.
+"""
+component Square
+  extends BlockComponents.Interfaces.Signal
+  "Maximum height of the square wave from zero (or from offset if specified)"
+  parameter amplitude::Real
+  "Frequency of the square wave oscillation"
+  parameter frequency::Frequency
+relations
+  y = ifelse(start_time < time, offset + (amplitude * (4 * floor(frequency * (time - start_time)) - 2 * floor(2 * (time - start_time) * frequency) + 1)), offset)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Square.svg"}
+  }
+}
+end

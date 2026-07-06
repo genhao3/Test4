@@ -1,0 +1,39 @@
+"""
+Performs interpolation of values based on an input signal using externally defined parameters.
+
+Implements a flexible interpolation function that maps the input value to an output value based
+on predefined interpolation parameters. The exact interpolation algorithm and parameters are
+defined externally to this component. This is commonly used for lookup tables, curve fitting,
+and approximating complex nonlinear relationships between variables.
+"""
+external component ParameterizedInterpolation
+  structural parameter interpolation_type::InterpolationType
+  structural parameter extrapolation_type::ExtrapolationType = ExtrapolationType.None()
+  structural parameter dataset::DyadData.DyadTimeseries
+  parameter data::Real[:]
+  parameter independent_var::Real[:]
+  "Input value to be interpolated"
+  u = RealInput() {^u}
+  "Interpolated output value"
+  y = RealOutput() {^y}
+relations
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Interpolation.svg"},
+    "doc": {"behavior": false}
+  },
+  "_links": {
+    "u": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "input", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "y": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "output", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    }
+  }
+}
+end

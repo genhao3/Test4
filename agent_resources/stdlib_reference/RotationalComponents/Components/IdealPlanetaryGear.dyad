@@ -1,0 +1,65 @@
+"""
+Ideal planetary gear set with three rotational flanges (sun, ring, carrier).
+
+This component models the kinematic and torque relationships of an ideal planetary gear system.
+It connects three shafts: the sun gear (`sun`), the ring gear (`ring`), and the planet carrier (`carrier`).
+The gear ratio `ratio` is defined as the number of teeth on the ring gear divided by the number of teeth on the sun gear.
+The fundamental kinematic relationship, also known as the Willis equation, links the angles of the three shafts:
+```math
+(1+\text{ratio}) \\cdot \\phi_{\text{carrier}} = \\phi_{\text{sun}} + \text{ratio} \\cdot \\phi_{\text{ring}}
+```
+For an ideal, massless gear, the torques are related as follows:
+```math
+\tau_{\text{ring}} = \text{ratio} \\cdot \tau_{\text{sun}}
+```
+```math
+\tau_{\text{carrier}} = -(1+\text{ratio}) \\cdot \tau_{\text{sun}}
+```
+Ideal planetary gear box
+"""
+component IdealPlanetaryGear
+  "Flange of sun shaft, representing the sun gear's connection point."
+  sun = Spline() {^sun}
+  "Flange of carrier shaft, representing the planet carrier's connection point."
+  carrier = Spline() {^carrier}
+  "Flange of ring shaft, representing the ring gear's connection point."
+  ring = Spline() {^ring}
+  "Gear ratio defined as (number of ring_teeth) / (number of sun_teeth)."
+  parameter ratio::Real
+relations
+  "Kinematic relationship between shaft angles (Willis equation)."
+  (1 + ratio) * carrier.phi = sun.phi + ratio * ring.phi
+  "Torque balance equation: ring torque in terms of sun torque."
+  ring.tau = ratio * sun.tau
+  "Torque balance equation: carrier torque in terms of sun torque."
+  carrier.tau = -(1 + ratio) * sun.tau
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/IdealPlanetary.svg"}},
+  "_links": {
+    "sun": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -50, "y1": 450, "x2": 50, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "carrier": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -50, "y1": 240, "x2": 50, "y2": 340, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ring": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 950, "y1": 450, "x2": 1050, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

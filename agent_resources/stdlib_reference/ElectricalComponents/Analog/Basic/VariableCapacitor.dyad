@@ -1,0 +1,47 @@
+"""
+Ideal linear electrical capacitor with variable capacitance.
+
+The capacitance value `C` is provided as an external input signal.
+A lower bound `Cmin` prevents the effective capacitance from reaching
+zero, which would cause a variable index change:
+```math
+Q = \max(C, C_{min}) \cdot v
+```
+The branch current follows from the time derivative of charge:
+```math
+i = \frac{dQ}{dt}
+```
+This charge-based formulation correctly accounts for time-varying
+capacitance, producing `i = C \dot{v} + \dot{C} v`.
+
+Corresponds to `Modelica.Electrical.Analog.Basic.VariableCapacitor`.
+"""
+component VariableCapacitor
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "Capacitance input signal"
+  C = RealInput() {^C}
+  "Lower bound for variable capacitance"
+  parameter Cmin::Capacitance = 1e-16
+  "Electric charge stored in the capacitor"
+  variable Q::ElectricCharge
+relations
+  assert(C >= 0, "Capacitance C has to be >= 0!")
+  Q = max(C, Cmin) * v
+  i = der(Q)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/Capacitor.svg"}
+  },
+  "_links": {
+    "C": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": -100, "x2": 550, "y2": 0, "rot": 90}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

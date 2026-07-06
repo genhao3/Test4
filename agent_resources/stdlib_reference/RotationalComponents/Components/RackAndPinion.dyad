@@ -1,0 +1,20 @@
+"""
+Models an ideal rack and pinion system, converting rotational motion to translational motion.
+
+This component represents a one-dimensional, inertia-less rack and pinion mechanism.
+It establishes a kinematic relationship between the rotation of the pinion
+(circular gear) and the translation of the rack (linear gear). The core behavior
+is inherited from the `IdealRollingWheel` component. This model assumes no slip
+between the rack and pinion and neglects any inertial effects.
+"""
+component RackAndPinion
+  extends RotationalComponents.Interfaces.PartialElementaryRotationalToTranslational
+  "Specifies the radius of the pinion gear, determining the kinematic relationship between rotational and translational motion."
+  parameter radius::Length
+relations
+  (spline.phi - support_r.phi) * radius = flange.s - support_t.s
+  0 = radius * flange.f + spline.tau
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/IdealRollingWheel.svg"}}
+}
+end

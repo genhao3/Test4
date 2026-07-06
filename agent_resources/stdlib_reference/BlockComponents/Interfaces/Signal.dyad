@@ -1,0 +1,16 @@
+"""
+Base component for signal generators that output time-varying signals.
+
+Provides common parameters for time-based signals including when the signal should start
+and the baseline offset value from which the signal varies. All signal generators should
+extend this component to maintain consistent interface and behavior across the signal library.
+"""
+partial component Signal
+  extends SO
+  "Time at which the signal starts changing from its offset value"
+  parameter start_time::Time = 0.0
+  "Constant value added to the signal output"
+  parameter offset::Real = 0.0
+relations
+metadata {"Dyad": {"labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}]}}
+end

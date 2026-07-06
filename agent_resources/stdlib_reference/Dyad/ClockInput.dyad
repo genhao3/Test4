@@ -1,0 +1,10 @@
+"""
+While it conveys no value, because every connector must
+have a clock associated with it, instantiation of this
+connector always instantiates a new clock.  This allows
+allows us to pass a clock (and only the clock) into a 
+component.
+"""
+connector ClockInput
+  # This connector is empty by design
+end

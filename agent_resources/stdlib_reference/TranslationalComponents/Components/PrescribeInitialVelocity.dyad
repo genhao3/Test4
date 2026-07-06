@@ -1,0 +1,40 @@
+"""
+Sets an initial velocity condition for a translational mechanical flange.
+
+This component defines the starting velocity of a one-dimensional mechanical
+translational interface, represented by its `flange`. It utilizes a parameter `v0`
+to specify this desired initial velocity. At the beginning of a simulation,
+an internal variable `v` (which also represents the flange's velocity) is set
+to `v0`. The component ensures that the derivative of the flange's position,
+`der(flange.s)`, is equal to this velocity `v`. Additionally, it exerts no
+force through the flange, as indicated by `flange.f = 0`, acting as a pure
+kinematic specification for the initial velocity. The key relations are:
+```math
+\begin{align*}
+v(0) &= v0 \\
+\frac{d(flange.s)}{dt} &= v\\
+flange.f &= 0
+\end{align*}
+```
+"""
+component PrescribeInitialVelocity
+  "Represents a 1D mechanical translational interface"
+  flange = Flange() {^flange}
+  "User-defined initial velocity for the flange"
+  parameter v0::Velocity
+  "Velocity of the connected flange"
+  variable v::Velocity
+relations
+  initial v = v0
+  der(flange.s) = v
+  flange.f = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "initial v=$(v0)", "x": 500, "y": 800, "rot": 0}],
+    "icons": {"default": "dyad://TranslationalComponents/Position.svg"}
+  },
+  "_links": {
+    "flange": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

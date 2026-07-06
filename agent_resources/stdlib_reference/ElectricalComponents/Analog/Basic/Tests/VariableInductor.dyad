@@ -1,0 +1,113 @@
+"""
+Test circuit for VariableInductor.
+
+A sine voltage source (1 V, 1 Hz) drives an RL circuit where the
+inductance ramps from 0.1 H to 0.6 H over 2 s. A 10 Ω series
+resistor provides damping.
+
+The flux-based formulation should produce smooth voltage despite
+the time-varying inductance.
+"""
+test component VariableInductor
+  "Sine signal source: 1 V amplitude, 1 Hz"
+  sine = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1) {^sine}
+  "Voltage source driven by the sine signal"
+  vs = ElectricalComponents.Analog.Sources.VoltageSource() {^vs}
+  "Series resistor (10 Ω)"
+  R1 = ElectricalComponents.Analog.Basic.Resistor(R = 10) {^R1}
+  "Variable inductor under test"
+  vl = ElectricalComponents.Analog.Basic.VariableInductor() {^vl}
+  "Ramp for inductance: 0.1 H to 0.6 H over 2 s"
+  ramp = BlockComponents.Sources.Ramp(height = 0.5, offset = 0.1, duration = 2) {^ramp}
+  "Ground reference"
+  ground = ElectricalComponents.Analog.Basic.Ground() {^ground}
+relations
+  initial vl.i = 0
+  connect(sine.y, vs.V) {^id7}
+  connect(vs.p, R1.p) {^id8}
+  connect(R1.n, vl.p) {^id9}
+  connect(vl.n, ground.g) {^id10}
+  connect(vs.n, ground.g) {^id11}
+  connect(ramp.y, vl.L) {^id12}
+metadata {
+  "Dyad": {
+    "tests": {"case1": {"stop": 1, "atol": {"vl.v": 1e-4}, "expect": {"signals": ["vl.v", "vl.i", "vl.Psi"]}}}
+  },
+  "_links": {
+    "sine": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 40, "y1": 400, "x2": 140, "y2": 500, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "vs": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 250, "y1": 500, "x2": 350, "y2": 400, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "R1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 280, "x2": 550, "y2": 380, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "vl": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 740, "y1": 500, "x2": 640, "y2": 400, "rot": 270}
+        },
+        "tags": []
+      }
+    },
+    "ramp": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 950, "y1": 400, "x2": 850, "y2": 500, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 600, "x2": 550, "y2": 700, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id7": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 300, "y": 330}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 690, "y": 330}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 690, "y": 540}, {"x": 500, "y": 540}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 300, "y": 540}, {"x": 500, "y": 540}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id12": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

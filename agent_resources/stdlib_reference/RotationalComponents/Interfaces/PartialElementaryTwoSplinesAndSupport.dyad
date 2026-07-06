@@ -1,0 +1,45 @@
+"""
+A foundational model for a mechanical component with two rotational shaft interfaces and a supporting housing, establishing torque balance.
+
+This partial component provides a common base for models involving two rotational
+mechanical splines (flanges), `spline_a` and `spline_b`, and a central support
+spline, `support`, typically representing a casing or ground. The absolute
+rotational angle of the `support` spline (`support.phi`) is equated to the model
+variable `phi_support`. The fundamental behavior defined is the torque balance on
+the support structure. The torque experienced by the support (`support.tau`) is
+equal and opposite to the sum of the torques from `spline_a` (`spline_a.tau`) and
+`spline_b` (`spline_b.tau`).
+These relationships are mathematically expressed as:
+```math
+\text{support}.\phi = \phi_{\text{support}}
+```
+```math
+\text{support}.\tau = -(\text{spline\_a}.\tau + \text{spline\_b}.\tau)
+```
+This component is 'partial', meaning it is intended to be extended by other components that will further
+define the relationships between the spline angles and torques or connect them to other elements.
+"""
+partial component PartialElementaryTwoSplinesAndSupport
+  "First rotational 1-dimensional shaft spline connector (flange_a)"
+  spline_a = Spline() {^spline_a}
+  "Second rotational 1-dimensional shaft spline connector (flange_b)"
+  spline_b = Spline() {^spline_b}
+  "Support spline connector, typically for housing or reaction torques"
+  support = Spline() {^support}
+  "Variable for the absolute angle of the support spline"
+  variable phi_support::Angle
+relations
+  support.phi = phi_support
+  support.tau = -spline_a.tau - spline_b.tau
+metadata {
+  "_links": {
+    "spline_a": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}},
+    "spline_b": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}},
+    "support": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "support", "x1": 450, "y1": 950, "x2": 550, "y2": 1050}}
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,28 @@
+"""
+Signal termination block that consumes input signals without further processing.
+
+A termination point that serves as a signal sink in a model, accepting real-valued inputs without
+producing any outputs. This component is typically used at the end of signal chains to properly
+terminate signals that are not connected to other components.
+"""
+component Terminator
+  "Input signal to be terminated"
+  u = RealInput() {^u}
+relations
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Terminator.svg"}
+  },
+  "_links": {
+    "u": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "input", "x1": -100, "y1": 450, "x2": 0, "y2": 550, "rot": 0},
+          "diagram": {"iconName": "input", "x1": -100, "y1": 450, "x2": 0, "y2": 550, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

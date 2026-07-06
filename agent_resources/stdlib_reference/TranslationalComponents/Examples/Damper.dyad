@@ -1,0 +1,201 @@
+"""
+Demonstrate the use of damper models.
+
+Replicates the structure of Modelica.Mechanics.Translational.Examples.Damper.
+
+Three parallel systems compare different damping configurations, all starting
+with the same initial conditions (s=3 m, v=10 m/s, m=1 kg) connected to a
+wall at s0=4.5 m:
+
+**System 1 (top):** mass1 → damper1(d=25) → fixed1. Pure velocity-dependent
+damping, exponential decay of velocity.
+
+**System 2 (middle):** mass2 → [damper2(d=25) ‖ spring2(c=1, s_rel0=1)]
+→ fixed2. Damper and spring in parallel, damped oscillation.
+
+**System 3 (bottom):** mass3 → springDamper3(d=25, c=1, s_rel0=1) → fixed3.
+Single SpringDamper component, equivalent to system 2.
+"""
+example component Damper
+  "Mass for system 1"
+  mass1 = TranslationalComponents.Components.Mass(L = 1, m = 1, s = initial 3, v = initial 10) {^mass1}
+  "Pure damper"
+  damper1 = TranslationalComponents.Components.Damper(d = 25) {^damper1}
+  "Wall for system 1"
+  fixed1 = TranslationalComponents.Components.Fixed(s0 = 4.5) {^fixed1}
+  "Mass for system 2"
+  mass2 = TranslationalComponents.Components.Mass(L = 1, m = 1, s = initial 3, v = initial 10) {^mass2}
+  "Damper in parallel with spring"
+  damper2 = TranslationalComponents.Components.Damper(d = 25) {^damper2}
+  "Spring in parallel with damper"
+  spring2 = TranslationalComponents.Components.Spring(s_rel0 = 1, c = 1) {^spring2}
+  "Wall for system 2"
+  fixed2 = TranslationalComponents.Components.Fixed(s0 = 4.5) {^fixed2}
+  "Mass for system 3"
+  mass3 = TranslationalComponents.Components.Mass(L = 1, m = 1, s = initial 3, v = initial 10) {^mass3}
+  "Combined spring-damper"
+  spring_damper3 = TranslationalComponents.Components.SpringDamper(s_rel0 = 1, d = 25, c = 1) {^spring_damper3}
+  "Wall for system 3"
+  fixed3 = TranslationalComponents.Components.Fixed(s0 = 4.5) {^fixed3}
+relations
+  # System 1: mass → damper → fixed
+  connect(mass1.flange_b, damper1.flange_a) {^id11}
+  connect(damper1.flange_b, fixed1.flange) {^id12}
+  # System 2: mass → [damper ‖ spring] → fixed
+  connect(mass2.flange_b, damper2.flange_a) {^id13}
+  connect(damper2.flange_a, spring2.flange_a) {^id14}
+  connect(damper2.flange_b, spring2.flange_b) {^id15}
+  connect(damper2.flange_b, fixed2.flange) {^id16}
+  # System 3: mass → springDamper → fixed
+  connect(mass3.flange_b, spring_damper3.flange_a) {^id17}
+  connect(spring_damper3.flange_b, fixed3.flange) {^id18}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "atol": {
+          "mass1.s": 0.001,
+          "mass1.v": 0.001,
+          "mass2.s": 0.001,
+          "mass2.v": 0.001,
+          "mass3.s": 0.001,
+          "mass3.v": 0.001
+        },
+        "expect": {
+          "final": {
+            "mass1.s": 3.4,
+            "mass1.v": 0,
+            "mass2.s": 3.38552676,
+            "mass2.v": -0.01544582,
+            "mass3.s": 3.38552676,
+            "mass3.v": -0.01544582
+          },
+          "signals": ["mass1.s", "mass1.v", "mass2.s", "mass2.v", "mass3.s", "mass3.v", "damper1.s_rel", "damper1.v_rel", "damper2.s_rel", "damper2.v_rel", "spring_damper3.s_rel", "spring_damper3.v_rel"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "mass1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 100, "y1": 20, "x2": 200, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "damper1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 440, "y1": 20, "x2": 540, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 850, "y1": 170, "x2": 950, "y2": 270, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 100, "y1": 300, "x2": 200, "y2": 400, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "damper2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 470, "y1": 300, "x2": 570, "y2": 400, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "spring2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 470, "y1": 450, "x2": 570, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 850, "y1": 500, "x2": 950, "y2": 600, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 120, "y1": 720, "x2": 220, "y2": 820, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "spring_damper3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 460, "y1": 720, "x2": 560, "y2": 820, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 860, "y1": 800, "x2": 960, "y2": 900, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id12": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 900, "y": 70}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id14": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [], "E": -1}, {"S": -1, "M": [{"x": 270, "y": 500}], "E": 2}],
+        "junctions": [{"x": 270, "y": 350}],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [{"x": 740, "y": 350}, {"x": 740, "y": 500}], "E": 2}
+        ],
+        "junctions": [{"x": 570, "y": 350}],
+        "renderStyle": "standard"
+      }
+    },
+    "id16": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 900, "y": 350}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id17": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id18": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 910, "y": 770}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

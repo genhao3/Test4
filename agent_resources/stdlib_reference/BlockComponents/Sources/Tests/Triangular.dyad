@@ -1,0 +1,49 @@
+"""
+A test component that integrates a triangular signal over time.
+
+This component connects a triangular wave generator to an integrator to demonstrate signal
+processing and integration. The triangular signal has amplitude 1, frequency 2 Hz, starts at
+time 0.5 seconds with an offset of 0.7. The output of the integrator represents the accumulated
+area under the triangular wave over time. The test case validates the behavior by checking both
+the initial signal value and the final integrated value after 5 seconds of simulation.
+"""
+test component Triangular
+  "Integrator component that accumulates the input signal"
+  integrator = BlockComponents.Continuous.Integrator() {^integrator}
+  "Triangular waveform generator with configurable parameters"
+  signal = BlockComponents.Sources.Triangular(amplitude = 1, frequency = 2, start_time = 0.5, offset = 0.7) {^signal}
+relations
+  "Connects the triangular signal output to the integrator input"
+  connect(signal.y, integrator.u) {^id3}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "atol": {"integrator.x": 0.001},
+        "expect": {
+          "signals": ["signal.y", "integrator.x"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 20, "x2": 260, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

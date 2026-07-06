@@ -1,0 +1,33 @@
+"""
+Ideal linear electrical conductor relating current and voltage through its conductance.
+
+This component models an ideal electrical conductor where the electrical current flowing through it
+is directly proportional to the voltage difference across its terminals.
+The relationship is defined by Ohm's law:
+```math
+i = G v
+```
+where `i` is the current, `v` is the voltage, and `G` is the conductance.
+The conductance `G` is a parameter, representing the ease with which current
+flows through the material, and is the reciprocal of resistance. This model
+assumes linear behavior, meaning the conductance `G` remains constant
+regardless of the voltage or current. It inherits from `TwoPin`,
+implying it has two electrical connection points (pins) where voltage `v` is measured
+across and current `i` flows through.
+"""
+component Conductor
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "The electrical conductance of the material."
+  parameter G::Conductance
+relations
+  i = G * v
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "G=$(G)℧", "x": 500, "y": 150, "rot": 0}
+    ],
+    "icons": {"default": "dyad://ElectricalComponents/Conductor.svg"}
+  }
+}
+end

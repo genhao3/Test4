@@ -1,0 +1,43 @@
+"""
+Sets initial zero angular velocity and zero angular acceleration for a rotational connector.
+
+This component establishes an initial equilibrium state for an associated `Spline` connector
+by setting its initial angular velocity (`w`) and initial angular acceleration (`a`) to zero.
+It also ensures that the torque (`spline.tau`) on the connector is zero.
+The component defines the kinematic relationships where angular velocity (`w`) is the
+time derivative of the spline's angle (`spline.phi`), and angular acceleration (`a`) is the
+time derivative of angular velocity, as expressed in the `relations` section:
+```math
+\begin{align*}
+w &= \frac{d \text{spline.phi}}{dt}\\
+a &= \frac{dw}{dt}
+\end{align*}
+```
+These initial conditions and definitions ensure the connected rotational system
+starts from a standstill without any initial torque being applied through this prescription.
+"""
+component PrescribeInitialEquilibrium
+  spline = Spline() {^spline}
+  "Represents the angular velocity of the connector."
+  variable w::AngularVelocity
+  "Represents the angular acceleration of the connector."
+  variable a::AngularAcceleration
+relations
+  initial w = 0
+  initial a = 0
+  spline.tau = 0
+  w = der(spline.phi)
+  a = der(w)
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "initial w = 0", "x": 500, "y": 150, "rot": 0},
+      {"label": "initial a = 0", "x": 500, "y": 800, "rot": 0}
+    ],
+    "icons": {"default": "dyad://RotationalComponents/Pos-Speed-Acc-Move.svg"}
+  },
+  "_links": {
+    "spline": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

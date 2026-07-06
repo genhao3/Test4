@@ -1,0 +1,21 @@
+"""
+Models a linear rotational mechanical damping element where torque is proportional to relative angular velocity.
+
+This component describes a viscous damper for 1D rotational systems. It generates a torque that opposes
+the relative motion between its two mechanical rotational ports (flanges). The relationship between the
+torque \$\tau\$ and the relative angular velocity \$w_{rel}\$ across the damper is linear and
+governed by the damping constant `d`. The defining equation is:
+```math
+\tau = d \\cdot w_{rel}
+```
+where `d` is the damping constant (parameter) and \$w_{rel}\$ is the relative angular velocity
+between the component's flanges.
+"""
+component Damper
+  extends RotationalComponents.Interfaces.PartialCompliantWithRelativeStates
+  "Damping coefficient, relating torque to relative angular velocity."
+  parameter d::RotationalDampingConstant
+relations
+  tau = d * w_rel
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/Damper.svg"}}}
+end

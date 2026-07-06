@@ -1,0 +1,49 @@
+"""
+Test passing a ramp signal to an integrator for verification purposes.
+
+A test component that connects a Ramp signal generator to an Integrator to verify correct
+behavior. The ramp starts at an offset value of 0.5, remains constant until the start
+time (0.5s), then increases linearly by 1.0 over 0.7 seconds to reach a final value of 1.5.
+The integrator accumulates this signal, and the metadata specifies expected initial and final
+values for verification purposes.
+"""
+test component Ramp
+  "Integrator component that accumulates the input signal"
+  integrator = BlockComponents.Continuous.Integrator() {^integrator}
+  "Ramp signal generator with configurable duration, height, start time and offset"
+  signal = BlockComponents.Sources.Ramp(duration = 0.7, height = 1.0, start_time = 0.5, offset = 0.5) {^signal}
+relations
+  "Connects the ramp output to the integrator input"
+  connect(signal.y, integrator.u) {^id3}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 3,
+        "atol": {"integrator.x": 0.001},
+        "expect": {
+          "signals": ["signal.y", "integrator.x"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 155, "y1": 20, "x2": 255, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

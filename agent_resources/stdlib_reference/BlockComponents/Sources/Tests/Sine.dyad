@@ -1,0 +1,51 @@
+"""
+Test component that integrates a sine wave with specific parameters.
+
+This component connects a configurable sine wave generator to an integrator and
+verifies correct numerical behavior through the test case in metadata. The sine
+wave has an amplitude of 1, frequency of 2 Hz, start time of 0.5s, offset of 0.5,
+and phase shift of 1.57 radians. The integrator accumulates the sine wave signal
+over time, and the test case verifies both signals meet expected values.
+"""
+test component Sine
+  "Integrator that accumulates the sine wave input"
+  integrator = BlockComponents.Continuous.Integrator() {^integrator}
+  "Sine wave generator with specific parameters for testing"
+  signal = BlockComponents.Sources.Sine(amplitude = 1, frequency = 2, start_time = 0.5, offset = 0.5, phase = pi / 4) {^signal}
+relations
+  "Connects the sine wave output to the integrator input"
+  connect(signal.y, integrator.u) {^id3}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "atol": {"signal.y": 0.001, "integrator.x": 0.001},
+        "expect": {
+          "initial": {"signal.y": 1.207},
+          "signals": ["signal.y", "integrator.x"],
+          "final": {"signal.y": 1.207, "integrator.x": 2.853}
+        }
+      }
+    }
+  },
+  "_links": {
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 155, "y1": 20, "x2": 255, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

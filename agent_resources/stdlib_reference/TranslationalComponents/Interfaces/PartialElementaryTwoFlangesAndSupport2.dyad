@@ -1,0 +1,36 @@
+"""
+Partial model for a component with two translational 1D flanges and a support.
+
+This partial component extends `PartialTwoFlanges` to add a support flange.
+It defines the distances `s_a` and `s_b` between each flange and the support:
+```math
+s_a = flange\_a.s - support.s
+```
+```math
+s_b = flange\_b.s - support.s
+```
+The force balance ensures the reaction force is transmitted to the support:
+```math
+support.f = -flange\_a.f - flange\_b.f
+```
+In the MSL, the support connector is conditional (`useSupport`). Here, the support
+is always present. To model a grounded support, connect it to a `Fixed` component.
+"""
+partial component PartialElementaryTwoFlangesAndSupport2
+  extends TranslationalComponents.Interfaces.PartialTwoFlanges
+  "Support/housing of component"
+  support = Flange() {^support}
+  "Distance between left flange and support"
+  variable s_a::Length
+  "Distance between right flange and support"
+  variable s_b::Length
+relations
+  s_a = flange_a.s - support.s
+  s_b = flange_b.s - support.s
+  support.f = -flange_a.f - flange_b.f
+metadata {
+  "_links": {
+    "support": {"Dyad": {"placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050}}}}
+  }
+}
+end

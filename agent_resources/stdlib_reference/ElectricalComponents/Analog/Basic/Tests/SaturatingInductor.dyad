@@ -1,0 +1,163 @@
+"""
+Test circuit for a saturating inductor component.
+
+This test component evaluates the behavior of a `SaturatingInductor`.
+It constructs an electrical circuit where the saturating inductor is
+placed in parallel with a standard linear inductor. A constant voltage
+source, driven by a signal generator block, applies 40 volts across
+this parallel inductor arrangement. The primary purpose is to observe
+and verify the dynamic changes in the saturating inductor's apparent
+inductance (`L_actual`) as current builds up, leading to magnetic
+saturation. Initial conditions are set for the saturating inductor's
+current, and the test metadata specifies expected inductance values at
+the beginning and end of the simulation, facilitating automated
+verification of the saturating inductor model.
+"""
+test component SaturatingInductor
+  "Instance of the saturating inductor model being tested."
+  sat_inductor = ElectricalComponents.Analog.Basic.SaturatingInductor(L_zero = 2, L_inf = 0.5, L_nominal = 1) {^sat_inductor}
+  "Constant signal generator providing the input for the voltage source."
+  signal = BlockComponents.Sources.Constant(k = 40) {^signal}
+  "Ideal voltage source component."
+  source = ElectricalComponents.Analog.Sources.VoltageSource() {^source}
+  "Electrical ground connection."
+  ground = ElectricalComponents.Analog.Basic.Ground() {^ground}
+  "Standard linear inductor used in parallel for the test setup."
+  inductor = ElectricalComponents.Analog.Basic.Inductor(L = 1) {^inductor}
+relations
+  initial sat_inductor.i = 1e-10
+  initial inductor.p.i = 0.0
+  connect(signal.y, source.V) {^id6}
+  connect(source.n, ground.g) {^id7}
+  connect(sat_inductor.p, inductor.p) {^id8}
+  connect(sat_inductor.p, source.p) {^id9}
+  connect(ground.g, sat_inductor.n) {^id10}
+  connect(source.n, sat_inductor.n) {^id11}
+  connect(inductor.n, sat_inductor.n) {^id12}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://ElectricalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 10,
+        "expect": {
+          "initial": {"sat_inductor.L_actual": 2},
+          "final": {"sat_inductor.L_actual": 0.50863266}
+        }
+      }
+    }
+  },
+  "_links": {
+    "sat_inductor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 100, "y1": 240, "x2": 200, "y2": 340, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 300, "y1": 280, "x2": 400, "y2": 380, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 420, "x2": 550, "y2": 520, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 810, "y1": 420, "x2": 910, "y2": 520, "rot": 270}
+        },
+        "tags": []
+      }
+    },
+    "inductor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 440, "y1": 560, "x2": 540, "y2": 660, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id6": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 330}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id7": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 20, "y": 290}, {"x": 20, "y": 610}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 20, "y": 290}, {"x": 20, "y": 470}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 740, "y": 470},
+              {"x": 740, "y": 140},
+              {"x": 240, "y": 140},
+              {"x": 240, "y": 290}
+            ],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 610, "y": 470},
+              {"x": 610, "y": 230},
+              {"x": 240, "y": 230},
+              {"x": 240, "y": 290}
+            ],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 680, "y": 610},
+              {"x": 680, "y": 190},
+              {"x": 240, "y": 190},
+              {"x": 240, "y": 290}
+            ],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

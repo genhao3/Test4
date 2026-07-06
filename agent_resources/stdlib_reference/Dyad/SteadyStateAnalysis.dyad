@@ -1,0 +1,15 @@
+"This is an analysis that computes the steady state solution of the specified `model`."
+partial analysis SteadyStateAnalysis
+  extends Analysis
+  parameter alg::NonlinearSolveAlg = NonlinearSolveAlg.Auto()
+  parameter abstol::Real = 1e-8
+  parameter reltol::Real = 1e-8
+  parameter automatic_discontinuity_detection::Boolean = false
+  parameter respecialize::Boolean = false
+  model::EmptyComponent = EmptyComponent()
+metadata {
+  "Dyad": {
+    "using": "DyadInterface"
+  }
+}
+end

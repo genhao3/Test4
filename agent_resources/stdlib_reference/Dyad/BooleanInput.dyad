@@ -1,0 +1,12 @@
+"This connector represents a boolean signal as an input to a component"
+connector BooleanInput = input Boolean metadata {
+"Dyad": {
+    "icons": {
+      "default": "dyad://Dyad/BooleanInput.svg"
+    },
+    "path": { "stroke": "rgb(205,23,218)" },
+    "labels": [
+      { "label": "$(instance)", "x": 500, "y": 1100, "layer": "icon" }
+    ]
+  }
+}

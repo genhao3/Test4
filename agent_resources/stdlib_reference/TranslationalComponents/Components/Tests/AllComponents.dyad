@@ -1,0 +1,166 @@
+"""
+Smoke test exercising all available translational components in a single model.
+
+Replicates the structure of ModelicaTest.Translational.AllComponents.
+
+**Top chain:** sliding_mass → rod(L=0) → spring(c=1) → damper(d=10) → sliding_mass1
+A RelativeStates element spans from sliding_mass.flange_b to damper.flange_a,
+measuring the relative displacement and velocity across the rod and spring.
+
+**Branch from sliding_mass.flange_b:** A Force source (driven by a sine signal)
+and a SpringDamper(c=1, d=1) connect to sliding_mass2. A Fixed ground provides
+the reaction reference for the two-flange Force component.
+
+**ElastoGap branch from sliding_mass2.flange_b:** An ElastoGap(c=1, d=1) connects
+to sliding_mass3. A FixedTemperature closes the thermal energy balance.
+
+**Position branch:** sine → position (Filtered) → sliding_mass4
+**Speed branch:** sine1 → position1 (Speed, Filtered) → sliding_mass5
+**Accelerate branch:** sine2 → position2 (Accelerate) → sliding_mass6
+
+Initial conditions: all masses at rest at the origin, all relative
+displacements and velocities zero.
+"""
+test component AllComponents
+  "First sliding mass (MSL: slidingMass)"
+  sliding_mass = TranslationalComponents.Components.Mass(m = 1, L = 0, s = initial 0, v = initial 0)
+  "Rigid rod (zero length) connecting sliding_mass to spring"
+  rod = TranslationalComponents.Components.Rod(L = 0)
+  "Linear spring"
+  spring = TranslationalComponents.Components.Spring(c = 1)
+  "Linear damper"
+  damper = TranslationalComponents.Components.Damper(d = 10, s_rel = initial 0)
+  "Second sliding mass at the end of the top chain (MSL: slidingMass1)"
+  sliding_mass1 = TranslationalComponents.Components.Mass(m = 1, L = 0)
+  "Relative state measurement from sliding_mass.flange_b to damper.flange_a"
+  relative_states = TranslationalComponents.Components.RelativeStates(s_rel = initial 0, v_rel = initial 0)
+  "Spring-damper on the branch from sliding_mass"
+  spring_damper = TranslationalComponents.Components.SpringDamper(c = 1, d = 1, s_rel0 = 0, s_rel = initial 0, v_rel = initial 0)
+  "Third sliding mass at the end of the spring-damper branch (MSL: slidingMass2)"
+  sliding_mass2 = TranslationalComponents.Components.Mass(m = 1, L = 0)
+  "Force source acting between ground and the junction node"
+  force = TranslationalComponents.Sources.Force()
+  "Sine signal driving the force source (MSL: sine4)"
+  sine4 = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "Fixed ground providing reaction reference for the force and source supports"
+  ground = TranslationalComponents.Components.Fixed()
+  "ElastoGap connecting from sliding_mass2 to sliding_mass3"
+  elasto_gap = TranslationalComponents.Components.ElastoGap(c = 1, d = 1, s_rel = initial 0, v_rel = initial 0)
+  "Fourth sliding mass connected via ElastoGap (MSL: slidingMass3)"
+  sliding_mass3 = TranslationalComponents.Components.Mass(m = 1, L = 0)
+  "Thermal boundary for ElastoGap heat port"
+  fixed_temp = ThermalComponents.Sources.FixedTemperature(T = 293.15)
+  "Sine reference for Position source (MSL: sine)"
+  sine = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "Position source — Filtered (MSL: position)"
+  position = TranslationalComponents.Sources.Position()
+  "Fifth sliding mass driven by Position source (MSL: slidingMass4)"
+  sliding_mass4 = TranslationalComponents.Components.Mass(m = 1, L = 0)
+  "Sine reference for Speed source (MSL: sine1)"
+  sine1 = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "Speed source — Filtered (MSL: position1)"
+  position1 = TranslationalComponents.Sources.Speed()
+  "Sixth sliding mass driven by Speed source (MSL: slidingMass5)"
+  sliding_mass5 = TranslationalComponents.Components.Mass(m = 1, L = 0)
+  "Sine reference for Accelerate source (MSL: sine2)"
+  sine2 = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "Accelerate source (MSL: position2)"
+  position2 = TranslationalComponents.Sources.Accelerate()
+  "Seventh sliding mass driven by Accelerate source (MSL: slidingMass6)"
+  sliding_mass6 = TranslationalComponents.Components.Mass(m = 1, L = 0)
+relations
+  # Top chain
+  connect(sliding_mass.flange_b, rod.flange_a)
+  connect(rod.flange_b, spring.flange_a)
+  connect(spring.flange_b, damper.flange_a)
+  connect(damper.flange_b, sliding_mass1.flange_a)
+  # RelativeStates across rod + spring (same span as MSL)
+  connect(sliding_mass.flange_b, relative_states.flange_a)
+  connect(relative_states.flange_b, damper.flange_a)
+  # Branch: force + spring_damper + sliding_mass2
+  connect(sliding_mass.flange_b, spring_damper.flange_a)
+  connect(spring_damper.flange_b, sliding_mass2.flange_a)
+  connect(force.flange_b, spring_damper.flange_a)
+  connect(force.flange_a, ground.flange)
+  connect(sine4.y, force.f)
+  # ElastoGap branch from sliding_mass2 (MSL: slidingMass2.flange_b → elastoGap)
+  connect(sliding_mass2.flange_b, elasto_gap.flange_a)
+  connect(elasto_gap.flange_b, sliding_mass3.flange_a)
+  connect(elasto_gap.heat_port, fixed_temp.port)
+  # Position branch: sine → position → sliding_mass4
+  connect(sine.y, position.s_ref)
+  connect(position.flange, sliding_mass4.flange_a)
+  connect(position.support, ground.flange)
+  initial position.v = 0
+  # Speed branch: sine1 → position1 → sliding_mass5
+  connect(sine1.y, position1.v_ref)
+  connect(position1.flange, sliding_mass5.flange_a)
+  connect(position1.support, ground.flange)
+  # Accelerate branch: sine2 → position2 → sliding_mass6
+  connect(sine2.y, position2.a_ref)
+  connect(position2.flange, sliding_mass6.flange_a)
+  connect(position2.support, ground.flange)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1.1,
+        "atol": {
+          "sliding_mass.s": 0.001,
+          "sliding_mass.v": 0.001,
+          "damper.s_rel": 0.001,
+          "relative_states.s_rel": 0.001,
+          "relative_states.v_rel": 0.001,
+          "spring_damper.s_rel": 0.001,
+          "spring_damper.v_rel": 0.001,
+          "elasto_gap.s_rel": 0.001,
+          "elasto_gap.v_rel": 0.001,
+          "position.s": 0.001,
+          "position.v": 0.01,
+          "position1.s": 0.001,
+          "position1.v": 0.01,
+          "position2.s": 0.001,
+          "position2.v": 0.001
+        },
+        "expect": {
+          "final": {
+            "sliding_mass.s": 0.07425,
+            "sliding_mass.v": -0.0935,
+            "damper.s_rel": -0.00582,
+            "relative_states.s_rel": -0.04583,
+            "relative_states.v_rel": 0.1563,
+            "spring_damper.s_rel": -0.02107,
+            "spring_damper.v_rel": 0.12458,
+            "elasto_gap.s_rel": -0.04303,
+            "elasto_gap.v_rel": 0.00352,
+            "position.s": 0.56547,
+            "position.v": 5.18124,
+            "position1.s": 0.02858,
+            "position1.v": 0.57138,
+            "position2.s": 0.16018,
+            "position2.v": 0.0304
+          },
+          "signals": [
+            "sliding_mass.s",
+            "sliding_mass.v",
+            "damper.s_rel",
+            "relative_states.s_rel",
+            "relative_states.v_rel",
+            "spring_damper.s_rel",
+            "spring_damper.v_rel",
+            "elasto_gap.s_rel",
+            "elasto_gap.v_rel",
+            "position.s",
+            "position.v",
+            "position1.s",
+            "position1.v",
+            "position2.s",
+            "position2.v"
+          ]
+        }
+      }
+    }
+  }
+}
+end

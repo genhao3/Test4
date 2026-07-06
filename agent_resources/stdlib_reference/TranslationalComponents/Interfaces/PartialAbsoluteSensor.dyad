@@ -1,0 +1,22 @@
+"""
+Base model for an ideal mechanical sensor measuring absolute flange variables by ensuring zero force interaction.
+
+This partial component establishes the foundation for sensors that measure absolute physical quantities
+(such as position or velocity) of a 1D mechanical translational system through its 'flange' connector.
+Its defining characteristic is that it imposes no force on the connected system, a behavior governed by
+the equation `flange.f = 0`. This principle ensures that the measurement process
+itself does not alter the system's dynamics, embodying an ideal sensor in terms of force interaction.
+Concrete sensor components derived from this partial model would further specify which variable
+(e.g., position 'flange.s' or velocity 'flange.v') is measured.
+"""
+partial component PartialAbsoluteSensor
+  "Mechanical flange connector through which the variable is sensed."
+  flange = Flange() {^flange}
+relations
+  0 = flange.f
+metadata {
+  "_links": {
+    "flange": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

@@ -1,0 +1,43 @@
+"""
+Models a prescribed heat flow rate at a thermal port, with optional temperature dependency.
+
+This component defines a boundary condition that injects or extracts a specified
+heat flow rate at its thermal `port`. The primary heat flow rate is determined by
+the external input signal `Q_flow`. A positive `Q_flow` value indicates that heat
+is flowing from this component into the system connected to `port`. The model can
+also account for temperature-dependent variations in the heat flow. If the
+parameter `alpha` is set to a value greater than zero, the heat flow is adjusted
+by a factor proportional to the difference between the temperature at the port
+(`port.T`) and a specified reference temperature (`T_ref`). This allows for
+simulating effects like temperature-dependent losses or efficiencies. The core
+behavior is defined by the equation:
+```math
+\text{port.Q_{flow}} = -Q_{flow} \cdot (1 + \alpha \cdot (\text{port.T} - T_{\text{ref}}))
+```
+"""
+component PrescribedHeatFlow
+  "Acausal thermal port through which heat is exchanged"
+  port = HeatPort() {^port}
+  "Input signal defining the prescribed base heat flow rate"
+  Q_flow = RealInput() {^Q_flow}
+  "Reference temperature for calculating temperature-dependent heat flow"
+  parameter T_ref::Temperature = 293.15
+  "Temperature coefficient that scales the heat flow based on temperature difference"
+  parameter alpha::LinearTemperatureCoefficient = 0.0
+relations
+  port.Q_flow = -Q_flow * (1 + alpha * (port.T - T_ref))
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ThermalComponents/PrescribedHeatFlow.svg"}
+  },
+  "_links": {
+    "port": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "port_b", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    },
+    "Q_flow": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

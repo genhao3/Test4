@@ -1,0 +1,28 @@
+"""
+Ideal electrical capacitor.
+
+This component models a linear capacitor, a fundamental passive two-terminal electrical component
+used to store energy electrostatically in an electric field. The relationship between the
+current `i` flowing through the capacitor and the voltage `v` across its terminals is
+defined by the equation:
+```math
+C der(v) = i
+```
+where `C` is the capacitance value and `der(v)` is the time derivative of the voltage `v`.
+"""
+component Capacitor
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "Capacitance of the ideal capacitor"
+  parameter C::Capacitance
+relations
+  C * der(v) = i
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "C=$(C)F", "x": 500, "y": 150, "rot": 0}
+    ],
+    "icons": {"default": "dyad://ElectricalComponents/Capacitor.svg"}
+  }
+}
+end

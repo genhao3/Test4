@@ -1,0 +1,49 @@
+"""
+Connects a square wave generator to an integrator to test integration of a periodic signal.
+
+This component demonstrates the integration of a square wave over time. It connects a Square
+signal generator (with amplitude 1, frequency 2 Hz, start time 0.5 seconds, and offset 0.7)
+to an Integrator block. The square wave alternates between values of 0.7 and 1.7, and when
+integrated, should reach approximately 3.537 at t=5 seconds.
+"""
+test component Square
+  "Integrator block that accumulates the square wave input"
+  integrator = BlockComponents.Continuous.Integrator() {^integrator}
+  "Square wave generator with specified amplitude, frequency, start time and offset"
+  signal = BlockComponents.Sources.Square(amplitude = 1, frequency = 2, start_time = 0.5, offset = 0.7) {^signal}
+relations
+  connect(signal.y, integrator.u) {^id3}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "atol": {"integrator.x": 0.001},
+        "expect": {
+          "initial": {"signal.y": 0.7},
+          "signals": ["signal.y", "integrator.x"],
+          "final": {"signal.y": 1.7, "integrator.x": 3.5}
+        }
+      }
+    }
+  },
+  "_links": {
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 20, "x2": 260, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

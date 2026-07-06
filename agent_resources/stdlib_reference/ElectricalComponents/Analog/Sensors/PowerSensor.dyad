@@ -1,0 +1,72 @@
+"""
+Measures the instantaneous electrical power flowing through or consumed by a circuit.
+
+This component utilizes an internal `VoltageSensor` and an internal `CurrentSensor` to
+determine electrical power. The voltage is measured between pins `pv` (positive voltage)
+and `nv` (negative voltage). The current is measured as it flows from pin `pc`
+(positive current) to pin `nc` (negative current).
+The instantaneous power is calculated as the product of these two measurements:
+```math
+P = V \cdot I
+```
+where `V` is the voltage measured by `voltage_sensor.v` and `I` is the
+current measured by `current_sensor.i`.
+"""
+component PowerSensor
+  "Positive pin for current measurement path"
+  pc = Pin() {^pc}
+  "Negative pin for current measurement path"
+  nc = Pin() {^nc}
+  "Positive pin for voltage measurement"
+  pv = Pin() {^pv}
+  "Negative pin for voltage measurement"
+  nv = Pin() {^nv}
+  "Internal subcomponent to measure voltage"
+  voltage_sensor = ElectricalComponents.Analog.Sensors.VoltageSensor()
+  "Internal subcomponent to measure current"
+  current_sensor = ElectricalComponents.Analog.Sensors.CurrentSensor()
+  "Output signal representing the calculated instantaneous power"
+  power = RealOutput() {^power}
+relations
+  connect(pv, voltage_sensor.p)
+  connect(voltage_sensor.n, nv)
+  connect(pc, current_sensor.p)
+  connect(current_sensor.n, nc)
+  power = voltage_sensor.v * current_sensor.i
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "P", "x": 500, "y": 713, "rot": 0}
+    ],
+    "icons": {"default": "dyad://ElectricalComponents/PowerSensor.svg"}
+  },
+  "_links": {
+    "pc": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "nc": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "neg", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    },
+    "pv": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "pos", "x1": 450, "y1": -50, "x2": 550, "y2": 50}}
+      }
+    },
+    "nv": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "neg", "x1": 450, "y1": 950, "x2": 550, "y2": 1050}}
+      }
+    },
+    "power": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 150, "y1": 950, "x2": 250, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,29 @@
+"""
+1-dim. rotational rigid component without inertia, where right spline is rotated
+by a fixed angle with respect to left spline.
+
+The right spline (`spline_b`) is rotated by the fixed angle `deltaPhi` with respect
+to the left spline (`spline_a`):
+```math
+\\text{spline\\_a}.\\phi = \\phi - \\frac{\\Delta\\phi}{2}
+```
+```math
+\\text{spline\\_b}.\\phi = \\phi + \\frac{\\Delta\\phi}{2}
+```
+No inertia is associated with this component; the sum of torques at both splines is zero:
+```math
+\\text{spline\\_a}.\\tau + \\text{spline\\_b}.\\tau = 0
+```
+"""
+component Disc
+  extends RotationalComponents.Interfaces.PartialTwoSplines
+  "Fixed rotation of left spline with respect to right spline (= spline_b.phi - spline_a.phi)"
+  parameter deltaPhi::Angle = 0.0
+  "Absolute rotation angle of component"
+  variable phi::Angle
+relations
+  spline_a.phi = phi - deltaPhi / 2
+  spline_b.phi = phi + deltaPhi / 2
+  0 = spline_a.tau + spline_b.tau
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/Disc.svg"}}}
+end

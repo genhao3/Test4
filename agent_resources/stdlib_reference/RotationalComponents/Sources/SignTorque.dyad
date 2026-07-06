@@ -1,0 +1,35 @@
+"""
+Constant torque changing sign with speed.
+
+Model of constant torque which changes sign with direction of rotation.
+Positive torque accelerates in both directions of rotation.
+Negative torque brakes in both directions of rotation.
+Around zero speed regularization avoids numerical problems.
+"""
+component SignTorque
+  extends RotationalComponents.Interfaces.PartialTorque
+  "Nominal torque (if negative, torque is acting as load)"
+  parameter tau_nominal::Torque
+  "Type of regularization"
+  structural parameter reg::RotationalComponents.Sources.Regularization = RotationalComponents.Sources.Regularization.Exp()
+  "Regularization below w0"
+  parameter w0::AngularVelocity(min = eps(Float64)) = 0.1
+  "Angular velocity of spline with respect to support (= der(phi))"
+  variable w::AngularVelocity
+  "Accelerating torque acting at spline (= -spline.tau)"
+  variable tau::Torque
+relations
+  w = der(phi)
+  tau = -spline.tau
+  switch reg
+    case Exp
+      tau = tau_nominal * (2.0 / (1.0 + exp(-w / (0.01 * w0))) - 1.0)
+    case Sine
+      tau = tau_nominal * ifelse(abs(w) >= w0, sign(w), sin(π / 2 * w / w0))
+    case Linear
+      tau = tau_nominal * ifelse(abs(w) >= w0, sign(w), w / w0)
+    case Cosine
+      tau = tau_nominal * ifelse(abs(w) >= w0, sign(w), sign(w) * (1.0 - cos(π / 2 * w / w0)))
+  end
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/SignTorque.svg"}}}
+end

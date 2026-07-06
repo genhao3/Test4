@@ -1,0 +1,53 @@
+"""
+Test component that connects an exponentially damped sine wave to an integrator for validation.
+
+This component instantiates an ExpSine signal generator with configurable parameters and connects
+its output to an Integrator block to test the integration of a damped sinusoidal signal. The ExpSine
+generates a signal according to:
+
+```math
+y = offset + amplitude \cdot e^{-damping \cdot (t-start\_time)} \cdot \sin(frequency \cdot (t-start\_time) + phase)
+```
+"""
+test component ExpSine
+  "Integrator block that accumulates the input signal"
+  integrator = BlockComponents.Continuous.Integrator() {^integrator}
+  "Exponentially damped sine wave generator with specified parameters"
+  signal = BlockComponents.Sources.ExpSine(amplitude = 1, damping = 0.5, frequency = 2, start_time = 0.5, offset = 0.5, phase = pi / 4) {^signal}
+relations
+  "Connects the exponentially damped sine output to the integrator input"
+  connect(signal.y, integrator.u) {^id3}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 7,
+        "atol": {"signal.y": 0.001, "integrator.x": 0.001},
+        "expect": {
+          "initial": {"signal.y": 1.207},
+          "signals": ["signal.y", "integrator.x"],
+          "final": {"signal.y": 0.527, "integrator.x": 3.91}
+        }
+      }
+    }
+  },
+  "_links": {
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 150, "y1": 20, "x2": 250, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

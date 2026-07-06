@@ -1,0 +1,30 @@
+"""
+Measures the absolute angular acceleration of a rotational spline.
+
+This sensor determines the absolute angular acceleration of its `spline` connector, leveraging properties inherited from `PartialAbsoluteSensor`, such as the spline's angle (`spline.phi`).
+The absolute angular velocity (`w`) is first calculated as the time derivative of this angle:
+```math
+w = \frac{d\text{spline}.\\phi}{dt}
+```
+Then, the absolute angular acceleration (`a`) is computed as the time derivative of the angular velocity:
+```math
+a = \frac{dw}{dt} = \frac{d^2\text{spline}.\\phi}{dt^2}
+```
+This resulting acceleration is provided as the output `a`.
+"""
+component AccelerationSensor
+  extends RotationalComponents.Interfaces.PartialAbsoluteSensor
+  "Absolute angular acceleration of flange as output signal"
+  a = RealOutput() {^a}
+  "Absolute angular velocity of flange"
+  variable w::AngularVelocity
+relations
+  w = der(spline.phi)
+  a = der(w)
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/SingleSplineSensor.svg"}},
+  "_links": {
+    "a": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}}
+  }
+}
+end

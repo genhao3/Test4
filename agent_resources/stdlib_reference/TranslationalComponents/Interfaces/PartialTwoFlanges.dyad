@@ -1,0 +1,21 @@
+"""
+Base component representing a one-dimensional mechanical component with two translational connection points (flanges).
+
+This partial component provides a standardized interface consisting of two mechanical translational flanges, `flange_a` and `flange_b`.
+It serves as a common base class for developing models of physical devices that interact with their surroundings
+at two distinct translational mechanical ports, such as springs, dampers, or masses.
+The component itself does not define any physical behavior or equations; its sole purpose is to declare these connection points.
+"""
+partial component PartialTwoFlanges
+  "Left mechanical translational flange (connector)"
+  flange_a = Flange() {^flange_a}
+  "Right mechanical translational flange (connector)"
+  flange_b = Flange() {^flange_b}
+relations
+metadata {
+  "_links": {
+    "flange_a": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}},
+    "flange_b": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}}
+  }
+}
+end

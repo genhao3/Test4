@@ -1,0 +1,23 @@
+"""
+Signal limiter that constrains input values between specified boundaries.
+
+Implements a hard saturation that restricts the output signal to remain within the bounds
+specified by y_min and y_max. When the input signal is within these limits, it passes through
+unchanged; otherwise, the output is clamped to the nearest limit value. This is commonly used
+in control systems to prevent signals from exceeding safe operating ranges.
+"""
+component Limiter
+  extends BlockComponents.Interfaces.SISO
+  "Maximum allowed output value"
+  parameter y_max::Real
+  "Minimum allowed output value, defaults to negative of y_max"
+  parameter y_min::Real = -y_max
+relations
+  y = clamp(u, y_min, y_max)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Limiter.svg"}
+  }
+}
+end

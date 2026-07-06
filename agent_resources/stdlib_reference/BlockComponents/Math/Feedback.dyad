@@ -1,0 +1,58 @@
+"""
+Computes the difference between a reference input and a feedback input.
+
+This block calculates the error signal in a feedback control system by subtracting the feedback
+input (`u2`) from the reference input (`u1`). The component is typically used at the beginning of a
+control system to determine the difference between a desired setpoint and the measured output
+being fed back.
+"""
+component Feedback
+  "First real-valued input signal"
+  u1 = RealInput() {^u1}
+  "Second real-valued input signal"
+  u2 = RealInput() {^u2}
+  "Real-valued output signal"
+  y = RealOutput() {^y}
+relations
+  "Calculates output as the difference between the reference input and feedback input"
+  y = u1 - u2
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Feedback.svg"}
+  },
+  "_links": {
+    "u1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -110, "y1": 450, "x2": -10, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "u2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {
+            "iconName": "default",
+            "x1": 450,
+            "y1": 1010,
+            "x2": 550,
+            "y2": 1110,
+            "rot": 270
+          }
+        },
+        "tags": []
+      }
+    },
+    "y": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 1000, "y1": 450, "x2": 1100, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

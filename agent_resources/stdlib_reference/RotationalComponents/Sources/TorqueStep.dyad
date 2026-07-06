@@ -1,0 +1,21 @@
+"""
+Constant torque, not dependent on speed.
+
+Model of a torque step at time startTime.
+Positive torque accelerates in positive direction of flange rotation.
+"""
+component TorqueStep
+  extends RotationalComponents.Interfaces.PartialTorque
+  "Height of torque step (if negative, torque is acting as load)"
+  parameter stepTorque::Torque = 1.0
+  "Offset of torque"
+  parameter offsetTorque::Torque = 0.0
+  "Torque = offset for time < startTime"
+  parameter startTime::Time = 0.0
+  "Accelerating torque acting at spline (= -spline.tau)"
+  variable tau::Torque
+relations
+  tau = -spline.tau
+  tau = offsetTorque + ifelse(time < startTime, 0.0, stepTorque)
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/TorqueStep.svg"}}}
+end

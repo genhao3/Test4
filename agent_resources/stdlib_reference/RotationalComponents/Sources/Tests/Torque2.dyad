@@ -1,0 +1,57 @@
+"""
+Test for Torque2: two inertias driven by a torque acting between them, matching the MSL test topology.
+
+SpeedSource (sine, f=1 Hz) → inertia_a (J=3) → Torque2 → inertia_b (J=3)
+                                                    ↑
+                                              sine (f=1 Hz)
+
+inertia_b is free on its outer flange. With tau = sin(2πt), and the flow sign
+convention at the connection (connect sums flow to zero), inertia_b sees +tau:
+  - J_b * a_b = +tau → a_b = sin(2πt)/3
+  - w_b(t) = (1 - cos(2πt))/(6π)
+  - At t=1.0: w_b = 0
+  - phi_b(t) = t/(6π) - sin(2πt)/(12π²)
+  - At t=1.0: phi_b ≈ 1/(6π) ≈ 0.05305
+"""
+test component Torque2
+  "Fixed support for speed source"
+  fixed = RotationalComponents.Components.Fixed()
+  "Sine signal for speed reference (amplitude=1, f=1 Hz)"
+  speed_sine = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "Speed source prescribing inertia_a velocity (Exact mode)"
+  speed = RotationalComponents.Sources.SpeedSource(ref_type = RotationalComponents.Sources.ReferenceType.Exact())
+  "First inertia (J=3), speed-driven side"
+  inertia_a = RotationalComponents.Components.Inertia(J = 3)
+  "Torque2 under test"
+  torque2 = RotationalComponents.Sources.Torque2()
+  "Sine signal for torque input (amplitude=1, f=1 Hz)"
+  torque_sine = BlockComponents.Sources.Sine(amplitude = 1, frequency = 1)
+  "Second inertia (J=3), free side"
+  inertia_b = RotationalComponents.Components.Inertia(J = 3)
+relations
+  initial inertia_a.phi = 0
+  initial inertia_b.phi = 0
+  initial inertia_b.w = 0
+  connect(speed_sine.y, speed.w_ref)
+  connect(speed.support, fixed.spline)
+  connect(speed.spline, inertia_a.spline_a)
+  connect(inertia_a.spline_b, torque2.spline_a)
+  connect(torque2.spline_b, inertia_b.spline_a)
+  connect(torque_sine.y, torque2.tau)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "atol": {"inertia_b.phi": 0.001, "inertia_b.w": 0.001, "inertia_a.w": 0.001},
+        "expect": {
+          "initial": {"inertia_a.phi": 0, "inertia_b.phi": 0, "inertia_b.w": 0},
+          "final": {"inertia_b.phi": 0.05305, "inertia_b.w": 0, "inertia_a.w": 0},
+          "signals": ["inertia_b.phi", "inertia_b.w", "inertia_a.w", "inertia_a.phi"]
+        }
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,5 @@
+analysis SecondOrderSystemTransient
+  extends TransientAnalysis(alg = ODEAlg.AutoImplicit(), start = 0, stop = 5)
+  model = SecondOrderSystemTest()
+relations
+end

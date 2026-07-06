@@ -1,0 +1,45 @@
+"""
+Test component that validates SlewRateLimiter behavior with a sinusoidal input.
+
+This test component connects a sine wave generator to a slew rate limiter and verifies the expected
+output value after simulation. The slew rate limiter restricts how quickly the output signal can change,
+with separate limits for rising and falling rates. The sine input provides a continuously changing signal
+that exercises both the rising and falling rate limits.
+"""
+test component SlewRateLimiter
+  "Slew rate limiter instance with rising/falling limits and small time delay"
+  limiter = BlockComponents.Nonlinear.SlewRateLimiter(rising = 1, falling = -1, td = 0.001) {^limiter}
+  "Sine wave generator producing a 2Hz signal with amplitude 2"
+  sine = BlockComponents.Sources.Sine(amplitude = 2, frequency = 2) {^sine}
+relations
+  "Connects the sine wave output to the slew rate limiter input"
+  connect(sine.y, limiter.u) {^id3}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "expect": {"signals": ["limiter.y"], "final": {"limiter.y": -0.03277527668771871}}
+      }
+    }
+  },
+  "_links": {
+    "limiter": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 20, "x2": 260, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "sine": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

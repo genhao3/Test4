@@ -1,0 +1,56 @@
+"""
+Element1D is partial one-dimensional thermal element for models without energy storage.
+
+This partial component provides the basic connectors and variables to create
+one-dimensional heat transfer models that do not store energy. It defines two
+thermal connection ports, `port_a` and `port_b`. The temperature difference
+across the element is $\Delta T$, and the heat flow rate through the
+element from `port_a` to `port_b` is $Q_{flow}$.
+
+The key equations governing its behavior are:
+
+Temperature difference:
+```math
+\Delta T = port\_a.T - port\_b.T
+```
+
+Heat flow assignment at ports (assuming $Q_{flow}$ flows from `port_a` to `port_b`):
+```math
+port\_a.Q_{flow} = Q_{flow}
+```
+```math
+port\_b.Q_{flow} = -Q_{flow}
+```
+
+The relationship for `port_b.Q_flow` is derived from the model's energy balance equation
+$math port\_a.Q_{flow} + port\_b.Q_{flow} = 0$, which signifies that no energy is stored
+within the element.
+"""
+partial component Element1D
+  "Port 'a' for thermal connection"
+  port_a = HeatPort() {^port_a}
+  "Port 'b' for thermal connection"
+  port_b = HeatPort() {^port_b}
+  "Temperature difference across the element, calculated as port_a.T - port_b.T"
+  variable ΔT::Temperature
+  "Heat flow rate through the element, positive from port_a to port_b"
+  variable Q_flow::HeatFlowRate
+relations
+  ΔT = port_a.T - port_b.T
+  port_a.Q_flow = Q_flow
+  port_a.Q_flow + port_b.Q_flow = 0
+metadata {
+  "_links": {
+    "port_a": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "port_a", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "port_b": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "port_b", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    }
+  }
+}
+end

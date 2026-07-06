@@ -1,0 +1,37 @@
+"""
+Tests interpolation with extrapolation by applying linear interpolation with constant extrapolation.
+
+This component creates an interpolation object configured with linear interpolation and constant
+extrapolation on a dataset containing time values from 0 to 1 and their corresponding squared values.
+The simulation runs beyond the data range to verify that extrapolation works correctly, extending
+the boundary values for inputs outside the dataset range.
+"""
+test component InterpolationExtrapolation
+  "Interpolation object that performs linear interpolation with constant extrapolation"
+  interp = BlockComponents.Tables.Interpolation(interpolation_type = InterpolationType.LinearInterpolation(),
+    extrapolation_type = ExtrapolationType.Constant(),
+    dataset = dataset) {^interp}
+  "Dataset containing time values from 0 to 1 and their squares, with 'ts' as independent variable and 'data' as dependent variable"
+  structural parameter dataset::DyadData.DyadTimeseries = DyadTimeseries(hcat(0:0.1:1, square(0:0.1:1)), dependent_vars = ["data"], independent_var = "ts")
+  "Output variable that receives the interpolated value"
+  variable y::Real
+relations
+  interp.u = time
+  interp.y = y
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {"case1": {"stop": 1.5, "expect": {"signals": ["y"]}}},
+    "doc": {"behavior": false}
+  },
+  "_links": {
+    "interp": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 170, "y1": 70, "x2": 270, "y2": 170, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

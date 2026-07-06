@@ -1,0 +1,27 @@
+"""
+Ideal inductor characterized by its inductance L.
+
+This component models a linear inductor, a fundamental passive two-terminal electrical component.
+It defines the relationship between voltage `v` and current `i` based on its inductance `L`.
+The behavior is described by the equation:
+```math
+v = L \frac{di}{dt}
+```math
+where `v` is the voltage across the inductor (difference between pin `p` and pin `n`), `i` is the current flowing through the inductor (from pin `p` to pin `n`), and `L` is its inductance.
+"""
+component Inductor
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "Inductance value of the component in Henries (H)"
+  parameter L::Inductance
+relations
+  L * der(i) = v
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "L=$(L)H", "x": 500, "y": 150, "rot": 0}
+    ],
+    "icons": {"default": "dyad://ElectricalComponents/Inductor.svg"}
+  }
+}
+end

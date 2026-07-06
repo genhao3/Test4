@@ -1,0 +1,27 @@
+"""
+Represents a pure thermal resistance relating temperature difference to heat flow rate.
+
+This component models a lumped thermal resistance where heat is transported without being stored.
+The relationship between the temperature difference ($\Delta T$) across the
+component and the heat flow rate ($Q_{flow}$) through it is defined by its constant
+thermal resistance ($R$). The fundamental behavior is captured by Fourier's law of heat conduction
+in its lumped form:
+```math
+\Delta T = R \cdot Q_{flow}
+```
+This component is acausal and inherits from `Element1D`, implying it has two
+thermal ports through which heat can flow.
+"""
+component ThermalResistor
+  extends ThermalComponents.Interfaces.Element1D
+  "Constant thermal resistance of the material"
+  parameter R::ThermalResistance
+relations
+  ΔT = R * Q_flow
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ThermalComponents/ThermalResistor.svg"}
+  }
+}
+end

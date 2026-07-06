@@ -1,0 +1,26 @@
+"""
+Ideal source applying an externally specified torque to a rotational spline.
+
+This component models an ideal torque source for rotational mechanical systems.
+It takes an external signal, `tau`, which defines the accelerating torque
+to be applied to the connected mechanical `spline`. The component inherits
+its mechanical connection interface, `spline`, from `PartialTorque`.
+The core behavior is established by the following equation that relates the
+input signal `tau` to the torque at the `spline` connector:
+```math
+spline.\tau = -\tau
+```
+"""
+component TorqueSource
+  extends RotationalComponents.Interfaces.PartialTorque
+  "Accelerating torque acting at spline"
+  tau = RealInput() {^tau}
+relations
+  spline.tau = -tau
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/Torque.svg"}},
+  "_links": {
+    "tau": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

@@ -1,0 +1,63 @@
+"""
+Ideal linear electrical resistor with variable resistance.
+
+The resistance value `R` is provided as an external input signal.
+An optional linear temperature coefficient `alpha` adjusts the
+actual resistance based on the heat port temperature:
+```math
+R_{actual} = R \cdot (1 + \alpha \cdot (T_{heatPort} - T_{ref}))
+```
+The electrical behavior follows Ohm's law:
+```math
+v = R_{actual} \cdot i
+```
+Power dissipated in the resistor is transferred as heat through
+the thermal port `heat_port`.
+
+Corresponds to `Modelica.Electrical.Analog.Basic.VariableResistor`.
+"""
+component VariableResistor
+  extends ElectricalComponents.Analog.Interfaces.OnePort
+  "Resistance input signal"
+  R = RealInput() {^R}
+  "Thermal port for heat exchange"
+  heat_port = HeatPort() {^heat_port}
+  "Reference temperature"
+  parameter T_ref::Temperature = 300.15
+  "Linear temperature coefficient of resistance"
+  parameter alpha::LinearTemperatureCoefficient = 0.0
+  "Actual resistance accounting for temperature"
+  variable R_actual::Resistance
+  "Power dissipated in the resistor"
+  variable LossPower::Power
+relations
+  assert((1 + alpha * (heat_port.T - T_ref)) >= 1e-15, "Temperature outside scope of model!")
+  R_actual = R * (1 + alpha * (heat_port.T - T_ref))
+  v = R_actual * i
+  LossPower = v * i
+  heat_port.Q_flow = -LossPower
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ElectricalComponents/Resistor.svg"}
+  },
+  "_links": {
+    "R": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": -100, "x2": 550, "y2": 0, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "heat_port": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 460, "y1": 950, "x2": 560, "y2": 1050, "rot": 0}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

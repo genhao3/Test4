@@ -1,0 +1,36 @@
+"""
+Use of model Accelerate.
+
+Demonstrates usage of component `Sources.Accelerate` by moving a mass with a
+predefined constant acceleration of 1 m/s².
+
+Expected results after 1 s:
+- acceleration a = 1 m/s²
+- velocity v = 1 m/s
+- position s = 0.5 m (of the Accelerate source)
+"""
+example component Accelerate
+  constant_acc = BlockComponents.Sources.Constant(k = 1.0)
+  accelerate = TranslationalComponents.Sources.Accelerate()
+  mass = TranslationalComponents.Components.Mass(L = 1.0, m = 1.0)
+  fixed = TranslationalComponents.Components.Fixed()
+relations
+  connect(constant_acc.y, accelerate.a_ref)
+  connect(accelerate.flange, mass.flange_a)
+  connect(accelerate.support, fixed.flange)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "atol": {"accelerate.v": 0.01, "accelerate.s": 0.01},
+        "expect": {
+          "final": {"accelerate.v": 1, "accelerate.s": 0.5},
+          "signals": ["accelerate.s", "accelerate.v"]
+        }
+      }
+    }
+  }
+}
+end

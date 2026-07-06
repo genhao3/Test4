@@ -1,0 +1,39 @@
+"""
+Base model for a 1D translational compliant connection using relative displacement and relative velocity as states.
+
+This partial component provides the foundational kinematics and force propagation for a compliant
+connection between two translational 1D mechanical flanges, `flange_a` and `flange_b`. It defines
+the relative displacement (`s_rel`) and relative velocity (`v_rel`) between these flanges. The
+relative velocity is explicitly defined as the time derivative of the relative displacement. An
+internal force `f` is declared, which is intended to be defined by an extending model (e.g., based
+on spring stiffness or damping coefficient). This internal force is then transmitted to `flange_b`
+and, with an opposite sign, to `flange_a`, satisfying Newton's third law. Since this is a `partial`
+model, it does not define the constitutive equation for the force `f` (i.e., how `f` depends on
+`s_rel` and `v_rel`). The key kinematic and force equations are:
+```math
+s_{rel} = flange_b.s - flange_a.s
+```
+```math
+v_{rel} = \frac{d(s_{rel})}{dt}
+```
+```math
+flange_b.f = f
+```
+```math
+flange_a.f = -f
+```
+"""
+partial component PartialCompliantWithRelativeStates
+  extends TranslationalComponents.Interfaces.PartialTwoFlanges
+  "Relative displacement between flange_b and flange_a (flange_b.s - flange_a.s)."
+  variable s_rel::Distance(statePriority = 50)
+  "Relative velocity between flange_b and flange_a, defined as der(s_rel)."
+  variable v_rel::Velocity(statePriority = 50)
+  "Internal force exerted by the compliant element between the flanges."
+  variable f::Dyad.Force
+relations
+  s_rel = flange_b.s - flange_a.s
+  v_rel = der(s_rel)
+  flange_b.f = f
+  flange_a.f = -f
+end

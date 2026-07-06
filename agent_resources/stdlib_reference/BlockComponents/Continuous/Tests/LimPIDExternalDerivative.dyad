@@ -1,0 +1,126 @@
+"""
+Test bench for the LimPIDExternalDerivative controller connected to a plant model.
+
+Uses the same plant and step setpoint as LimPIDTest. The external derivative input
+is provided by a Derivative block that differentiates the plant output externally,
+demonstrating the intended use case where the derivative signal comes from outside
+the controller. A constant feedforward signal is also connected.
+"""
+test component LimPIDExternalDerivative
+  "PID controller with external derivative input"
+  pid = BlockComponents.Continuous.LimPIDExternalDerivative(Ti = 0.5, y_max = 1, y_min = -1, wp = 1, Ni = 0.9, k_ff = 1) {^pid}
+  "Plant model to be controlled"
+  plant = BlockComponents.Continuous.Plant() {^plant}
+  "Step input signal used as setpoint"
+  signal = BlockComponents.Sources.Step(height = 1) {^signal}
+  "Constant signal for feedforward control"
+  signal_ff = BlockComponents.Sources.Constant(k = 1) {^signal_ff}
+  "External derivative block computing derivative of plant output"
+  ext_der = BlockComponents.Continuous.Derivative(k = 1, T = 0.01) {^ext_der}
+relations
+  initial plant.x1 = 0
+  initial plant.y = 0
+  connect(signal.y, pid.u_s) {^id6}
+  connect(plant.y, pid.u_m) {^id7}
+  connect(pid.y, plant.u) {^id8}
+  connect(pid.u_ff, signal_ff.y) {^id9}
+  connect(plant.y, ext_der.u) {^id10}
+  connect(ext_der.y, pid.u_d) {^id11}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 10,
+        "atol": {"plant.y": 0.0001, "pid.y": 0.0001},
+        "expect": {"signals": ["plant.y", "pid.y"]}
+      }
+    }
+  },
+  "_links": {
+    "pid": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 320, "y1": 43, "x2": 420, "y2": 143, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "plant": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 40, "y1": 120, "x2": 140, "y2": 220, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 180, "y1": 20, "x2": 280, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "signal_ff": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 180, "y1": -130, "x2": 280, "y2": -30, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ext_der": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 180, "y1": 230, "x2": 280, "y2": 330, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id6": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 300, "y": 170}, {"x": 300, "y": 116}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [
+              {"x": 440, "y": 94},
+              {"x": 440, "y": 530},
+              {"x": 20, "y": 530},
+              {"x": 20, "y": 170}
+            ],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 370, "y": -80}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [], "E": -1}, {"S": -1, "M": [{"x": 160, "y": 280}], "E": 2}],
+        "junctions": [{"x": 160, "y": 170}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 370, "y": 280}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,41 @@
+"""
+Base model for a one-flange translational component with support.
+
+Provides a primary translational flange and a support flange.
+The support flange's position is defined by the variable `s_support`.
+The force on the support is equal and opposite to the force on the
+primary flange (Newton's third law).
+
+Matches MSL `Modelica.Mechanics.Translational.Interfaces.PartialElementaryOneFlangeAndSupport2`.
+Since Dyad does not support conditional connectors, the support flange is
+always visible. Connect it to a `Fixed` component for grounded behaviour.
+
+The defining equations are:
+```math
+\text{support}.s = s_{support}
+```
+```math
+\text{support}.f = -\text{flange}.f
+```
+"""
+partial component PartialElementaryOneFlangeAndSupport
+  "Primary translational flange"
+  flange = Flange() {^flange}
+  "Support flange (connect to Fixed for grounded behaviour)"
+  support = Flange() {^support}
+  "Absolute position of the support flange"
+  variable s_support::Position
+relations
+  support.s = s_support
+  support.f = -flange.f
+metadata {
+  "_links": {
+    "flange": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}},
+    "support": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "support", "x1": 450, "y1": 950, "x2": 550, "y2": 1050}}
+      }
+    }
+  }
+}
+end

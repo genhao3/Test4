@@ -1,0 +1,30 @@
+"""
+Generates a linearly increasing signal from an offset to a target value over a specified duration.
+
+The ramp component produces an output signal that starts at the `offset` value, then increases
+linearly to reach `offset`+`height` over the specified `duration`. After the `duration` elapses, the
+output remains constant at the final value.
+
+```math
+y = \begin{cases}
+\text{offset}, & \text{if } t < \text{start\_time} \\
+\text{offset} + (t - \text{start\_time}) \cdot \frac{\text{height}}{\text{duration}}, & \text{if } \text{start\_time} \leq t < \text{start\_time} + \text{duration} \\
+\text{offset} + \text{height}, & \text{if } t \geq \text{start\_time} + \text{duration}
+\end{cases}
+```
+"""
+component Ramp
+  extends BlockComponents.Interfaces.Signal
+  "Duration of the ramp transition"
+  parameter duration::Time
+  "Total height (amplitude) of the ramp"
+  parameter height::Real
+relations
+  y = ifelse(start_time < time, ifelse(time < start_time + duration, offset + (time - start_time) * height / duration, offset + height), offset)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Ramp.svg"}
+  }
+}
+end

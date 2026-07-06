@@ -1,0 +1,26 @@
+"""
+Lumped thermal element for heat conduction without thermal energy storage.
+
+This component models a purely conductive thermal element. Heat flows through the
+conductor from the port with higher temperature to the port with lower temperature.
+The rate of heat flow `Q_flow` is linearly proportional to the temperature difference
+`ΔT` across the element. The constant of proportionality is the thermal
+conductance `G`. The relationship is given by Fourier's law for conduction in
+its lumped form:
+```math
+Q_{flow} = G \cdot \Delta T
+```
+"""
+component ThermalConductor
+  extends ThermalComponents.Interfaces.Element1D
+  "Constant thermal conductance of the material"
+  parameter G::ThermalConductance
+relations
+  Q_flow = G * ΔT
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://ThermalComponents/ThermalConductor.svg"}
+  }
+}
+end

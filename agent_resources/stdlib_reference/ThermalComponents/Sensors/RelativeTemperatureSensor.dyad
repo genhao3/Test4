@@ -1,0 +1,55 @@
+"""
+Measures the temperature difference between two thermal nodes.
+
+This sensor calculates the temperature difference between two connection points,
+`port_a` and `port_b`. It is ideal because it does not draw any
+heat flow from the system to which it is connected; specifically, the heat
+flows `port_a.Q_flow` and `port_b.Q_flow` are both constrained to be zero.
+The temperatures at these nodes are `port_a.T` and `port_b.T`.
+The relative temperature output `T_rel` is given by the equation:
+```math
+T_{rel} = port\_a.T - port\_b.T
+```
+"""
+component RelativeTemperatureSensor
+  "First thermal connection point"
+  port_a = HeatPort() {^port_a}
+  "Second thermal connection point"
+  port_b = HeatPort() {^port_b}
+  "Relative temperature as output signal"
+  T_rel = RealOutput() {^T_rel}
+relations
+  T_rel = port_a.T - port_b.T
+  0 = port_a.Q_flow
+  0 = port_b.Q_flow
+metadata {
+  "Dyad": {
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0},
+      {"label": "K", "x": 565.6, "y": 545.5, "rot": 0}
+    ],
+    "icons": {"default": "dyad://ThermalComponents/RelativeTemperatureSensor.svg"}
+  },
+  "_links": {
+    "port_a": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "port_a", "x1": -50, "y1": 450, "x2": 50, "y2": 550}}
+      }
+    },
+    "port_b": {
+      "Dyad": {
+        "placement": {"icon": {"iconName": "port_b", "x1": 950, "y1": 450, "x2": 1050, "y2": 550}}
+      }
+    },
+    "T_rel": {
+      "Dyad": {
+        "placement": {
+          "icon": {"iconName": "default", "x1": 450, "y1": 1000, "x2": 550, "y2": 1100, "rot": 90},
+          "diagram": {"iconName": "default", "x1": 450, "y1": 1000, "x2": 550, "y2": 1100, "rot": 90}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,32 @@
+"""
+Partial model for a component with one translational 1D flange and a support.
+
+This partial component provides a single translational flange and a support flange.
+The variable `s` represents the distance between the flange and the support:
+```math
+s = flange.s - support.s
+```
+The force balance ensures the reaction force is transmitted to the support:
+```math
+support.f = -flange.f
+```
+In the MSL, the support connector is conditional (`useSupport`). Here, the support
+is always present. To model a grounded support, connect it to a `Fixed` component.
+"""
+partial component PartialElementaryOneFlangeAndSupport2
+  "Flange of component"
+  flange = Flange() {^flange}
+  "Support/housing of component"
+  support = Flange() {^support}
+  "Distance between flange and support (= flange.s - support.s)"
+  variable s::Length
+relations
+  s = flange.s - support.s
+  support.f = -flange.f
+metadata {
+  "_links": {
+    "flange": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}},
+    "support": {"Dyad": {"placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050}}}}
+  }
+}
+end

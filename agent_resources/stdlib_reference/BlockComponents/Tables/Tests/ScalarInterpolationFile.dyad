@@ -1,0 +1,37 @@
+"""
+Tests time-based interpolation using data from a CSV file.
+
+This component reads data from a specified CSV file and performs linear interpolation, using the
+current simulation time as the input. The interpolated value is made available through the output
+variable `y`. The component utilizes a dataset structure that identifies dependent and independent
+variables from the CSV file, allowing for flexible time-series data interpolation.
+"""
+test component ScalarInterpolationFile
+  "Interpolation object that performs the actual interpolation calculation"
+  interp = BlockComponents.Tables.ScalarInterpolation(interpolation_type = "LinearInterpolation", filepath = filepath, independent_var = independent_var, dependent_var = dependent_var) {^interp}
+  "Dataset configuration specifying the CSV file path and variable mappings"
+  structural parameter filepath::String = "dyad://BlockComponents/data/interp_square_data.csv"
+  structural parameter independent_var::String = "ts"
+  structural parameter dependent_var::String = "data"
+  "Output variable that holds the interpolated value"
+  variable y::Real
+relations
+  interp.u = time
+  interp.y = y
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {"case1": {"stop": 0.1, "expect": {"signals": ["y"]}}},
+    "doc": {"behavior": false}
+  },
+  "_links": {
+    "interp": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 100, "x2": 260, "y2": 200, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,36 @@
+"""
+Defines a specific initial acceleration for a one-dimensional mechanical translational flange.
+
+This component kinematically prescribes an initial acceleration via its `flange` connector.
+The value of this initial acceleration is determined by the parameter `a0`.
+The component exerts no force on the connected system.
+The governing equations are:
+```math
+\begin{align*}
+a(0) &= a0 \\
+\frac{d^2 flange.s}{dt^2} &= a \\
+flange.f &= 0
+\end{align*}
+```
+"""
+component PrescribeInitialAcceleration
+  "Mechanical translational connector to which the initial acceleration is applied."
+  flange = Flange() {^flange}
+  "Prescribed initial acceleration value for the flange."
+  parameter a0::Acceleration
+  "Internal variable representing the acceleration of the flange."
+  variable a::Acceleration
+relations
+  initial a = a0
+  der(der(flange.s)) = a
+  flange.f = 0
+metadata {
+  "Dyad": {
+    "labels": [{"label": "initial a=$(a0)", "x": 500, "y": 800, "rot": 0}],
+    "icons": {"default": "dyad://TranslationalComponents/Position.svg"}
+  },
+  "_links": {
+    "flange": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}}
+  }
+}
+end

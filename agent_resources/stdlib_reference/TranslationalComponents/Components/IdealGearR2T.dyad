@@ -1,0 +1,15 @@
+"""
+Gearbox transforming rotational into translational motion.
+
+Couples rotational and translational motion, like a toothed wheel with
+a toothed rack, specifying the ratio of rotational / translational motion.
+
+Matches MSL `Modelica.Mechanics.Translational.Components.IdealGearR2T`.
+This is a re-export of `RotationalComponents.Components.IdealGearR2T`.
+"""
+component IdealGearR2T
+  extends RotationalComponents.Components.IdealGearR2T
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/IdealGearR2T.svg"}}
+}
+end

@@ -1,0 +1,117 @@
+"""
+Represents an electrical circuit with a conductor, inductor, and capacitor in parallel, driven by a sinusoidal current source.
+
+This component models a parallel GLC (conductor, inductor, capacitor) circuit. An internal sinusoidal signal generator dictates the behavior
+of an ideal current source which, in turn, energizes the parallel combination of the conductor, inductor, and capacitor. The conductor exhibits
+a constant conductance G, the inductor a constant inductance L, and the capacitor a constant capacitance C. The voltage across the parallel
+elements is measured by a voltage sensor. All components share a common ground reference.
+The key equations governing the ideal passive components are:
+For the conductor: $i_G = G \cdot v$
+For the inductor: $v_L = L \cdot \frac{di_L}{dt}$
+For the capacitor: $i_C = C \cdot \frac{dv_C}{dt}$
+The current source provides a current $I_s(t) = A \sin(2\pi f t + \phi)$, where A is amplitude, f is frequency, and $\phi$ is phase, as defined
+by the `BlockComponents.Sources.Sine` sub-component.
+By Kirchhoff's Current Law, the sum of currents leaving the top node is zero: $I_s(t) - i_G(t) - i_L(t) - i_C(t) = 0$.
+All parallel components share the same voltage: $v = v_G = v_L = v_C$.
+"""
+example component ParallelGLC
+  "Sine wave generator providing the input waveform for the current source."
+  signal = BlockComponents.Sources.Sine(frequency = 1, amplitude = 1, phase = 0) {^signal}
+  "Ideal current source that injects current into the parallel circuit."
+  source = ElectricalComponents.Analog.Sources.CurrentSource() {^source}
+  "Inductor component with a specified inductance L."
+  inductor = ElectricalComponents.Analog.Basic.Inductor(L = 1) {^inductor}
+  "Capacitor component with a specified capacitance C."
+  capacitor = ElectricalComponents.Analog.Basic.Capacitor(C = 1) {^capacitor}
+  "Conductor component with a specified conductance G."
+  conductor = ElectricalComponents.Analog.Basic.Conductor(G = 0.1) {^conductor}
+  "Sensor to measure the voltage across the parallel branches."
+  voltage_sensor = ElectricalComponents.Analog.Sensors.VoltageSensor() {^voltage_sensor}
+  "Ground component providing a common zero-voltage reference."
+  ground = ElectricalComponents.Analog.Basic.Ground() {^ground}
+relations
+  initial capacitor.v = 0.0
+  initial inductor.p.i = 0.0
+  connect(signal.y, source.I) {^id8}
+  connect(source.p, inductor.p, capacitor.p, conductor.p, voltage_sensor.p) {^id9}
+  connect(source.n, inductor.n, capacitor.n, conductor.n, voltage_sensor.n, ground.g) {^id10}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://ElectricalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 10,
+        "expect": {
+          "final": {
+            "capacitor.i": "-0.07795903093879361",
+            "inductor.i": "0.05353769465262252",
+            "capacitor.v": "0.24421336286173523",
+            "inductor.v": "0.24421336286173523",
+            "voltage_sensor.v": "0.24421336286173523"
+          }
+        }
+      }
+    }
+  },
+  "_links": {
+    "signal": {"Dyad": {"placement": {"diagram": {"x1": 0, "y1": 400, "x2": 100, "y2": 500}}}},
+    "source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 150, "y1": 500, "x2": 250, "y2": 400, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "inductor": {
+      "Dyad": {
+        "placement": {"diagram": {"x1": 350, "y1": 400, "x2": 450, "y2": 500, "rot": 90}}
+      }
+    },
+    "capacitor": {
+      "Dyad": {
+        "placement": {"diagram": {"x1": 550, "y1": 400, "x2": 650, "y2": 500, "rot": 90}}
+      }
+    },
+    "conductor": {
+      "Dyad": {
+        "placement": {"diagram": {"x1": 750, "y1": 400, "x2": 850, "y2": 500, "rot": 90}}
+      }
+    },
+    "voltage_sensor": {
+      "Dyad": {
+        "placement": {"diagram": {"x1": 950, "y1": 400, "x2": 1050, "y2": 500, "rot": 90}}
+      }
+    },
+    "ground": {
+      "Dyad": {"placement": {"diagram": {"x1": 550, "y1": 700, "x2": 650, "y2": 800}}}
+    },
+    "id8": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id9": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 200, "y": 300}], "E": -1},
+          {"S": 2, "M": [{"x": 400, "y": 300}], "E": -1},
+          {"S": 3, "E": -1},
+          {"S": 4, "M": [{"x": 800, "y": 300}], "E": -1},
+          {"S": 5, "M": [{"x": 1000, "y": 300}], "E": -1}
+        ],
+        "junctions": [{"x": 600, "y": 300}]
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 200, "y": 600}], "E": -1},
+          {"S": 2, "M": [{"x": 400, "y": 600}], "E": -1},
+          {"S": 3, "E": -1},
+          {"S": 4, "M": [{"x": 800, "y": 600}], "E": -1},
+          {"S": 5, "M": [{"x": 1000, "y": 600}], "E": -1},
+          {"S": 6, "E": -1}
+        ],
+        "junctions": [{"x": 600, "y": 600}]
+      }
+    }
+  }
+}
+end

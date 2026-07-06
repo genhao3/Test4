@@ -1,0 +1,36 @@
+"""
+Ideal sensor to measure the relative angle between two splines.
+
+This component computes the difference between the angle of `spline_b` (denoted \$\\phi_b\$)
+and the angle of `spline_a` (denoted \$\\phi_a\$). This difference is provided as the output
+signal `phi_rel`. It models an ideal sensor, ensuring it does not influence the
+dynamics of the connected mechanical system. This is achieved by enforcing that the
+torque exerted on `spline_a` (denoted \$\tau_a\$) is zero.
+The governing equations are:
+```math
+\\phi_{rel} = \\phi_b - \\phi_a
+```
+```math
+\tau_a = 0
+```
+"""
+component RelativeAngleSensor
+  extends RotationalComponents.Interfaces.PartialRelativeSensor
+  "Relative angle between two splines as output signal"
+  phi_rel = RealOutput() {^phi_rel}
+relations
+  phi_rel = spline_b.phi - spline_a.phi
+  0 = spline_a.tau
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/RelSensor-Angle-Vel-Acc.svg"}
+  },
+  "_links": {
+    "phi_rel": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

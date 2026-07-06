@@ -1,0 +1,28 @@
+"""
+Ideal rolling wheel converting rotational motion to translational motion and vice-versa, without inertia.
+
+This component models the ideal kinematic and static interaction between a rotational mechanical port (spline) and a translational
+mechanical port (flange) representing a wheel rolling on a surface. It assumes perfect rolling contact, meaning there is no slip.
+The wheel itself is considered massless and frictionless, so no inertial effects or energy losses are included.
+The key kinematic relationship links the relative angular displacement of the spline (`spline.phi - support_r.phi`)
+to the relative translational displacement of the flange (`flange.s - support_t.s`) via the wheel radius:
+```math
+(\text{spline.phi} - \text{support\\_r.phi}) \\cdot \text{radius} = \text{flange.s} - \text{support\\_t.s}
+```math
+The static force-torque balance is also defined, relating the torque at the spline (\$\text{spline}.\\tau\$) and the force
+at the flange (\$\text{flange.f}\$) through the radius:
+```math
+\text{radius} \\cdot \text{flange.f} + \text{spline.tau} = 0
+```math
+"""
+component IdealRollingWheel
+  extends RotationalComponents.Interfaces.PartialElementaryRotationalToTranslational
+  "wheel radius"
+  parameter radius::Length
+relations
+  (spline.phi - support_r.phi) * radius = flange.s - support_t.s
+  0 = radius * flange.f + spline.tau
+metadata {
+  "Dyad": {"icons": {"default": "dyad://RotationalComponents/IdealRollingWheel.svg"}}
+}
+end

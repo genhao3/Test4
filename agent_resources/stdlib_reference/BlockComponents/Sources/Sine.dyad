@@ -1,0 +1,29 @@
+"""
+Generates a sine wave signal with configurable parameters.
+
+The component produces a sinusoidal output according to:
+
+```math
+y = \text{offset} + \text{amplitude} \cdot \sin(2\pi \cdot \text{frequency} \cdot (\text{time} - \text{start\_time}) + \text{phase})
+```
+
+When time is less than `start_time`, the output equals the `offset` value.
+"""
+component Sine
+  extends BlockComponents.Interfaces.Signal
+  "Peak value of the sine wave"
+  parameter amplitude::Real
+  "Number of cycles per time unit"
+  parameter frequency::Frequency
+  "Angular displacement of the sine wave at start time"
+  parameter phase::Angle = 0.0
+relations
+  "Output equation that generates the sine wave when time exceeds start_time"
+  y = offset + amplitude * ifelse(time >= start_time, sin(2 * π * frequency * (time - start_time) + phase), sin(phase))
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Sine.svg"}
+  }
+}
+end

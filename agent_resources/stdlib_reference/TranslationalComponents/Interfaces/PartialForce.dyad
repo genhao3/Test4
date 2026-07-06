@@ -1,0 +1,19 @@
+"""
+Partial model of a force acting at the flange (accelerates the flange).
+
+This partial component extends `PartialElementaryOneFlangeAndSupport2` to provide
+a convenient base for force source components. It introduces a force variable `f`
+that equals the flange force:
+```math
+f = flange.f
+```
+Concrete force source components should extend this model and provide an equation
+that defines `f` (e.g., as a constant, a function of velocity, or from an input signal).
+"""
+partial component PartialForce
+  extends TranslationalComponents.Interfaces.PartialElementaryOneFlangeAndSupport2
+  "Accelerating force acting at flange (= flange.f)"
+  variable f::Dyad.Force
+relations
+  f = flange.f
+end

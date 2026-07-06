@@ -1,0 +1,39 @@
+"""
+An ideal mechanical gear unit with a fixed housing, connecting two rotational shafts.
+
+This component models a lossless gearbox with a user-defined gear ratio,
+connecting two mechanical rotational splines, `spline_a` and `spline_b`.
+The housing of the gear is assumed to be rigidly connected to a support.
+The kinematic relationship between the relative angle of shaft 'a' and shaft 'b'
+with respect to the support is given by:
+```math
+\\phi_a = ratio \\cdot \\phi_b
+```
+The corresponding torque relationship, assuming an ideal (lossless) transmission, is:
+```math
+\text{ratio} \\cdot \\tau_a + \\tau_b = 0
+```
+where \$\tau_a\$ and \$\tau_b\$ are the torques at `spline_a` and `spline_b` respectively.
+The relative angles are defined as:
+```math
+\\phi_a = \text{spline\\_a}.\\phi - \\phi\\_\text{support}
+```
+```math
+\\phi_b = \text{spline}\\_b.\\phi - \\phi\\_\text{support}
+```
+"""
+component IdealGear
+  extends RotationalComponents.Interfaces.PartialElementaryTwoSplinesAndSupport
+  "The fixed transmission ratio between shaft 'a' and shaft 'b' (phi_a / phi_b)"
+  parameter ratio::Real
+  "Relative angle of shaft 'a' with respect to the support"
+  variable phi_a::Angle
+  "Relative angle of shaft 'b' with respect to the support"
+  variable phi_b::Angle
+relations
+  phi_a = spline_a.phi - phi_support
+  phi_b = spline_b.phi - phi_support
+  phi_a = ratio * phi_b
+  0 = ratio * spline_a.tau + spline_b.tau
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/IdealGear.svg"}}}
+end

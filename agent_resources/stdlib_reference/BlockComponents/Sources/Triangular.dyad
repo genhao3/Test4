@@ -1,0 +1,27 @@
+"""
+Triangular waveform generator with configurable amplitude and frequency.
+
+Produces a continuous triangular wave signal that oscillates between -amplitude and
++amplitude values. The triangular wave is generated using modulo arithmetic on the
+time variable, creating a periodic signal with the specified frequency. The component
+begins generating the waveform only after the start_time is reached; before that point,
+it outputs the offset value. The period of the wave is automatically calculated as the
+inverse of the frequency.
+"""
+component Triangular
+  extends BlockComponents.Interfaces.Signal
+  "Maximum amplitude of the triangular wave"
+  parameter amplitude::Real
+  "Frequency of the triangular wave"
+  parameter frequency::Frequency
+  "Period of the triangular wave, calculated as inverse of frequency"
+  final parameter period::Period = 1 / frequency
+relations
+  y = offset + ifelse(time >= start_time, 4 * amplitude * frequency * abs(abs(mod(time - period / 4 - start_time, period)) - period / 2) - amplitude, 0)
+metadata {
+  "Dyad": {
+    "labels": [{"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}],
+    "icons": {"default": "dyad://BlockComponents/Triangular.svg"}
+  }
+}
+end

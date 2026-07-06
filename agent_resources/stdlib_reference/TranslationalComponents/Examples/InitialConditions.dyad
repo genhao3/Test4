@@ -1,0 +1,73 @@
+"""
+Setting of initial conditions.
+
+Replicates the structure of Modelica.Mechanics.Translational.Examples.InitialConditions.
+
+Two systems demonstrate different ways of specifying initial conditions.
+
+**Top system:** A chain fixed2 → s2 (spring) → m3 (mass) → sd2 (spring-damper) → m4 (mass)
+with positions chosen so the system starts at rest:
+  m3.s = fixed2.s0 + s2.s_rel0 + m3.L/2 = 1 + 2 + 1.5 = 4.5 m
+  m4.s = 4.5 + 1.5 + 4 + 2.5 = 12.5 m
+
+**Bottom system:** A chain fixed1 → s1 (spring) → m1 (mass) → sd1 (spring-damper) → m2 (mass)
+with spring s1 starting compressed (s_rel=0.5 vs s_rel0=1), so the system
+is not at rest.
+"""
+example component InitialConditions
+  "Fixed reference at s=1 (top system)"
+  fixed2 = TranslationalComponents.Components.Fixed(s0 = 1)
+  "Spring s2 with unstretched length 2 m (top system)"
+  s2 = TranslationalComponents.Components.Spring(s_rel0 = 2, c = 1e3)
+  "Mass m3 with L=3, starting at rest at s=4.5 (top system)"
+  m3 = TranslationalComponents.Components.Mass(L = 3, m = 1, s = initial 4.5, v = initial 0)
+  "Spring-damper sd2 with unstretched length 4 m (top system)"
+  sd2 = TranslationalComponents.Components.SpringDamper(s_rel0 = 4, c = 111, d = 1)
+  "Mass m4 with L=5, starting at rest at s=12.5 (top system)"
+  m4 = TranslationalComponents.Components.Mass(L = 5, m = 1, s = initial 12.5, v = initial 0)
+  "Fixed reference at s=-1 (bottom system)"
+  fixed1 = TranslationalComponents.Components.Fixed(s0 = -1)
+  "Spring s1 with unstretched length 1 m, starting compressed (bottom system)"
+  s1 = TranslationalComponents.Components.Spring(s_rel0 = 1, c = 1e3, s_rel = initial 0.5)
+  "Mass m1 with L=1, starting with v=0 (bottom system)"
+  m1 = TranslationalComponents.Components.Mass(L = 1, m = 1, v = initial 0)
+  "Spring-damper sd1 (bottom system)"
+  sd1 = TranslationalComponents.Components.SpringDamper(s_rel0 = 1, c = 111, d = 1, s_rel = initial 1, v_rel = initial 0)
+  "Mass m2 with L=2 (bottom system)"
+  m2 = TranslationalComponents.Components.Mass(L = 2, m = 1)
+relations
+  # Top system connections
+  connect(s2.flange_a, fixed2.flange)
+  connect(m3.flange_a, s2.flange_b)
+  connect(sd2.flange_a, m3.flange_b)
+  connect(m4.flange_a, sd2.flange_b)
+  # Bottom system connections
+  connect(s1.flange_a, fixed1.flange)
+  connect(m1.flange_a, s1.flange_b)
+  connect(sd1.flange_a, m1.flange_b)
+  connect(m2.flange_a, sd1.flange_b)
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "atol": {
+          "m1.s": 0.01,
+          "m1.v": 0.01,
+          "m3.s": 0.001,
+          "m3.v": 0.001,
+          "m4.s": 0.001,
+          "m4.v": 0.001,
+          "sd1.s_rel": 0.01,
+          "sd1.v_rel": 0.01
+        },
+        "expect": {
+          "final": {"m3.s": 4.5, "m3.v": 0, "m4.s": 12.5, "m4.v": 0},
+          "signals": ["m1.s", "m1.v", "m3.s", "m3.v", "m4.s", "m4.v", "sd1.s_rel", "sd1.v_rel", "sd2.s_rel", "sd2.v_rel"]
+        }
+      }
+    }
+  }
+}
+end

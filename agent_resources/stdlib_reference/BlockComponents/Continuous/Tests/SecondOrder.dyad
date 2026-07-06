@@ -1,0 +1,49 @@
+"""
+Second-order system test with constant input.
+
+Tests a second-order dynamic system by applying a constant input and verifying the expected
+step response. The second-order system is configured with a gain of 1.0, natural frequency
+of 1.0, and damping ratio of 0.5, which produces a slightly under-damped response. The system
+should eventually reach the steady-state output value matching the input constant.
+"""
+test component SecondOrder
+  "Constant source block that provides a fixed value of 1 as input"
+  c = BlockComponents.Sources.Constant(k = 1) {^c}
+  "Second-order transfer function block with specified dynamics parameters"
+  pt2 = BlockComponents.Continuous.SecondOrder(k = 1.0, w = 1.0, d = 0.5) {^pt2}
+relations
+  "Connects the constant output to the input of the second-order system"
+  connect(c.y, pt2.u) {^id3}
+  initial pt2.x = 0
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "experiments": {},
+    "tests": {
+      "case1": {
+        "stop": 10,
+        "initial": {"pt2.xd": 0},
+        "atol": {"pt2.y": 0.01},
+        "expect": {"final": {"pt2.y": 1}, "signals": ["pt2.y"]}
+      }
+    }
+  },
+  "_links": {
+    "c": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 70, "y1": 120, "x2": 170, "y2": 220, "rot": 0}
+        }
+      }
+    },
+    "pt2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 290, "y1": 120, "x2": 390, "y2": 220, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

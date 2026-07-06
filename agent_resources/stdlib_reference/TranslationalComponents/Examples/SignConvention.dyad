@@ -1,0 +1,225 @@
+"""
+Examples for the used sign conventions.
+
+Demonstrates force sign conventions using the two-flange `Force` component.
+A positive input force of 1 N is applied to a 1 kg mass in three different
+wiring configurations:
+
+1) `force.flange_b` connected to `mass.flange_a`: force pushes mass in positive
+   direction. Result: a = 1 m/s², v = 1 m/s after 1 s, s = 0.5 m after 1 s.
+
+2) `force.flange_b` connected to `mass.flange_b`: equivalent to system 1.
+   It doesn't matter which flange of the mass is used, as long as `force.flange_b`
+   is the side connected to the mass.
+
+3) `force.flange_a` connected to `mass.flange_b`, `force.flange_b` connected to
+   fixed: arrows are opposed. The force now acts in the negative direction.
+   Result: a = -1 m/s².
+"""
+example component SignConvention
+  "System 1: force.flange_b pushes at mass.flange_a"
+  constant1 = BlockComponents.Sources.Constant(k = 1.0) {^constant1}
+  force1 = TranslationalComponents.Sources.Force() {^force1}
+  mass1 = TranslationalComponents.Components.Mass(L = 1.0, m = 1.0) {^mass1}
+  fixed1 = TranslationalComponents.Components.Fixed() {^fixed1}
+  "System 2: force.flange_b pushes at mass.flange_b (equivalent to system 1)"
+  constant2 = BlockComponents.Sources.Constant(k = 1.0) {^constant2}
+  force2 = TranslationalComponents.Sources.Force() {^force2}
+  mass2 = TranslationalComponents.Components.Mass(L = 1.0, m = 1.0) {^mass2}
+  fixed2 = TranslationalComponents.Components.Fixed() {^fixed2}
+  "System 3: force.flange_a at mass (arrows opposed, reversed acceleration)"
+  constant3 = BlockComponents.Sources.Constant(k = 1.0) {^constant3}
+  force3 = TranslationalComponents.Sources.Force() {^force3}
+  mass3 = TranslationalComponents.Components.Mass(L = 1.0, m = 1.0) {^mass3}
+  fixed3 = TranslationalComponents.Components.Fixed() {^fixed3}
+relations
+  # System 1
+  connect(constant1.y, force1.f) {^id13}
+  connect(force1.flange_a, fixed1.flange) {^id14}
+  connect(force1.flange_b, mass1.flange_a) {^id15}
+  initial mass1.s = 0.0
+  initial mass1.v = 0.0
+  # System 2
+  connect(constant2.y, force2.f) {^id16}
+  connect(force2.flange_a, fixed2.flange) {^id17}
+  connect(force2.flange_b, mass2.flange_b) {^id18}
+  initial mass2.s = 0.0
+  initial mass2.v = 0.0
+  # System 3
+  connect(constant3.y, force3.f) {^id19}
+  connect(force3.flange_a, mass3.flange_b) {^id20}
+  connect(force3.flange_b, fixed3.flange) {^id21}
+  initial mass3.s = 0.0
+  initial mass3.v = 0.0
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://TranslationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "atol": {
+          "mass1.s": 0.001,
+          "mass1.v": 0.001,
+          "mass2.s": 0.001,
+          "mass2.v": 0.001,
+          "mass3.s": 0.001,
+          "mass3.v": 0.001
+        },
+        "expect": {
+          "final": {
+            "mass1.s": 0.5,
+            "mass1.v": 1.0,
+            "mass2.s": 0.5,
+            "mass2.v": 1.0,
+            "mass3.s": -0.5,
+            "mass3.v": -1.0
+          },
+          "signals": ["mass1.s", "mass1.v", "mass2.s", "mass2.v", "mass3.s", "mass3.v"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "constant1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 200, "y1": -100, "x2": 300, "y2": 0, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "force1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 20, "x2": 550, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 630, "y1": 20, "x2": 730, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 200, "y1": 150, "x2": 300, "y2": 250, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "constant2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 250, "y1": 350, "x2": 350, "y2": 450, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "force2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 400, "y1": 450, "x2": 500, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 640, "y1": 340, "x2": 740, "y2": 440, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 190, "y1": 570, "x2": 290, "y2": 670, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "constant3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 400, "y1": 710, "x2": 500, "y2": 810, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "force3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 570, "y1": 800, "x2": 670, "y2": 900, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 190, "y1": 800, "x2": 290, "y2": 900, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 810, "y1": 900, "x2": 910, "y2": 1000, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": -50}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 250, "y": 70}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id15": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id16": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 450, "y": 400}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id17": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 240, "y": 500}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id18": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 840, "y": 500}, {"x": 840, "y": 390}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id19": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 620, "y": 760}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id20": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id21": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 860, "y": 850}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

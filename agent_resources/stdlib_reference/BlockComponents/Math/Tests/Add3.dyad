@@ -1,0 +1,70 @@
+"""
+Test the functionality of the Add3 block by connecting three constant inputs.
+
+This test harness connects three constant sources (with values 1, 2, and 3) to an Add3 component and verifies
+that the output equals the sum of the inputs (6). The test case simulates for 5 seconds and checks the final
+value of the output.
+"""
+test component Add3
+  "Constant source with value 1"
+  c1 = BlockComponents.Sources.Constant(k = 1) {^c1}
+  "Constant source with value 2"
+  c2 = BlockComponents.Sources.Constant(k = 2) {^c2}
+  "Constant source with value 3"
+  c3 = BlockComponents.Sources.Constant(k = 3) {^c3}
+  "Component that adds three inputs"
+  add3 = BlockComponents.Math.Add3() {^add3}
+relations
+  connect(add3.u1, c1.y) {^id5}
+  connect(add3.u2, c2.y) {^id6}
+  connect(add3.u3, c3.y) {^id7}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {"case1": {"stop": 5, "expect": {"final": {"add3.y": 6}}}}
+  },
+  "_links": {
+    "c1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 400, "y1": 260, "x2": 500, "y2": 360, "rot": 0}
+        }
+      }
+    },
+    "c2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 400, "y1": 450, "x2": 500, "y2": 550, "rot": 0}
+        }
+      }
+    },
+    "c3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 400, "y1": 660, "x2": 500, "y2": 760, "rot": 0}
+        }
+      }
+    },
+    "add3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 640, "y1": 450, "x2": 740, "y2": 550, "rot": 0}
+        }
+      }
+    },
+    "id5": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 590, "y": 470}, {"x": 590, "y": 310}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id6": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id7": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 600, "y": 530}, {"x": 600, "y": 710}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

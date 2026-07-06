@@ -1,0 +1,37 @@
+"""
+Ideal sensor measuring the relative acceleration between two translational flanges.
+
+This sensor determines the acceleration of `flange_b` with respect to `flange_a`
+(where `s_a` and `s_b` in the equations below refer to `flange_a.s` and `flange_b.s`
+respectively). It operates by first calculating the relative displacement,
+$s_{rel} = s_b - s_a$. This relative displacement is then differentiated with
+respect to time to obtain the relative velocity, $v_{rel} = \frac{d(s_{rel})}{dt}$.
+Finally, the relative velocity is differentiated with respect to time to yield the
+relative acceleration, $a_{rel} = \frac{d(v_{rel})}{dt}$. The sensor is ideal,
+meaning it does not exert any force on the connected components; specifically, the force at
+`flange_a` is defined as zero, ensuring no mechanical load is introduced by the sensor.
+"""
+component RelativeAccelerationSensor
+  extends TranslationalComponents.Interfaces.PartialRelativeSensor
+  "Relative acceleration of `flange_b` relative to `flange_a` as output signal"
+  a_rel = RealOutput(units="m/s^2") {^a_rel}
+  "Relative position of `flange_b` relative to `flange_a`"
+  variable s_rel::Distance
+  "Relative velocity of `flange_b` relative to `flange_a`"
+  variable v_rel::Velocity
+relations
+  s_rel = flange_b.s - flange_a.s
+  v_rel = der(s_rel)
+  a_rel = der(v_rel)
+  0 = flange_a.f
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/RelativeSensor.svg"}},
+  "_links": {
+    "a_rel": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

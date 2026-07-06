@@ -1,0 +1,24 @@
+"""
+Constrains a translational flange to a fixed position.
+
+This component represents a mechanical anchor or a fixed reference point within a 1D translational system.
+It rigidly sets the position of its single translational flange (`flange`) to a constant value specified by the parameter `s0`.
+The key behavior is defined by the simple algebraic constraint:
+```math
+flange.s = s0
+```math
+"""
+component Fixed
+  "Translational flange connector"
+  flange = Flange() {^flange}
+  "Fixed offset position"
+  parameter s0::Dyad.Position = 0.0
+relations
+  flange.s = s0
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/Fixed.svg"}},
+  "_links": {
+    "flange": {"Dyad": {"placement": {"icon": {"x1": 450, "y1": -50, "x2": 550, "y2": 50}}}}
+  }
+}
+end

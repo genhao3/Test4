@@ -1,0 +1,32 @@
+"""
+Gearbox transforming rotational into translational motion.
+
+This component models an ideal gearbox that transforms rotational motion from a
+rotational `spline` connector (relative to `support_r`) to translational motion
+at a `flange` connector (relative to `support_t`). The transformation is defined
+by the `ratio` parameter.
+
+The kinematic relationship between the relative angular displacement on the
+rotational side and the relative linear displacement on the translational side is:
+```math
+spline.\\phi - support_r.\\phi = \text{ratio} \\cdot (flange.s - support_t.s)
+```
+
+The corresponding force-torque relationship, ensuring power conservation (ideal gear), is:
+```math
+\text{ratio} \\cdot spline.\\tau + flange.f = 0
+```
+
+The component extends `PartialElementaryRotationalToTranslational`, which provides
+the rotational connectors (`spline`, `support_r` with variables `phi`, `tau`) and
+translational connectors (`flange`, `support_t` with variables `s`, `f`).
+"""
+component IdealGearR2T
+  extends RotationalComponents.Interfaces.PartialElementaryRotationalToTranslational
+  "Gear ratio defining the conversion from relative angular displacement (spline.phi - support_r.phi) to relative translational displacement (flange.s - support_t.s). Units: rad/m."
+  parameter ratio::Real(units = "rad/m")
+relations
+  spline.phi - support_r.phi = ratio * (flange.s - support_t.s)
+  0 = ratio * spline.tau + flange.f
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/IdealGearR2T.svg"}}}
+end

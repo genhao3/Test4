@@ -1,0 +1,26 @@
+"""
+Constant speed, not dependent on torque.
+
+Model of fixed angular velocity of flange, not dependent on torque.
+The angular velocity of the spline with respect to the support is fixed to
+the parameter `w_fixed`.
+
+The equations are:
+```math
+w = \frac{d\phi}{dt}
+```
+```math
+w = w_{fixed}
+```
+"""
+component ConstantSpeed
+  extends RotationalComponents.Interfaces.PartialTorque
+  "Fixed speed"
+  parameter w_fixed::AngularVelocity
+  "Angular velocity of spline with respect to support (= der(phi))"
+  variable w::AngularVelocity
+relations
+  w = der(phi)
+  w = w_fixed
+metadata {"Dyad": {"icons": {"default": "dyad://RotationalComponents/ConstantSpeed.svg"}}}
+end

@@ -1,0 +1,39 @@
+"""
+Constant force changing sign with speed.
+
+Model of constant force which changes sign with direction of movement.
+Positive force accelerates in both directions of movement.
+Negative force brakes in both directions of movement.
+
+Around zero speed, regularization avoids numerical problems. Four regularization
+types are available:
+
+- Exp (default): ``f = -f_{nominal} \\cdot \\left(\\frac{2}{1 + e^{-v / (0.01 \\cdot v_0)}} - 1\\right)``
+- Sine: ``f = -f_{nominal} \\cdot \\sin\\left(\\frac{\\pi}{2} \\cdot \\frac{v}{v_0}\\right)`` for ``|v| < v_0``
+- Linear: ``f = -f_{nominal} \\cdot \\frac{v}{v_0}`` for ``|v| < v_0``
+- Cosine: ``f = -f_{nominal} \\cdot \\text{sign}(v) \\cdot \\left(1 - \\cos\\left(\\frac{\\pi}{2} \\cdot \\frac{v}{v_0}\\right)\\right)`` for ``|v| < v_0``
+"""
+component SignForce
+  extends TranslationalComponents.Interfaces.PartialForce
+  "Nominal force (if negative, force is acting as load)"
+  parameter f_nominal::Dyad.Force
+  "Type of regularization"
+  structural parameter reg::TranslationalComponents.Components.Regularization = TranslationalComponents.Components.Regularization.Exp()
+  "Regularization below v0"
+  parameter v0::Velocity(min = eps(Float64)) = 0.1
+  "Velocity of flange with respect to support (= der(s))"
+  variable v::Velocity
+relations
+  v = der(s)
+  switch reg
+    case Exp
+      f = -f_nominal * (2.0 / (1.0 + exp(-v / (0.01 * v0))) - 1.0)
+    case Sine
+      f = -f_nominal * ifelse(abs(v) >= v0, sign(v), sin(π / 2 * v / v0))
+    case Linear
+      f = -f_nominal * ifelse(abs(v) >= v0, sign(v), v / v0)
+    case Cosine
+      f = -f_nominal * ifelse(abs(v) >= v0, sign(v), sign(v) * (1.0 - cos(π / 2 * v / v0)))
+  end
+metadata {"Dyad": {"icons": {"default": "dyad://TranslationalComponents/SignForce.svg"}}}
+end

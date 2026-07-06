@@ -1,0 +1,41 @@
+"""
+Ideal sensor measuring the translational force transmitted between two flanges.
+
+This component models an ideal sensor that measures the translational force acting between its two mechanical flanges, `flange_a` and `flange_b`.
+It ensures the sensor body is perfectly rigid, meaning no relative displacement between the flanges.
+This is expressed by the equation:
+
+```math
+flange_a.s = flange_b.s
+```
+
+The force exerted at `flange_a` is directly measured and provided as the output signal `f`:
+
+```math
+flange_a.f = f
+```
+
+By Newton's third law, the force at `flange_b` is equal and opposite to the force at `flange_a`:
+
+```math
+flange_b.f = -flange_a.f
+```
+"""
+component ForceSensor
+  extends TranslationalComponents.Interfaces.PartialRelativeSensor
+  "Force transmitted from `flange_a` to `flange_b` as output signal"
+  f = RealOutput(units="N") {^f}
+relations
+  flange_a.s = flange_b.s
+  flange_a.f = f
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/RelativeSensor.svg"}},
+  "_links": {
+    "f": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

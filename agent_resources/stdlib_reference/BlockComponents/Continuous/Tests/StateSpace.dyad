@@ -1,0 +1,78 @@
+"""
+Test component for StateSpace block demonstrating basic functionality.
+
+Creates a simple test system with:
+- A step input signal
+- A second-order state space system
+- Integration of the output for verification
+
+The state space system represents a second-order system with:
+- States: position and velocity
+- Single input: force/acceleration
+- Single output: position
+- Operating point offset to test that feature
+"""
+component StateSpaceTest
+  "Step input signal starting at time 1.0 with amplitude 2.0"
+  step = BlockComponents.Sources.Step(height = 2.0, start_time = 1.0)
+  """
+  Second-order state space system
+  Represents: d²x/dt² + 2*damping*freq*dx/dt + freq²*x = freq²*u
+  In state space form with x1=position, x2=velocity:
+  dx1/dt = x2
+  dx2/dt = -freq²*x1 - 2*damping*freq*x2 + freq²*u
+  y = x1 (output position)
+  """
+  state_space = BlockComponents.Continuous.StateSpace(nx = 2, nu = 1, ny = 1, A = reshape([0.0, 1.0, -4.0, -2.0], 2, 2), B = reshape([0.0, 4.0], 2, 1), C = reshape([1.0, 0.0], 1, 2), D = reshape([0.0], 1, 1), x0 = [0.5, 0.0], u0 = [0.5], y0 = [0.1]) {^state_space}
+  "Integrator to accumulate the output for testing"
+  integrator = BlockComponents.Continuous.Integrator(k = 1.0, x0 = 0.0) {^integrator}
+  "Terminator for the integrated signal"
+  terminator = BlockComponents.Routing.Terminator() {^terminator}
+relations
+  "Connect step input to state space system"
+  connect(step.y, state_space.u[1])
+  "Connect state space output to integrator"
+  connect(state_space.y[1], integrator.u)
+  "Connect integrator output to terminator"
+  connect(integrator.y, terminator.u) {^id4}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "rtol": {"integrator.y": 0.0001},
+        "expect": {
+          "signals": ["integrator.y"],
+          "initial": {"integrator.y": 0},
+          "final": {"integrator.y": -18.288754189661404}
+        }
+      }
+    }
+  },
+  "_links": {
+    "state_space": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 180, "y1": 0, "x2": 280, "y2": 100, "rot": 0}
+        }
+      }
+    },
+    "integrator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 360, "y1": 0, "x2": 460, "y2": 100, "rot": 0}
+        }
+      }
+    },
+    "terminator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 540, "y1": 0, "x2": 640, "y2": 100, "rot": 0}
+        }
+      }
+    },
+    "id4": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

@@ -1,0 +1,181 @@
+"""
+Test component for simulating heat exchange between two masses and verifying temperature sensor readings.
+
+This component models the thermal interaction of two distinct masses, `mass1` and `mass2`, each represented by a `HeatCapacitor` with
+specified heat capacities (`C`) and initial temperatures (`T0`).  A `ThermalConductor` facilitates heat transfer between the two masses.
+The system's behavior is monitored using a `RelativeTemperatureSensor` to measure the temperature difference across the masses,
+and two `TemperatureSensor`s to read the absolute temperature of each mass individually. The component also calculates the theoretical
+final equilibrium temperature, `final_T`, that the combined system will reach, assuming no heat loss to the environment. This final
+temperature is determined by the conservation of energy, expressed as:
+```math
+final\_T = \frac{mass1.T0 \cdot mass1.C + mass2.T0 \cdot mass2.C}{mass1.C + mass2.C}
+```
+The `connect` statements define the acausal thermal connections between the masses, the conductor, and the sensors. The metadata reveals this component is intended for testing the functionality
+of the temperature sensors and the heat exchange model under defined conditions.
+"""
+example component TemperatureOfTwoMasses
+  "First heat capacitor with initial temperature T0 = 373.15 K and heat capacity C = 15 J/K."
+  mass1 = ThermalComponents.Components.HeatCapacitor(C = 15, T0 = 373.15) {^mass1}
+  "Second heat capacitor with initial temperature T0 = 273.15 K and heat capacity C = 15 J/K."
+  mass2 = ThermalComponents.Components.HeatCapacitor(C = 15, T0 = 273.15) {^mass2}
+  "Thermal conductor with thermal conductance G = 10 W/K connecting the two masses."
+  conduction = ThermalComponents.Components.ThermalConductor(G = 10) {^conduction}
+  "Sensor to measure the relative temperature difference between mass1 and mass2."
+  relative_temperature_sensor = ThermalComponents.Sensors.RelativeTemperatureSensor() {^relative_temperature_sensor}
+  "Sensor to measure the absolute temperature of mass1."
+  temperature_sensor1 = ThermalComponents.Sensors.TemperatureSensor() {^temperature_sensor1}
+  "Sensor to measure the absolute temperature of mass2."
+  temperature_sensor2 = ThermalComponents.Sensors.TemperatureSensor() {^temperature_sensor2}
+  "Projected final equilibrium temperature of the two masses."
+  variable final_T::Temperature
+relations
+  final_T = (mass1.T0 * mass1.C + mass2.T0 * mass2.C) / (mass1.C + mass2.C)
+  connect(mass1.port, conduction.port_a) {^id7}
+  connect(conduction.port_b, mass2.port) {^id8}
+  connect(mass1.port, relative_temperature_sensor.port_a) {^id9}
+  connect(mass2.port, relative_temperature_sensor.port_b) {^id10}
+  connect(mass1.port, temperature_sensor1.port) {^id11}
+  connect(mass2.port, temperature_sensor2.port) {^id12}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://ThermalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 10,
+        "atol": {
+          "mass1.T": 0.001,
+          "mass2.T": 0.001,
+          "temperature_sensor1.T": 0.001,
+          "temperature_sensor2.T": 0.001,
+          "relative_temperature_sensor.T_rel": 0.001
+        },
+        "expect": {
+          "initial": {
+            "temperature_sensor1.T": 373.15,
+            "temperature_sensor2.T": 273.15,
+            "relative_temperature_sensor.T_rel": 100
+          },
+          "signals": [
+            "mass1.port.T",
+            "mass2.port.T",
+            "temperature_sensor1.T",
+            "temperature_sensor2.T",
+            "relative_temperature_sensor.T_rel"
+          ]
+        }
+      }
+    }
+  },
+  "_links": {
+    "mass1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 241, "x2": 120, "y2": 341, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "mass2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 270, "y1": 320, "x2": 370, "y2": 420, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "conduction": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 145, "y1": 226, "x2": 245, "y2": 326, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "relative_temperature_sensor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 395, "y1": 20, "x2": 495, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "temperature_sensor1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 145, "y1": 346, "x2": 245, "y2": 446, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "temperature_sensor2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 530, "y1": 320, "x2": 630, "y2": 420, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id7": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 70, "y": 396}], "E": -1},
+          {"S": -1, "M": [], "E": -2},
+          {"S": -2, "M": [], "E": 2}
+        ],
+        "junctions": [{"x": 130, "y": 396}, {"x": 130, "y": 276}],
+        "renderStyle": "standard"
+      }
+    },
+    "id8": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [], "E": -1}, {"S": -1, "M": [], "E": 2}],
+        "junctions": [{"x": 320, "y": 276}],
+        "renderStyle": "standard"
+      }
+    },
+    "id9": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 70, "y": 396}, {"x": 130, "y": 396}, {"x": 130, "y": 70}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id10": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [{"x": 350, "y": 276}, {"x": 350, "y": 250}], "E": -2},
+          {
+            "S": -2,
+            "M": [{"x": 500, "y": 176}, {"x": 510, "y": 176}, {"x": 510, "y": 70}],
+            "E": 2
+          }
+        ],
+        "junctions": [{"x": 320, "y": 276}, {"x": 500, "y": 250}],
+        "renderStyle": "standard"
+      }
+    },
+    "id11": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 70, "y": 396}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [], "E": -1},
+          {"S": -1, "M": [{"x": 357.5, "y": 276}, {"x": 357.5, "y": 370}], "E": 2}
+        ],
+        "junctions": [{"x": 320, "y": 276}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

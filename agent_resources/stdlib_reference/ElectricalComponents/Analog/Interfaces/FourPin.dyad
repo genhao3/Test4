@@ -1,0 +1,72 @@
+"""
+Component with two electrical ports (four pins).
+
+Defines two voltage/current pairs for a four-terminal device:
+```math
+v_1 = p_1.v - n_1.v, \quad i_1 = p_1.i
+```
+```math
+v_2 = p_2.v - n_2.v, \quad i_2 = p_2.i
+```
+
+Corresponds to `Modelica.Electrical.Analog.Interfaces.FourPin`.
+"""
+partial component FourPin
+  "Positive electrical pin of port 1"
+  p1 = Pin() {^p1}
+  "Negative electrical pin of port 1"
+  n1 = Pin() {^n1}
+  "Positive electrical pin of port 2"
+  p2 = Pin() {^p2}
+  "Negative electrical pin of port 2"
+  n2 = Pin() {^n2}
+  "Voltage drop of port 1 (= p1.v - n1.v)"
+  variable v1::Voltage
+  "Voltage drop of port 2 (= p2.v - n2.v)"
+  variable v2::Voltage
+  "Current flowing from pos. to neg. pin of port 1"
+  variable i1::Current
+  "Current flowing from pos. to neg. pin of port 2"
+  variable i2::Current
+relations
+  v1 = p1.v - n1.v
+  v2 = p2.v - n2.v
+  i1 = p1.i
+  i2 = p2.i
+metadata {
+  "_links": {
+    "p1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -40, "y1": -40, "x2": 60, "y2": 60, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "n1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -40, "y1": 940, "x2": 60, "y2": 1040, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "p2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 960, "y1": -40, "x2": 1060, "y2": 60, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "n2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 960, "y1": 950, "x2": 1060, "y2": 1050, "rot": 0}
+        },
+        "tags": []
+      }
+    }
+  }
+}
+end

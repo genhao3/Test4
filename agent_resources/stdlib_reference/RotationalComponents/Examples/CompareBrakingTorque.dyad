@@ -1,0 +1,193 @@
+"""
+Compare different braking torques.
+
+Matches MSL Modelica.Mechanics.Rotational.Examples.CompareBrakingTorque.
+
+Four inertias (J=1) start at w=100 rad/s and are braked by different
+speed-dependent torque sources, all with TorqueDirection=false (torque
+direction depends on speed direction):
+
+1. SignTorque (Linear regularization): constant magnitude braking, smooth near zero
+2. LinearSpeedDependentTorque: tau ∝ w → exponential decay w(t) = 100·exp(-t)
+3. QuadraticSpeedDependentTorque: tau ∝ w|w| → w(t) = 100/(1+t)
+4. InverseSpeedDependentTorque: tau ∝ 1/w → rapid braking, w hits 0 at t=0.5
+"""
+example component CompareBrakingTorque
+  "Fixed ground for all source supports"
+  fixed = RotationalComponents.Components.Fixed() {^fixed}
+  "Inertia 1 for sign torque braking"
+  inertia1 = RotationalComponents.Components.Inertia(J = 1) {^inertia1}
+  "Sign torque with Linear regularization (tau_nominal=-100, w0=1)"
+  sign_torque = RotationalComponents.Sources.SignTorque(tau_nominal = -100, reg = RotationalComponents.Sources.Regularization.Linear(), w0 = 1) {^sign_torque}
+  "Inertia 2 for linear speed dependent braking"
+  inertia2 = RotationalComponents.Components.Inertia(J = 1) {^inertia2}
+  "Linear speed dependent torque (TorqueDirection=false)"
+  linear_speed = RotationalComponents.Sources.LinearSpeedDependentTorque(tau_nominal = -100, TorqueDirection = false, w_nominal = 100) {^linear_speed}
+  "Inertia 3 for quadratic speed dependent braking"
+  inertia3 = RotationalComponents.Components.Inertia(J = 1) {^inertia3}
+  "Quadratic speed dependent torque (TorqueDirection=false)"
+  quadratic_speed = RotationalComponents.Sources.QuadraticSpeedDependentTorque(tau_nominal = -100, TorqueDirection = false, w_nominal = 100) {^quadratic_speed}
+  "Inertia 4 for inverse speed dependent braking"
+  inertia4 = RotationalComponents.Components.Inertia(J = 1) {^inertia4}
+  "Inverse speed dependent torque (TorqueDirection=false)"
+  inverse_speed = RotationalComponents.Sources.InverseSpeedDependentTorque(tau_nominal = -100, TorqueDirection = false, w_nominal = 100, w0 = 1) {^inverse_speed}
+relations
+  initial inertia1.phi = 0
+  initial inertia1.w = 100
+  initial inertia2.phi = 0
+  initial inertia2.w = 100
+  initial inertia3.phi = 0
+  initial inertia3.w = 100
+  initial inertia4.phi = 0
+  initial inertia4.w = 100
+  connect(sign_torque.spline, inertia1.spline_a) {^id10}
+  connect(sign_torque.support, fixed.spline) {^id11}
+  connect(linear_speed.spline, inertia2.spline_a) {^id12}
+  connect(linear_speed.support, fixed.spline) {^id13}
+  connect(quadratic_speed.spline, inertia3.spline_a) {^id14}
+  connect(quadratic_speed.support, fixed.spline) {^id15}
+  connect(inverse_speed.spline, inertia4.spline_a) {^id16}
+  connect(inverse_speed.support, fixed.spline) {^id17}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://RotationalComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 5,
+        "atol": {"inertia1.w": 0.001, "inertia2.w": 0.001, "inertia3.w": 0.001, "inertia4.w": 0.001},
+        "expect": {
+          "initial": {"inertia1.w": 100, "inertia2.w": 100, "inertia3.w": 100, "inertia4.w": 100},
+          "signals": ["inertia1.w", "inertia2.w", "inertia3.w", "inertia4.w"]
+        }
+      }
+    }
+  },
+  "_links": {
+    "fixed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": -240, "y1": 400, "x2": -140, "y2": 500, "rot": 90}
+        },
+        "tags": []
+      }
+    },
+    "inertia1": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 430, "y1": 20, "x2": 530, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "sign_torque": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 20, "x2": 260, "y2": 120, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inertia2": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 420, "y1": 250, "x2": 520, "y2": 350, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "linear_speed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 150, "y1": 250, "x2": 250, "y2": 350, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inertia3": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 420, "y1": 470, "x2": 520, "y2": 570, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "quadratic_speed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 150, "y1": 470, "x2": 250, "y2": 570, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inertia4": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 420, "y1": 710, "x2": 520, "y2": 810, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "inverse_speed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 160, "y1": 710, "x2": 260, "y2": 810, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id10": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id11": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 210, "y": 160}, {"x": 0, "y": 160}, {"x": 0, "y": 450}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id12": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 200, "y": 450}], "E": -1},
+          {"S": -1, "M": [], "E": -2},
+          {"S": -2, "M": [], "E": 2}
+        ],
+        "junctions": [{"x": -140, "y": 450}, {"x": -140, "y": 450}],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id15": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 200, "y": 700}, {"x": 0, "y": 700}, {"x": 0, "y": 450}],
+            "E": -1
+          },
+          {"S": -1, "M": [], "E": 2}
+        ],
+        "junctions": [{"x": -140, "y": 450}],
+        "renderStyle": "standard"
+      }
+    },
+    "id16": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id17": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 210, "y": 905}, {"x": 0, "y": 905}, {"x": 0, "y": 450}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end

@@ -1,0 +1,49 @@
+"""
+Test that validates step response behavior by connecting a step signal to a terminator.
+
+This component creates a test setup for validating the `Step` block by connecting its output
+to a `Terminator`. The `Step` block generates a signal that starts at the `offset` value and jumps
+by the `height` value at the `start_time`. The test case verifies that the signal properly
+transitions from the initial offset value to the final value (offset + height).
+"""
+test component Step
+  "Terminates a signal connection without passing it further"
+  terminator = BlockComponents.Routing.Terminator() {^terminator}
+  "Generates a step signal with configurable height, offset and start time"
+  signal = BlockComponents.Sources.Step(height = 1.4, offset = 0.5, start_time = 0.5) {^signal}
+relations
+  "Connects the step signal output to the terminator input"
+  connect(signal.y, terminator.u) {^id3}
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://BlockComponents/Example.svg"},
+    "tests": {
+      "case1": {
+        "stop": 1,
+        "expect": {
+          "initial": {"signal.y": 0.5},
+          "signals": ["signal.y", "terminator.u"],
+          "final": {"signal.y": 1.9, "terminator.u": 1.9}
+        }
+      }
+    }
+  },
+  "_links": {
+    "terminator": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 155, "y1": 20, "x2": 255, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "signal": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 20, "x2": 120, "y2": 120, "rot": 0}
+        }
+      }
+    },
+    "id3": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}}
+  }
+}
+end

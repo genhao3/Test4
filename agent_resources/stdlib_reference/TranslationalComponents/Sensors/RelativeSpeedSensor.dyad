@@ -1,0 +1,43 @@
+"""
+Ideal sensor measuring the relative translational velocity between two mechanical flanges.
+
+This component computes the relative translational velocity between two mechanical flanges, `flange_a` and `flange_b`.
+It first determines the relative displacement, `s_rel`, by subtracting the absolute position of `flange_a` from the absolute position of `flange_b`:
+
+```math
+s_{rel} = flange_b.s - flange_a.s
+```
+
+The relative velocity, `v_rel`, is then calculated as the time derivative of this relative displacement:
+
+```math
+v_{rel} = \frac{d(s_{rel})}{dt}
+```
+
+The sensor is ideal, meaning it does not exert any force on the connected flanges, which is enforced by the equation:
+
+```math
+flange_a.f = 0
+```
+"""
+component RelativeSpeedSensor
+  extends TranslationalComponents.Interfaces.PartialRelativeSensor
+  "Relative velocity of `flange_b` relative to `flange_a` as output signal"
+  v_rel = RealOutput(units="m/s") {^v_rel}
+  "Relative position of `flange_b` relative to `flange_a`"
+  variable s_rel::Distance
+relations
+  s_rel = flange_b.s - flange_a.s
+  v_rel = der(s_rel)
+  0 = flange_a.f
+metadata {
+  "Dyad": {"icons": {"default": "dyad://TranslationalComponents/RelativeSensor.svg"}},
+  "_links": {
+    "v_rel": {
+      "Dyad": {
+        "placement": {"icon": {"x1": 450, "y1": 950, "x2": 550, "y2": 1050, "rot": 90}}
+      }
+    }
+  }
+}
+end

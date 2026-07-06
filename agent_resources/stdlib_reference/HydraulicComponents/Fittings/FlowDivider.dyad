@@ -1,0 +1,69 @@
+"""
+Splits an incoming mass flow from `port_a` such that the flow to `port_b` is reduced by a factor `n`, with the remainder exiting via an `open` port.
+
+This component models a flow splitting device where an incoming mass flow rate,
+$\\dot{m}_{a}$ (represented by `m_flow_a` and sourced from `port_a.m_flow`), is divided.
+A fraction of this flow is directed to `port_b`, resulting in an outgoing mass flow rate,
+$\\dot{m}_{b}$ (represented by `m_flow_b` and connected to `port_b.m_flow`).
+The governing equations are:
+```math
+\\dot{m}_{b} = \\frac{\\dot{m}_{a}}{n} \\\\
+\\dot{m}_{open} = \\dot{m}_{a} - \\dot{m}_{b}
+```
+where `n` is the division factor parameter and $\\dot{m}_{open}$ is the mass flow
+rate expelled through the `open` port. This ensures mass conservation.
+The component is useful for modeling parallel tubes efficiently by placing
+a `FlowDivider` on each end of a tube, with the extra flow being dumped
+into the `open` port.
+"""
+component FlowDivider
+  "Input port for the flow to be divided"
+  port_a = HydraulicComponents.Interfaces.Port() {^port_a}
+  "Output port for the main divided flow"
+  port_b = HydraulicComponents.Interfaces.Port() {^port_b}
+  "Output port for the remaining (excess) flow"
+  open = HydraulicComponents.Interfaces.Port() {^open}
+  "Divide flow from `port_a` to `port_b` by `n`"
+  parameter n::Real
+  "Mass flow of `port_a`"
+  variable m_flow_a::MassFlowRate
+  "Mass flow of `port_b`"
+  variable m_flow_b::MassFlowRate
+relations
+  continuity(port_a.medium, port_b.medium, open.medium)
+  m_flow_a = port_a.m_flow
+  m_flow_b = port_b.m_flow
+  m_flow_b = m_flow_a / n
+  open.m_flow = m_flow_a - m_flow_b
+metadata {
+  "Dyad": {
+    "icons": {"default": "dyad://HydraulicComponents/FlowDivider.svg"},
+    "labels": [
+      {"label": "$(instance)", "x": 500, "y": 1100, "rot": 0}
+    ]
+  },
+  "_links": {
+    "port_a": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": -20, "x2": 20, "y1": 480, "y2": 520, "sh": 1, "sw": 1, "rot": 0}
+        }
+      }
+    },
+    "port_b": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": 980, "x2": 1020, "y1": 480, "y2": 520, "sh": 1, "sw": 1, "rot": 0}
+        }
+      }
+    },
+    "open": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"x1": 480, "x2": 520, "y1": 980, "y2": 1020, "sh": 1, "sw": 1, "rot": 0}
+        }
+      }
+    }
+  }
+}
+end

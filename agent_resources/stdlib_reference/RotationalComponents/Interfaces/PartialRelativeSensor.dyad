@@ -1,0 +1,28 @@
+"""
+A foundational partial model for measuring relative kinematic variables between two ideal mechanical splines.
+
+This partial component provides the essential structure for sensors that measure
+a relative rotational quantity between two splines, denoted as `spline_a` and
+`spline_b`. It models an ideal sensing interaction by ensuring that the torques at
+the two connection points are equal and opposite, resulting in no net torque being
+applied to the system under measurement. This behavior is captured by the equation:
+```math
+\text{spline\_a}.\tau + \text{spline\_b}.\tau = 0
+```math
+Specific sensors derived from this partial model would implement the equations for
+the particular relative variable (e.g., relative angle, relative speed) being measured.
+"""
+partial component PartialRelativeSensor
+  "Left spline connector for the sensor."
+  spline_a = Spline() {^spline_a}
+  "Right spline connector for the sensor."
+  spline_b = Spline() {^spline_b}
+relations
+  0 = spline_a.tau + spline_b.tau
+metadata {
+  "_links": {
+    "spline_a": {"Dyad": {"placement": {"icon": {"x1": -50, "y1": 450, "x2": 50, "y2": 550}}}},
+    "spline_b": {"Dyad": {"placement": {"icon": {"x1": 950, "y1": 450, "x2": 1050, "y2": 550}}}}
+  }
+}
+end

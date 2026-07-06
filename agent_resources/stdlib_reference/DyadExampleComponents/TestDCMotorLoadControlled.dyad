@@ -1,0 +1,193 @@
+test component TestDCMotorLoadControlled
+  motor = DCMotor() {^motor}
+  ground = ElectricalComponents.Analog.Basic.Ground() {^ground}
+  source = ElectricalComponents.Analog.Sources.VoltageSource() {^source}
+  fixed = RotationalComponents.Components.Fixed() {^fixed}
+  load = RotationalComponents.Sources.TorqueSource() {^load}
+  load_source = BlockComponents.Sources.Step(height = tau_load, start_time = load_step_start_time) {^load_source}
+  speed_reference = BlockComponents.Sources.Constant(k = w_motor) {^speed_reference}
+  controller = BlockComponents.Continuous.LimPID(k = k, Ti = Ti, Td = Td, Nd = Nd, y_max = 5, y_min = -5) {^controller}
+  signal_ff = BlockComponents.Sources.Constant(k = 0) {^signal_ff}
+  speed_sensor = RotationalComponents.Sensors.VelocitySensor() {^speed_sensor}
+  "Motor desired speed"
+  parameter w_motor::AngularVelocity = 1
+  "Amplitude of load torque step"
+  parameter tau_load::Torque = -0.3
+  "Load step start time"
+  parameter load_step_start_time::Time = 2
+  "Controller gain"
+  parameter k::Real = 0.5
+  "Controller time constant of the integrator block"
+  parameter Ti::Time = 0.1
+  "Controller Time constant of the derivative block"
+  parameter Td::Time = 1e5
+  "Maximum derivative gain"
+  parameter Nd::Real = 10
+relations
+  initial motor.L1.i = 0
+  initial motor.inertia.w = 0
+  u: analysis_point(controller.y, source.V)
+  y: analysis_point(speed_sensor.w, controller.u_m)
+  r: analysis_point(speed_reference.y, controller.u_s)
+  connect(load_source.y, load.tau) {^id11}
+  connect(source.p, motor.p) {^id12}
+  connect(ground.g, source.n, motor.n) {^id13}
+  connect(motor.shaft, load.spline) {^id14}
+  connect(motor.housing, load.support, fixed.spline) {^id15}
+  connect(speed_reference.y, controller.u_s) {^id16}
+  connect(speed_sensor.w, controller.u_m) {^id17}
+  connect(controller.y, source.V) {^id18}
+  connect(speed_sensor.spline, motor.shaft) {^id19}
+  connect(controller.u_ff, signal_ff.y) {^id20}
+metadata {
+  "Dyad": {"icons": {"default": "dyad://DyadExampleComponents/Example.svg"}},
+  "_links": {
+    "motor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 560, "x2": 550, "y2": 660, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "ground": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 680, "y1": 430, "x2": 780, "y2": 530, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 360, "x2": 550, "y2": 460, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "fixed": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 450, "y1": 850, "x2": 550, "y2": 950, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "load": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 730, "y1": 560, "x2": 630, "y2": 660, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "load_source": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 910, "y1": 560, "x2": 810, "y2": 660, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "speed_reference": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 280, "x2": 120, "y2": 380, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "controller": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 200, "y1": 350, "x2": 300, "y2": 250, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "signal_ff": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 20, "y1": 450, "x2": 120, "y2": 550, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "speed_sensor": {
+      "Dyad": {
+        "placement": {
+          "diagram": {"iconName": "default", "x1": 580, "y1": 30, "x2": 480, "y2": 130, "rot": 0}
+        },
+        "tags": []
+      }
+    },
+    "id11": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id12": {
+      "Dyad": {
+        "edges": [
+          {
+            "S": 1,
+            "M": [{"x": 400, "y": 410}, {"x": 400, "y": 500}, {"x": 467, "y": 500}],
+            "E": 2
+          }
+        ],
+        "renderStyle": "standard"
+      }
+    },
+    "id13": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 730, "y": 410}], "E": -1},
+          {"S": -1, "M": [], "E": 2},
+          {"S": 3, "M": [{"x": 533, "y": 500}, {"x": 600, "y": 500}], "E": -1}
+        ],
+        "junctions": [{"x": 600, "y": 410}],
+        "renderStyle": "standard"
+      }
+    },
+    "id14": {"Dyad": {"edges": [{"S": 1, "M": [], "E": 2}], "renderStyle": "standard"}},
+    "id15": {
+      "Dyad": {
+        "edges": [
+          {"S": 1, "M": [{"x": 500.00000000000006, "y": 770}], "E": -1},
+          {"S": -1, "M": [{"x": 680, "y": 770}], "E": 2},
+          {"S": -1, "M": [], "E": 3}
+        ],
+        "junctions": [{"x": 500, "y": 770}],
+        "renderStyle": "standard"
+      }
+    },
+    "id16": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 150, "y": 330}, {"x": 150, "y": 323}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id17": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 150, "y": 80}, {"x": 150, "y": 277}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id18": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 500, "y": 299}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id19": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 610, "y": 80}, {"x": 610, "y": 610}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    },
+    "id20": {
+      "Dyad": {
+        "edges": [{"S": 1, "M": [{"x": 250, "y": 500}], "E": 2}],
+        "renderStyle": "standard"
+      }
+    }
+  }
+}
+end
